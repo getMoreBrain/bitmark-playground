@@ -5,7 +5,15 @@
   "author": "Richard Sewell",
   "license": "ISC",
   "homepage": "https://github.com/getMoreBrain/bitmark-playground",
+  "scripts": {
+    "start": "run generate-build-info && react-scripts start",
+    "build": "run generate-build-info && react-scripts build",
+    "test": "react-scripts test",
+    "generate-build-info": "node ./scripts/generate-build-info.js"
+  },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@gmb/bitmark-parser-generator": "^1.2.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -13,18 +21,20 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@uidotdev/usehooks": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "theme-ui": "^0.16.1",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "run generate-build-info && react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "generate-build-info": "node ./scripts/generate-build-info.js"
+  "devDependencies": {
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-arca": "^0.16.0",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.2"
   },
   "repository": {
     "type": "git",

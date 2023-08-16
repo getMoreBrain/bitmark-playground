@@ -1,6 +1,54 @@
-# Getting Started with Create React App
+@gmb/bitmark-parser-generator
+================
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Build & Test](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/build-test.yml/badge.svg?branch=main)
+
+A web playground for parsing and generating bitmark
+
+Features:
+- Convert bitmark to JSON, and vice-versa.
+
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### `yarn start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `yarn test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `yarn build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+
+
+## Basic Usage
+
+
+
+
+
+## License
+
+This open source software is licenced under the [ISC licence](https://opensource.org/license/isc-license-txt).
+
+
 
 ## Available Scripts
 

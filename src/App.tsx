@@ -1,21 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
+/** @jsxImportSource theme-ui */
+import { Flex, ThemeUIProvider } from 'theme-ui';
+
+import { BitmarkConverterProvider } from './components/bitmark/BitmarkConverter';
+import { BitmarkJsonTextBox } from './components/bitmark/BitmarkJsonTextBox';
+import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox';
+import { BitmarkParserGeneratorProvider } from './components/bitmark/BitmarkParserGenerator';
+import { theme } from './theme/theme';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeUIProvider theme={theme}>
+      <BitmarkParserGeneratorProvider>
+        <BitmarkConverterProvider>
+          <Flex
+            sx={{
+              alignItems: 'center',
+            }}
+          >
+            <BitmarkMarkupTextBox initialMarkup="[.article] Hello World!" />
+            <BitmarkJsonTextBox />
+          </Flex>
+        </BitmarkConverterProvider>
+      </BitmarkParserGeneratorProvider>
+    </ThemeUIProvider>
   );
 }
 
-export default App;
+export { App };

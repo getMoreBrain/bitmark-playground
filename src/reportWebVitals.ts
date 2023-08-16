@@ -12,4 +12,5 @@ const reportWebVitals = (onPerfEntry?: ReportHandler) => {
   }
 };
 
+// eslint-disable-next-line arca/no-default-export
 export default reportWebVitals;
