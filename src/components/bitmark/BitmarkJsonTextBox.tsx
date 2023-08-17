@@ -18,7 +18,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     async (markup: string) => {
       await jsonToMarkup(markup, {
         bitmarkOptions: {
-          cardSetVersion: 1,
+          // cardSetVersion: 1,
         },
       });
     },

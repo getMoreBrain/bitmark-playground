@@ -8,31 +8,35 @@ export interface BitmarkState {
   readonly markup: string;
   readonly markupError: Error | undefined;
   readonly markupErrorAsString: string | undefined;
+  readonly markupDurationSec: number | undefined;
   readonly markupUpdates: number;
   readonly json: BitWrapperJson[];
   readonly jsonAsString: string;
   readonly jsonError: Error | undefined;
   readonly jsonErrorAsString: string | undefined;
+  readonly jsonDurationSec: number | undefined;
   readonly jsonUpdates: number;
   // AST not implemented yet
   // ast: BitmarkAst | undefined;
   // astError: string | undefined;
   // astUpdates: number;
-  setJson(markup: string, json: BitWrapperJson[] | undefined, jsonError?: Error): void;
-  setMarkup(json: string, markup: string | undefined, markupError?: Error): void;
+  setJson(markup: string, json: BitWrapperJson[] | undefined, jsonError: Error | undefined, durationSec?: number): void;
+  setMarkup(json: string, markup: string | undefined, markupError: Error | undefined, durationSec?: number): void;
 }
 
 const bitmarkState = proxy<BitmarkState>({
   markup: '',
   markupError: undefined,
   markupErrorAsString: undefined,
+  markupDurationSec: undefined,
   markupUpdates: 0,
   json: [],
   jsonAsString: '',
   jsonError: undefined,
-  jsonErrorAsString: '',
+  jsonErrorAsString: undefined,
+  jsonDurationSec: undefined,
   jsonUpdates: 0,
-  setJson: (markup: string, json: BitWrapperJson[] | undefined, jsonError?: Error) => {
+  setJson: (markup: string, json: BitWrapperJson[] | undefined, jsonError: Error | undefined, durationSec?: number) => {
     const state = bitmarkState as Writable<BitmarkState>;
 
     state.markup = markup;
@@ -55,9 +59,10 @@ const bitmarkState = proxy<BitmarkState>({
         state.jsonErrorAsString = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
       }
     }
+    state.jsonDurationSec = durationSec;
     state.jsonUpdates += 1;
   },
-  setMarkup: (json: string, markup: string | undefined, markupError?: Error) => {
+  setMarkup: (json: string, markup: string | undefined, markupError: Error | undefined, durationSec?: number) => {
     const state = bitmarkState as Writable<BitmarkState>;
 
     state.jsonAsString = json;
@@ -74,6 +79,7 @@ const bitmarkState = proxy<BitmarkState>({
       state.markupError = undefined;
       state.markupErrorAsString = undefined;
     }
+    state.markupDurationSec = durationSec;
     state.markupUpdates += 1;
   },
 });

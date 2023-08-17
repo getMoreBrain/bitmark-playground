@@ -1,7 +1,9 @@
 /** @jsxImportSource theme-ui */
-import { Flex, ThemeUIProvider } from 'theme-ui';
+import { Flex, Text, ThemeUIProvider } from 'theme-ui';
 
+import { BitmarkJsonDuration } from './components/bitmark/BitmarkJsonDuration';
 import { BitmarkJsonTextBox } from './components/bitmark/BitmarkJsonTextBox';
+import { BitmarkMarkupDuration } from './components/bitmark/BitmarkMarkupDuration';
 import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox';
 import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
@@ -26,14 +28,71 @@ function App() {
               height: '100%',
             }}
           >
-            <BitmarkMarkupTextBox
-              initialMarkup="[.article] Hello World!"
+            <Flex
               sx={{
-                resize: 'none',
-                variant: 'textarea.code',
+                flexDirection: 'column',
+                flexGrow: 1,
               }}
-            />
-            <BitmarkJsonTextBox sx={{ resize: 'none', variant: 'textarea.code' }} />
+            >
+              <Flex
+                sx={{
+                  alignItems: 'flex-end',
+                }}
+              >
+                <Text
+                  sx={{
+                    variant: 'header.code',
+                  }}
+                >
+                  bitmark
+                </Text>
+                <BitmarkMarkupDuration
+                  sx={{
+                    variant: 'text.parserDuration',
+                  }}
+                />
+              </Flex>
+              <BitmarkMarkupTextBox
+                initialMarkup="[.article] Hello World!"
+                sx={{
+                  resize: 'none',
+                  variant: 'textarea.code',
+                  flexGrow: 1,
+                }}
+              />
+            </Flex>
+            <Flex
+              sx={{
+                flexDirection: 'column',
+                flexGrow: 1,
+              }}
+            >
+              <Flex
+                sx={{
+                  alignItems: 'flex-end',
+                }}
+              >
+                <Text
+                  sx={{
+                    variant: 'header.code',
+                  }}
+                >
+                  JSON
+                </Text>
+                <BitmarkJsonDuration
+                  sx={{
+                    variant: 'text.parserDuration',
+                  }}
+                />
+              </Flex>
+              <BitmarkJsonTextBox
+                sx={{
+                  resize: 'none',
+                  variant: 'textarea.code',
+                  flexGrow: 1,
+                }}
+              />
+            </Flex>
           </Flex>
           <Flex
             sx={{

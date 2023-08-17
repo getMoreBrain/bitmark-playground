@@ -19,7 +19,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
       await markupToJson(markup, {
         jsonOptions: {
           enableWarnings: true,
-          textAsPlainText: true,
+          // textAsPlainText: true,
         },
       });
     },

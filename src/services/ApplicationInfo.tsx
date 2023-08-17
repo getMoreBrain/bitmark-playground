@@ -29,7 +29,7 @@ const useApplicationInfo = (): ApplicationInfo => {
     const copyrightYear =
       thisYear === FIRST_PUBLISHED_YEAR ? thisYear.toString() : `${FIRST_PUBLISHED_YEAR}-${thisYear}`;
 
-    const copyright = `(c) ${copyrightYear} ${buildInfo.author}`;
+    const copyright = `© ${copyrightYear} ${buildInfo.author}`;
 
     return {
       ...buildInfo,
