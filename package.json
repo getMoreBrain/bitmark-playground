@@ -4,7 +4,7 @@
   "description": "A web playground for parsing and generating bitmark",
   "author": "Get More Brain Ltd",
   "license": "ISC",
-  "homepage": "https://github.com/getMoreBrain/bitmark-playground",
+  "homepage": "https://getmorebrain.github.io//bitmark-playground",
   "scripts": {
     "start": "run generate-build-info && react-scripts start",
     "build": "run generate-build-info && react-scripts build",

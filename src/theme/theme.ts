@@ -89,6 +89,7 @@ const themeVariants: ThemeVariants = {
     code: {
       fontFamily: 'code',
       fontSize: 1,
+      borderRadius: 0,
     },
   },
 };
