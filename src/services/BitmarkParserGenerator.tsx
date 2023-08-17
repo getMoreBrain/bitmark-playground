@@ -2,7 +2,7 @@ import type { BitmarkParserGenerator } from '@gmb/bitmark-parser-generator';
 import { useScript } from '@uidotdev/usehooks';
 import { useState, createContext, useContext, ReactNode, ReactElement } from 'react';
 
-import { log } from '../../logging/log';
+import { log } from '../logging/log';
 
 const BITMARK_PARSER_GENERATOR_SCRIPT_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser-generator@latest/dist/browser/bitmark-parser-generator.min.js';
@@ -26,7 +26,7 @@ const defaultState = {
 
 const BitmarkParserGeneratorContext = createContext<IBitmarkParserGeneratorContext>(defaultState);
 
-const useBitmarkParserGeneratorContext = () => useContext(BitmarkParserGeneratorContext);
+const useBitmarkParserGenerator = () => useContext(BitmarkParserGeneratorContext);
 
 const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderProps): ReactElement => {
   const { children } = props;
@@ -63,4 +63,4 @@ const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderPro
   return <BitmarkParserGeneratorContext.Provider value={state}>{children}</BitmarkParserGeneratorContext.Provider>;
 };
 
-export { BitmarkParserGeneratorProvider, BitmarkParserGeneratorContext, useBitmarkParserGeneratorContext };
+export { BitmarkParserGeneratorProvider, BitmarkParserGeneratorContext, useBitmarkParserGenerator };

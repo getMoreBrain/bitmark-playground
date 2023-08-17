@@ -4,7 +4,14 @@ module.exports = {
     node: true,
     es2021: true,
   },
-  extends: ['react-app', 'react-app/jest', 'eslint:recommended', 'plugin:prettier/recommended', 'prettier'],
+  extends: [
+    'react-app',
+    'react-app/jest',
+    'plugin:valtio/recommended',
+    'eslint:recommended',
+    'plugin:prettier/recommended',
+    'prettier',
+  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: false,

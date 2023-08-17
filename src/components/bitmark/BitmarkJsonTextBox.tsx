@@ -1,46 +1,33 @@
-import { useEffect, useRef } from 'react';
-import { Textarea } from 'theme-ui';
+import { useCallback } from 'react';
+import { useSnapshot } from 'valtio';
 
-import { useBitmarkConverterJson } from './BitmarkConverter';
+import { useBitmarkConverter } from '../../services/BitmarkConverter';
+import { bitmarkState } from '../../state/bitmarkState';
+import { TextAreaUncontrolled, TextAreaUncontrolledProps } from '../generic/ui/TextAreaUncontrolled';
 
-// TODO - proper state management / move the converter out to a service.
-// While the current implementation works, it's not ideal.
-
-export interface BitmarkJsonTextBoxProps {
+export interface BitmarkJsonTextBoxProps extends TextAreaUncontrolledProps {
   //
 }
 
-const BitmarkJsonTextBox = (_props: BitmarkJsonTextBoxProps) => {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const { json, jsonError, jsonToMarkup } = useBitmarkConverterJson();
+const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
+  const { ...restProps } = props;
+  const bitmarkStateSnap = useSnapshot(bitmarkState);
+  const { jsonToMarkup } = useBitmarkConverter();
 
-  /* Register the textarea input change handler */
-  useEffect(() => {
-    if (!ref.current) return;
-    const textAreaRef = ref.current;
+  const onInput = useCallback(
+    async (markup: string) => {
+      await jsonToMarkup(markup, {
+        bitmarkOptions: {
+          cardSetVersion: 1,
+        },
+      });
+    },
+    [jsonToMarkup],
+  );
 
-    const onInput = () => {
-      const value = textAreaRef.value ?? '';
-      jsonToMarkup(value);
-    };
+  const value = bitmarkStateSnap.jsonErrorAsString ?? bitmarkStateSnap.jsonAsString;
 
-    ref.current.addEventListener('input', onInput, false);
-
-    return () => {
-      textAreaRef.removeEventListener('input', onInput, false);
-    };
-  }, [ref, jsonToMarkup]);
-
-  let value = jsonError;
-  if (!value) {
-    try {
-      value = JSON.stringify(json, null, 2);
-    } catch (e) {
-      value = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
-    }
-  }
-
-  return <Textarea ref={ref} defaultValue="" value={value} rows={32} sx={{ resize: 'none' }} />;
+  return <TextAreaUncontrolled {...restProps} value={value} onInputUncontrolled={onInput} />;
 };
 
 export { BitmarkJsonTextBox };

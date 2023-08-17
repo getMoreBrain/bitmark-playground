@@ -1,50 +1,40 @@
-import { useEffect, useRef } from 'react';
-import { Textarea } from 'theme-ui';
+import { useCallback, useEffect } from 'react';
+import { useSnapshot } from 'valtio';
 
-import { useBitmarkConverterMarkup } from './BitmarkConverter';
+import { useBitmarkConverter } from '../../services/BitmarkConverter';
+import { bitmarkState } from '../../state/bitmarkState';
+import { TextAreaUncontrolled, TextAreaUncontrolledProps } from '../generic/ui/TextAreaUncontrolled';
 
-export interface BitmarkMarkupTextBoxProps {
+export interface BitmarkMarkupTextBoxProps extends TextAreaUncontrolledProps {
   initialMarkup?: string;
 }
 
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
-  const { initialMarkup } = props;
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const { markup, markupError, markupToJson } = useBitmarkConverterMarkup();
+  const { initialMarkup, ...restProps } = props;
+  const bitmarkStateSnap = useSnapshot(bitmarkState);
+  const { markupToJson } = useBitmarkConverter();
 
-  /* Convert the initial markup to JSON */
+  const onInput = useCallback(
+    async (markup: string) => {
+      await markupToJson(markup, {
+        jsonOptions: {
+          enableWarnings: true,
+          textAsPlainText: true,
+        },
+      });
+    },
+    [markupToJson],
+  );
+
+  // Do initial conversion with the initial markup
   useEffect(() => {
-    if (initialMarkup) markupToJson(initialMarkup);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markupToJson]);
+    if (!initialMarkup) return;
+    onInput(initialMarkup ?? '');
+  }, [initialMarkup, onInput]);
 
-  /* Register the textarea input change handler */
-  useEffect(() => {
-    if (!ref.current) return;
-    const textAreaRef = ref.current;
+  const value = bitmarkStateSnap.markupErrorAsString ?? bitmarkStateSnap.markup;
 
-    const onInput = () => {
-      const value = textAreaRef.value ?? '';
-      markupToJson(value);
-    };
-
-    ref.current.addEventListener('input', onInput, false);
-
-    return () => {
-      textAreaRef.removeEventListener('input', onInput, false);
-    };
-  }, [ref, markupToJson]);
-
-  let value = markupError;
-  if (!value) {
-    try {
-      value = markup;
-    } catch (e) {
-      value = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
-    }
-  }
-
-  return <Textarea ref={ref} defaultValue={initialMarkup} value={value} rows={32} sx={{ resize: 'none' }} />;
+  return <TextAreaUncontrolled {...restProps} value={value} onInputUncontrolled={onInput} />;
 };
 
 export { BitmarkMarkupTextBox };

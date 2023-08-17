@@ -2025,12 +2025,14 @@ __metadata:
     eslint-plugin-arca: ^0.16.0
     eslint-plugin-json: ^3.1.0
     eslint-plugin-prettier: ^5.0.0
+    eslint-plugin-valtio: ^0.6.2
     prettier: ^3.0.2
     react: ^18.2.0
     react-dom: ^18.2.0
     react-scripts: 5.0.1
     theme-ui: ^0.16.1
     typescript: ^4.4.2
+    valtio: ^1.11.2
     web-vitals: ^2.1.0
   languageName: unknown
   linkType: soft
@@ -6628,6 +6630,13 @@ __metadata:
   peerDependencies:
     eslint: ^7.5.0 || ^8.0.0
   checksum: 9f3fc68ef9f13016a4381b33ab5dbffcc189e5de3eaeba184bcf7d2771faa7f54e59c04b652162fb1c0f83fb52428dd909db5450a25508b94be59eba69fcc990
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-valtio@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "eslint-plugin-valtio@npm:0.6.2"
+  checksum: 6caf1f24edf62515c50bc72ba258755c2558afafbcf572cbc1e10e5310af42094e10ad6d6ff235ab25c5057c056fe7515b9d09653db752099a353cf20f586d58
   languageName: node
   linkType: hard
 
@@ -11770,6 +11779,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxy-compare@npm:2.5.1":
+  version: 2.5.1
+  resolution: "proxy-compare@npm:2.5.1"
+  checksum: c7cc151ac255150bcb24becde6495b3e399416c31991af377ce082255b51f07eaeb5d861bf8bf482703e92f88b90a5892ad57d3153ea29450d03ef921683d9fa
+  languageName: node
+  linkType: hard
+
 "psl@npm:^1.1.33":
   version: 1.9.0
   resolution: "psl@npm:1.9.0"
@@ -13957,6 +13973,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-sync-external-store@npm:1.2.0":
+  version: 1.2.0
+  resolution: "use-sync-external-store@npm:1.2.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
+  languageName: node
+  linkType: hard
+
 "utf8-length@npm:0.0.1":
   version: 0.0.1
   resolution: "utf8-length@npm:0.0.1"
@@ -14014,6 +14039,24 @@ __metadata:
     convert-source-map: ^1.6.0
     source-map: ^0.7.3
   checksum: 54ce92bec2727879626f623d02c8d193f0c7e919941fa373ec135189a8382265117f5316ea317a1e12a5f9c13d84d8449052a731fe3306fa4beaafbfa4cab229
+  languageName: node
+  linkType: hard
+
+"valtio@npm:^1.11.2":
+  version: 1.11.2
+  resolution: "valtio@npm:1.11.2"
+  dependencies:
+    proxy-compare: 2.5.1
+    use-sync-external-store: 1.2.0
+  peerDependencies:
+    "@types/react": ">=16.8"
+    react: ">=16.8"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: cce2d9212aac9fc4bdeba2d381188cc831cfe8d2d03039024cfcd58ba1801f2a5b14d01c2bb21a2c9f12046d2ede64f1dd887175185f39bee553677a35592c30
   languageName: node
   linkType: hard
 
