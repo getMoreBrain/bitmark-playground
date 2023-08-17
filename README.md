@@ -1,7 +1,7 @@
-@gmb/bitmark-parser-generator
+@gmb/bitmark-playground
 ================
 
-![Build & Test](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/build-test.yml/badge.svg?branch=main)
+![Build & Deploy](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/build-and-deploy-to-github-pages.yml/badge.svg?branch=main)
 
 A web playground for parsing and generating bitmark
 
