@@ -5,6 +5,8 @@
 
 A web playground for parsing and generating bitmark
 
+[Try out bitmark - visit the bitmark Playground](https://getmorebrain.github.io/bitmark-playground/)
+
 Features:
 - Convert bitmark to JSON, and vice-versa.
 
