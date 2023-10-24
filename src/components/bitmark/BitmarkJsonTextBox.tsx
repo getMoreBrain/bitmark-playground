@@ -3,9 +3,9 @@ import { useSnapshot } from 'valtio';
 
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
-import { TextAreaUncontrolled, TextAreaUncontrolledProps } from '../generic/ui/TextAreaUncontrolled';
+import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 
-export interface BitmarkJsonTextBoxProps extends TextAreaUncontrolledProps {
+export interface BitmarkJsonTextBoxProps extends MonacoTextAreaUncontrolledProps {
   //
 }
 
@@ -15,8 +15,8 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const { jsonToMarkup } = useBitmarkConverter();
 
   const onInput = useCallback(
-    async (markup: string) => {
-      await jsonToMarkup(markup, {
+    async (json: string) => {
+      await jsonToMarkup(json, {
         bitmarkOptions: {
           // cardSetVersion: 1,
         },
@@ -27,7 +27,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
 
   const value = bitmarkStateSnap.jsonErrorAsString ?? bitmarkStateSnap.jsonAsString;
 
-  return <TextAreaUncontrolled {...restProps} value={value} onInputUncontrolled={onInput} />;
+  return <MonacoTextArea {...restProps} theme="vs-dark" language="json" value={value} onInput={onInput} />;
 };
 
 export { BitmarkJsonTextBox };
