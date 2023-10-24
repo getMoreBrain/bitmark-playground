@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import type { BitmarkParserGenerator } from '@gmb/bitmark-parser-generator';
 import { useScript } from '@uidotdev/usehooks';
 import { useState, createContext, useContext, ReactNode, ReactElement } from 'react';
@@ -5,7 +6,7 @@ import { useState, createContext, useContext, ReactNode, ReactElement } from 're
 import { log } from '../logging/log';
 
 const BITMARK_PARSER_GENERATOR_SCRIPT_URL =
-  'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser-generator@latest/dist/browser/bitmark-parser-generator.min.js';
+  'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser-generator@${version}/dist/browser/bitmark-parser-generator.min.js';
 
 interface BitmarkParserGeneratorProviderProps {
   children?: ReactNode;
@@ -29,8 +30,11 @@ const BitmarkParserGeneratorContext = createContext<IBitmarkParserGeneratorConte
 const useBitmarkParserGenerator = () => useContext(BitmarkParserGeneratorContext);
 
 const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderProps): ReactElement => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const version = searchParams.get('v') ?? 'latest';
+  const scriptUrl = `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`;
   const { children } = props;
-  const loadStatus = useScript(BITMARK_PARSER_GENERATOR_SCRIPT_URL);
+  const loadStatus = useScript(scriptUrl);
   const [state, setState] = useState<IBitmarkParserGeneratorContext>(defaultState);
 
   if (!state.loadSuccess && !state.loadError) {

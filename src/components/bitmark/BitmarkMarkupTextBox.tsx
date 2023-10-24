@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
@@ -12,7 +13,7 @@ export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledPro
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { initialMarkup, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
-  const { markupToJson } = useBitmarkConverter();
+  const { loadSuccess, loadError, markupToJson } = useBitmarkConverter();
 
   const onInput = useCallback(
     async (markup: string) => {
@@ -32,9 +33,26 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     onInput(initialMarkup ?? '');
   }, [initialMarkup, onInput]);
 
-  const value = bitmarkStateSnap.markupErrorAsString ?? bitmarkStateSnap.markup;
-
-  return <MonacoTextArea {...restProps} theme="vs-dark" language="ini" value={value} onInput={onInput} />;
+  if (loadSuccess) {
+    const value = bitmarkStateSnap.markupErrorAsString ?? bitmarkStateSnap.markup;
+    return <MonacoTextArea {...restProps} theme="vs-dark" language="ini" value={value} onInput={onInput} />;
+  } else {
+    let text = 'Loading...';
+    if (loadError) {
+      text = 'Load failed.';
+    }
+    return (
+      <Flex
+        sx={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        {text}
+      </Flex>
+    );
+  }
 };
 
 export { BitmarkMarkupTextBox };
