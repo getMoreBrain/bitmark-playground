@@ -3,9 +3,9 @@ import { useSnapshot } from 'valtio';
 
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
-import { TextAreaUncontrolled, TextAreaUncontrolledProps } from '../generic/ui/TextAreaUncontrolled';
+import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 
-export interface BitmarkMarkupTextBoxProps extends TextAreaUncontrolledProps {
+export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledProps {
   initialMarkup?: string;
 }
 
@@ -34,7 +34,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
 
   const value = bitmarkStateSnap.markupErrorAsString ?? bitmarkStateSnap.markup;
 
-  return <TextAreaUncontrolled {...restProps} value={value} onInputUncontrolled={onInput} />;
+  return <MonacoTextArea {...restProps} theme="vs-dark" language="ini" value={value} onInput={onInput} />;
 };
 
 export { BitmarkMarkupTextBox };

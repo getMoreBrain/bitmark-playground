@@ -38,9 +38,16 @@ const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderPro
       // log.debug('BitmarkParserGeneratorProvider: Loaded OK');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bitmarkParserGeneratorLibrary = (window as any).bitmarkParserGenerator;
+      if (!bitmarkParserGeneratorLibrary) {
+        setState({
+          loadSuccess: false,
+          loadError: true,
+          bitmarkParserGenerator: undefined,
+        });
+        return <></>;
+      }
       const { BitmarkParserGenerator } = bitmarkParserGeneratorLibrary;
       const bitmarkParserGenerator = new BitmarkParserGenerator();
-
       setState({
         loadSuccess: true,
         loadError: false,
@@ -55,10 +62,6 @@ const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderPro
       });
     }
   }
-
-  // const toggleDark = () => {
-  //   setDark(!dark);
-  // };
 
   return <BitmarkParserGeneratorContext.Provider value={state}>{children}</BitmarkParserGeneratorContext.Provider>;
 };

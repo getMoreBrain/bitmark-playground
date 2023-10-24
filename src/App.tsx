@@ -19,6 +19,7 @@ function App() {
           sx={{
             flexDirection: 'column',
             height: '100vh',
+            width: '100vw',
             backgroundColor: 'background',
           }}
         >
@@ -32,6 +33,7 @@ function App() {
               sx={{
                 flexDirection: 'column',
                 flexGrow: 1,
+                width: '50%',
               }}
             >
               <Flex
@@ -52,19 +54,28 @@ function App() {
                   }}
                 />
               </Flex>
-              <BitmarkMarkupTextBox
-                initialMarkup="[.article] Hello World!"
+              <Flex
                 sx={{
                   resize: 'none',
                   variant: 'textarea.code',
                   flexGrow: 1,
                 }}
-              />
+              >
+                <BitmarkMarkupTextBox
+                  className={'markup-editor'}
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'accent',
+                  }}
+                  initialMarkup="[.article] Hello World!"
+                />
+              </Flex>
             </Flex>
             <Flex
               sx={{
                 flexDirection: 'column',
                 flexGrow: 1,
+                width: '50%',
               }}
             >
               <Flex
@@ -85,13 +96,21 @@ function App() {
                   }}
                 />
               </Flex>
-              <BitmarkJsonTextBox
+              <Flex
                 sx={{
                   resize: 'none',
                   variant: 'textarea.code',
                   flexGrow: 1,
                 }}
-              />
+              >
+                <BitmarkJsonTextBox
+                  className={'json-editor'}
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'accent',
+                  }}
+                />
+              </Flex>
             </Flex>
           </Flex>
           <Flex

@@ -2,6 +2,7 @@ import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generat
 import { useCallback } from 'react';
 
 import { bitmarkState } from '../state/bitmarkState';
+import { StringUtils } from '../utils/StringUtils';
 
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
@@ -20,7 +21,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
       let json: unknown;
       let jsonError: Error | undefined;
 
-      performance.clearMarks();
       performance.mark('Start');
 
       try {
@@ -45,11 +45,13 @@ const useBitmarkConverter = (): BitmarkConverter => {
       let markup: unknown;
       let markupError: Error | undefined;
 
-      performance.clearMarks();
       performance.mark('Start');
 
       try {
         markup = await bitmarkParserGenerator.convert(json, options);
+        if (!StringUtils.isString(markup)) {
+          throw new Error('Expected string');
+        }
       } catch (e) {
         markupError = e as Error;
       }
@@ -57,8 +59,10 @@ const useBitmarkConverter = (): BitmarkConverter => {
       performance.mark('End');
       const convertTimeSecs = Math.round(performance.measure('jsonToMarkup', 'Start', 'End').duration) / 1000;
 
-      // Update state
-      bitmarkState.setMarkup(json, markup as string | undefined, markupError, convertTimeSecs);
+      // Update state (if no error)
+      if (!markupError || markupError.message !== 'Expected string') {
+        bitmarkState.setMarkup(json, markup as string | undefined, markupError, convertTimeSecs);
+      }
     },
     [bitmarkParserGenerator],
   );

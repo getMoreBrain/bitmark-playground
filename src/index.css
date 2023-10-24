@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.monaco-editor.focused {
+  --vscode-editor-background:#000000;
+  --vscode-editorGutter-background :#000000;
+}
+
