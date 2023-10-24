@@ -7,12 +7,14 @@ import { StringUtils } from '../utils/StringUtils';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
 export interface BitmarkConverter {
+  loadSuccess: boolean;
+  loadError: boolean;
   markupToJson: (markup: string, options?: ConvertOptions) => Promise<void>;
   jsonToMarkup: (json: string, options?: ConvertOptions) => Promise<void>;
 }
 
 const useBitmarkConverter = (): BitmarkConverter => {
-  const { bitmarkParserGenerator } = useBitmarkParserGenerator();
+  const { bitmarkParserGenerator, loadSuccess, loadError } = useBitmarkParserGenerator();
 
   const markupToJson = useCallback(
     async (markup: string, options?: ConvertOptions) => {
@@ -68,6 +70,8 @@ const useBitmarkConverter = (): BitmarkConverter => {
   );
 
   return {
+    loadSuccess,
+    loadError,
     markupToJson,
     jsonToMarkup,
   };
