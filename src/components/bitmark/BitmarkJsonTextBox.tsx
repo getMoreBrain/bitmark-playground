@@ -1,3 +1,4 @@
+import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
@@ -6,12 +7,16 @@ import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 
+const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
+  //
+};
+
 export interface BitmarkJsonTextBoxProps extends MonacoTextAreaUncontrolledProps {
   //
 }
 
 const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
-  const { ...restProps } = props;
+  const { options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
   const { loadSuccess, loadError, jsonToMarkup } = useBitmarkConverter();
 
@@ -27,8 +32,15 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   );
 
   if (loadSuccess) {
+    const opts = {
+      ...DEFAULT_MONACO_OPTIONS,
+      ...options,
+    };
+
     const value = bitmarkStateSnap.jsonErrorAsString ?? bitmarkStateSnap.jsonAsString;
-    return <MonacoTextArea {...restProps} theme="vs-dark" language="json" value={value} onInput={onInput} />;
+    return (
+      <MonacoTextArea {...restProps} theme="vs-dark" language="json" value={value} options={opts} onInput={onInput} />
+    );
   } else {
     let text = 'Loading...';
     if (loadError) {
