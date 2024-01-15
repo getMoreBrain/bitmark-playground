@@ -21,22 +21,41 @@ interface MonacoEditorRef {
  * causing unwanted renders. It will also not update when it has focus.
  */
 const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
-  const { value, onInput, ...restProps } = props;
+  const {
+    value,
+    onInput,
+    editorWillMount: editorWillMountOrig,
+    editorDidMount: editorDidMountOrig,
+    editorWillUnmount: editorWillUnmountOrig,
+    ...restProps
+  } = props;
   const ref = useRef<MonacoEditorRef>({});
 
-  const editorWillMount = useCallback<EditorWillMount>((monaco) => {
-    ref.current.monaco = monaco;
-  }, []);
+  const editorWillMount = useCallback<EditorWillMount>(
+    (monaco) => {
+      ref.current.monaco = monaco;
+      if (editorWillMountOrig) editorWillMountOrig(monaco);
+    },
+    [editorWillMountOrig],
+  );
 
-  const editorDidMount = useCallback<EditorDidMount>((editor, monaco) => {
-    ref.current.editor = editor;
-    ref.current.monaco = monaco;
-  }, []);
+  const editorDidMount = useCallback<EditorDidMount>(
+    (editor, monaco) => {
+      ref.current.editor = editor;
+      ref.current.monaco = monaco;
+      if (editorDidMountOrig) editorDidMountOrig(editor, monaco);
+    },
+    [editorDidMountOrig],
+  );
 
-  const editorWillUnmount = useCallback<EditorWillUnmount>((_monaco) => {
-    ref.current.editor = undefined;
-    ref.current.monaco = undefined;
-  }, []);
+  const editorWillUnmount = useCallback<EditorWillUnmount>(
+    (editor, monaco) => {
+      ref.current.editor = undefined;
+      ref.current.monaco = undefined;
+      if (editorWillUnmountOrig) editorWillUnmountOrig(editor, monaco);
+    },
+    [editorWillUnmountOrig],
+  );
 
   /* Register the textarea input change handler */
   useEffect(() => {
