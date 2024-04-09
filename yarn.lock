@@ -1995,14 +1995,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gmb/bitmark-parser-generator@npm:^1.4.12":
-  version: 1.4.12
-  resolution: "@gmb/bitmark-parser-generator@npm:1.4.12"
+"@gmb/bitmark-parser-generator@npm:^1.5.28":
+  version: 1.5.28
+  resolution: "@gmb/bitmark-parser-generator@npm:1.5.28"
   dependencies:
     "@ncoderz/superenum": ^0.2.3
-    "@types/fs-extra": ^11.0.2
-    fs-extra: ^11.1.1
-  checksum: d0f01ddd390b874db69f660e84449454f60e9586eab6e2188f380675025304066989e9908670b9f49ce14489e3de7ff8e3454612cbd5796434f5a4d398014c8c
+    "@types/fs-extra": ^11.0.4
+    "@ungap/structured-clone": ^1.2.0
+    fs-extra: ^11.2.0
+  checksum: 57ab73ad46d0e3c9db6b01bd0136d083f09fc39d4309e3ee5190c6ff2962d5beb837582f00757828ad3a93c686afdc0590eb2a86d743fe567204255128c69c67
   languageName: node
   linkType: hard
 
@@ -2011,7 +2012,7 @@ __metadata:
   resolution: "@gmb/bitmark-playground@workspace:."
   dependencies:
     "@emotion/react": ^11.11.1
-    "@gmb/bitmark-parser-generator": ^1.4.12
+    "@gmb/bitmark-parser-generator": ^1.5.28
     "@testing-library/jest-dom": ^6.1.4
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.5.1
@@ -3237,13 +3238,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:^11.0.2":
-  version: 11.0.3
-  resolution: "@types/fs-extra@npm:11.0.3"
+"@types/fs-extra@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@types/fs-extra@npm:11.0.4"
   dependencies:
     "@types/jsonfile": "*"
     "@types/node": "*"
-  checksum: f196bc216906e7016a6c9c549dbe204fe7e1e87515c7e961f741309e25f8e2f8c268dba3dbf0ca7f3ddab5911d39888472f8624ac0c11a461f1b2d05377e38fa
+  checksum: 242cb84157631f057f76495c8220707541882c00a00195b603d937fb55e471afecebcb089bab50233ed3a59c69fd68bf65c1f69dd7fafe2347e139cc15b9b0e5
   languageName: node
   linkType: hard
 
@@ -7173,14 +7174,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^11.1.1":
-  version: 11.1.1
-  resolution: "fs-extra@npm:11.1.1"
+"fs-extra@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "fs-extra@npm:11.2.0"
   dependencies:
     graceful-fs: ^4.2.0
     jsonfile: ^6.0.1
     universalify: ^2.0.0
-  checksum: fb883c68245b2d777fbc1f2082c9efb084eaa2bbf9fddaa366130d196c03608eebef7fb490541276429ee1ca99f317e2d73e96f5ca0999eefedf5a624ae1edfd
+  checksum: b12e42fa40ba47104202f57b8480dd098aa931c2724565e5e70779ab87605665594e76ee5fb00545f772ab9ace167fe06d2ab009c416dc8c842c5ae6df7aa7e8
   languageName: node
   linkType: hard
 

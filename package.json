@@ -1,6 +1,6 @@
 {
   "name": "@gmb/bitmark-playground",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A web playground for parsing and generating bitmark",
   "author": "Get More Brain Ltd",
   "license": "ISC",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
-    "@gmb/bitmark-parser-generator": "^1.4.12",
+    "@gmb/bitmark-parser-generator": "^1.5.28",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
