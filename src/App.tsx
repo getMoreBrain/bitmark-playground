@@ -68,6 +68,9 @@ function App() {
                     borderColor: 'accent',
                   }}
                   initialMarkup="[.article] Hello World!"
+                  options={{
+                    wordWrap: 'on',
+                  }}
                 />
               </Flex>
             </Flex>
@@ -108,6 +111,9 @@ function App() {
                   sx={{
                     border: '1px solid',
                     borderColor: 'accent',
+                  }}
+                  options={{
+                    wordWrap: 'on',
                   }}
                 />
               </Flex>
