@@ -1,17 +1,23 @@
 // config-overrides.js
+const { override, addWebpackResolve, addWebpackPlugin } = require('customize-cra');
 
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
-module.exports = function override(config, env) {
-  config.plugins.push(
+module.exports = override(
+  addWebpackResolve({
+    fallback: {
+      module: false,
+    },
+  }),
+  addWebpackPlugin(
     new MonacoWebpackPlugin({
       // available options are documented at https://github.com/microsoft/monaco-editor/blob/main/webpack-plugin/README.md#options
-      languages: ['json', 'ini'],
+      // languages: ['json', 'ini'],
+      languages: ['json'],
       // features: ['!gotoSymbol'],
     }),
-  );
-  return config;
-};
+  ),
+);
 
 // For information on customizing Monaco:
 // const metadata = require('monaco-editor/esm/metadata');

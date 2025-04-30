@@ -2017,15 +2017,18 @@ __metadata:
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.5.1
     "@types/jest": ^29.5.6
+    "@types/lodash": ^4.17.16
     "@types/node": ^20.8.7
     "@types/react": ^18.2.31
     "@types/react-dom": ^18.2.14
     "@uidotdev/usehooks": ^2.4.0
+    customize-cra: ^1.0.0
     eslint-config-prettier: ^9.0.0
     eslint-plugin-arca: ^0.16.0
     eslint-plugin-json: ^3.1.0
     eslint-plugin-prettier: ^5.0.1
     eslint-plugin-valtio: ^0.6.2
+    lodash: ^4.17.21
     monaco-editor: ^0.44.0
     monaco-editor-core: ^0.44.0
     monaco-editor-webpack-plugin: ^7.1.0
@@ -2036,8 +2039,10 @@ __metadata:
     react-monaco-editor: ^0.54.0
     react-scripts: 5.0.1
     theme-ui: ^0.16.1
+    tree-sitter-cpp: ^0.23.4
     typescript: ^5.2.2
     valtio: ^1.11.3
+    web-tree-sitter: ^0.25.3
     web-vitals: ^3.5.0
   languageName: unknown
   linkType: soft
@@ -3335,6 +3340,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: 3f2d0060a567f78b5d666971d5371e72f37294cbfc19069912c76ba9585d209ceb5aac421658f2b3ab922f96b8df53081e9f51d09aef34f2b4882b813a0e0c38
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:^4.17.16":
+  version: 4.17.16
+  resolution: "@types/lodash@npm:4.17.16"
+  checksum: 915618c5735b10007e0ed7d06fdce6b344f88fc721d492b189a69064bfd046d2382e1ba61d683eeb61cad60ca0286cd110e6fe0fa4ab2e99066a40478376831d
   languageName: node
   linkType: hard
 
@@ -5570,6 +5582,15 @@ __metadata:
   version: 3.1.2
   resolution: "csstype@npm:3.1.2"
   checksum: e1a52e6c25c1314d6beef5168da704ab29c5186b877c07d822bd0806717d9a265e8493a2e35ca7e68d0f5d472d43fac1cdce70fd79fd0853dff81f3028d857b5
+  languageName: node
+  linkType: hard
+
+"customize-cra@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "customize-cra@npm:1.0.0"
+  dependencies:
+    lodash.flow: ^3.5.0
+  checksum: b38c48a607efc2321e6f2f12a3b53f3497b2f9b0008b48242524a92a1f26f8ae50bd73c97526e7d89c32b51f53711948e0da8f7e3618c9875087227a11a5feeb
   languageName: node
   linkType: hard
 
@@ -9471,6 +9492,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.flow@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "lodash.flow@npm:3.5.0"
+  checksum: a9a62ad344e3c5a1f42bc121da20f64dd855aaafecee24b1db640f29b88bd165d81c37ff7e380a7191de6f70b26f5918abcebbee8396624f78f3618a0b18634c
+  languageName: node
+  linkType: hard
+
 "lodash.memoize@npm:^4.1.2":
   version: 4.1.2
   resolution: "lodash.memoize@npm:4.1.2"
@@ -10013,10 +10041,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-addon-api@npm:^8.2.1, node-addon-api@npm:^8.3.0":
+  version: 8.3.1
+  resolution: "node-addon-api@npm:8.3.1"
+  dependencies:
+    node-gyp: latest
+  checksum: 8d8566cdead5ffb866000fa1d2472833dfdaa2e5abc282c1aa29e0e6a4570e3978c6f00846bd62c96fde4b7e25972636472dc1a4dba2d5b07178c018929b9799
+  languageName: node
+  linkType: hard
+
 "node-forge@npm:^1":
   version: 1.3.1
   resolution: "node-forge@npm:1.3.1"
   checksum: 08fb072d3d670599c89a1704b3e9c649ff1b998256737f0e06fbd1a5bf41cae4457ccaee32d95052d80bbafd9ffe01284e078c8071f0267dc9744e51c5ed42a9
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:^4.8.2, node-gyp-build@npm:^4.8.4":
+  version: 4.8.4
+  resolution: "node-gyp-build@npm:4.8.4"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 8b81ca8ffd5fa257ad8d067896d07908a36918bc84fb04647af09d92f58310def2d2b8614d8606d129d9cd9b48890a5d2bec18abe7fcff54818f72bedd3a7d74
   languageName: node
   linkType: hard
 
@@ -13471,6 +13519,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tree-sitter-c@npm:^0.23.1":
+  version: 0.23.5
+  resolution: "tree-sitter-c@npm:0.23.5"
+  dependencies:
+    node-addon-api: ^8.3.0
+    node-gyp: latest
+    node-gyp-build: ^4.8.4
+  peerDependencies:
+    tree-sitter: ^0.22.1
+  peerDependenciesMeta:
+    tree-sitter:
+      optional: true
+  checksum: 6dbbbabe048be2dd02cfad16582d9922bc7eace703aeaeaf1c6fbf89ffe6a0bd65278f34e1dda8ed5d9eca3ca8aed19689bde516a48a6d0af218853c2a0b26ac
+  languageName: node
+  linkType: hard
+
+"tree-sitter-cpp@npm:^0.23.4":
+  version: 0.23.4
+  resolution: "tree-sitter-cpp@npm:0.23.4"
+  dependencies:
+    node-addon-api: ^8.2.1
+    node-gyp: latest
+    node-gyp-build: ^4.8.2
+    tree-sitter-c: ^0.23.1
+  peerDependencies:
+    tree-sitter: ^0.21.1
+  peerDependenciesMeta:
+    tree-sitter:
+      optional: true
+  checksum: 68f3e63aea8c5060c8ed12c71a876389eafae9ede51a10fecd1743c196734bd84428ca8f4740a48f1df4596859783ab56bcf6001a66bc545869d0bb9c3a7037f
+  languageName: node
+  linkType: hard
+
 "tryer@npm:^1.0.1":
   version: 1.0.1
   resolution: "tryer@npm:1.0.1"
@@ -13984,6 +14065,13 @@ __metadata:
   dependencies:
     minimalistic-assert: ^1.0.0
   checksum: 2abc306c96930b757972a1c4650eb6b25b5d99f24088714957f88629e137db569368c5de0e57986c89ea70db2f1df9bba11a87cb6d0c8694b6f53a0159fab3bf
+  languageName: node
+  linkType: hard
+
+"web-tree-sitter@npm:^0.25.3":
+  version: 0.25.3
+  resolution: "web-tree-sitter@npm:0.25.3"
+  checksum: 57eacbce507c845bb0a7dda5ea4f87b83dbf1a4dc2919b426b478b07f7c0865e66c361cbba9229c9493f5005dae164328b6bcf638ece1d7004cbfa70c0efb531
   languageName: node
   linkType: hard
 

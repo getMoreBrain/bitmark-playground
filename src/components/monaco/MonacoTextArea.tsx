@@ -1,4 +1,5 @@
 /** @jsxImportSource theme-ui */
+
 import { EditorDidMount, EditorWillMount, EditorWillUnmount, MonacoEditorProps, monaco } from 'react-monaco-editor';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
@@ -43,6 +44,7 @@ const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
     (editor, monaco) => {
       ref.current.editor = editor;
       ref.current.monaco = monaco;
+
       if (editorDidMountOrig) editorDidMountOrig(editor, monaco);
     },
     [editorDidMountOrig],
