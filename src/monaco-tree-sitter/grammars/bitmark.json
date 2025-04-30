@@ -1,0 +1,57 @@
+{
+  "simpleTerms": {
+    "bit_type": "control",
+    "text_format": "directive",
+    "resource_type": "variable",
+    "identifier": "type",
+    "tag_value": "variable",
+
+    "style_bold": "modifier",
+    "style_italic": "modifier",
+    "style_light": "modifier",
+    "style_highlight": "modifier",
+    "style_strike": "modifier",
+    "style_subscript": "modifier",
+    "style_superscript": "modifier",
+    "style_ins": "modifier",
+    "style_del": "modifier",
+    "style_underline": "modifier",
+    "style_doubleUnderline": "modifier",
+    "style_circle": "modifier",
+    "style_languageEm": "modifier",
+    "style_userUnderline": "modifier",
+    "style_userDoubleUnderline": "modifier",
+    "style_userStrike": "modifier",
+    "style_userCircle": "modifier",
+    "style_userHighlight": "modifier",
+    "style_notranslate": "modifier",
+
+    "bracket_left_bit": "punctuation-bracket",
+    "bracket_left_property": "punctuation-bracket",
+    "bracket_left_title": "punctuation-bracket",
+    "bracket_left_anchor": "punctuation-bracket",
+    "bracket_left_reference": "punctuation-bracket",
+    "bracket_left_item_lead": "punctuation-bracket",
+    "bracket_left_instruction": "punctuation-bracket",
+    "bracket_left_hint": "punctuation-bracket",
+    "bracket_left_true": "punctuation-bracket",
+    "bracket_left_false": "punctuation-bracket",
+    "bracket_left_sample_solution": "punctuation-bracket",
+    "bracket_left_gap": "punctuation-bracket",
+    "bracket_left_mark": "punctuation-bracket",
+    "bracket_left_resource": "punctuation-bracket",
+    "bracket_right": "punctuation-bracket",
+    "delimiter_bold": "punctuation-delimiter",
+    "delimiter_italic": "punctuation-delimiter",
+    "delimiter_inline": "punctuation-delimiter",
+    "delimiter_inline_property": "punctuation-delimiter"
+  },
+
+  "complexTerms": ["text"],
+
+  "complexScopes": {
+    "text": "string",
+    "bold > text": "function",
+    "inline > text": "function"
+  }
+}

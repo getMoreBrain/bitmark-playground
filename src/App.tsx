@@ -11,6 +11,36 @@ import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerato
 import { theme } from './theme/theme';
 import './App.css';
 
+const initialMarkup = '[.article] Hello World!';
+// const initialMarkup = `
+// [.article:bitmark++&video]
+
+// Here is some inline 'style' applied **here is __the__ text** is this bold.
+// Here is some __italic__ text ==the text==|test| is that correct **bold**
+
+// [.article:bitmark++]
+// Here is some inline 'style' applied ==here is the text==|bold|italic|subscript|, nice huh?
+
+// **bold**
+
+// [.image]
+// [@id:304379]
+// [@backgroundWallpaper:https://miro.medium.com/background.png]
+// [&image:https://miro.medium.com/v2/resizefit1400/1nT_Rrk9LCI5XWiLGzzOzBQ*.gif][@search:testing **123**]
+
+// [.image]
+// [@id:304379]
+// [@levelCEFRp:levelCEFRp]
+// [@levelCEFR:levelCEFR]
+// [@levelILR:levelILR]
+// [@levelACTFL:levelACTFL]
+// [&image:https://miro.medium.com/v2/resizefit1400/1nT_Rrk9LCI5XWiLGzzOzBQ$.gif][@zoomDisabled]
+
+// [.article]
+
+// [@ip:false]
+// `.trim();
+
 function App() {
   return (
     <ThemeUIProvider theme={theme}>
@@ -67,9 +97,13 @@ function App() {
                     border: '1px solid',
                     borderColor: 'accent',
                   }}
-                  initialMarkup="[.article] Hello World!"
+                  initialMarkup={initialMarkup}
                   options={{
                     wordWrap: 'on',
+                    // bracketPairColorization: {
+                    //   enabled: false,
+                    //   independentColorPoolPerBracketType: false,
+                    // },
                   }}
                 />
               </Flex>

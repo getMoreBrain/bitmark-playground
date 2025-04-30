@@ -1,6 +1,6 @@
 {
   "name": "@gmb/bitmark-playground",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A web playground for parsing and generating bitmark",
   "author": "Get More Brain Ltd",
   "license": "ISC",
@@ -19,10 +19,12 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^29.5.6",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^20.8.7",
     "@types/react": "^18.2.31",
     "@types/react-dom": "^18.2.14",
     "@uidotdev/usehooks": "^2.4.0",
+    "lodash": "^4.17.21",
     "monaco-editor": "^0.44.0",
     "monaco-editor-core": "^0.44.0",
     "react": "^18.2.0",
@@ -32,9 +34,11 @@
     "theme-ui": "^0.16.1",
     "typescript": "^5.2.2",
     "valtio": "^1.11.3",
+    "web-tree-sitter": "^0.25.3",
     "web-vitals": "^3.5.0"
   },
   "devDependencies": {
+    "customize-cra": "^1.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-arca": "^0.16.0",
     "eslint-plugin-json": "^3.1.0",
@@ -42,7 +46,8 @@
     "eslint-plugin-valtio": "^0.6.2",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "prettier": "^3.0.3",
-    "react-app-rewired": "^2.2.1"
+    "react-app-rewired": "^2.2.1",
+    "tree-sitter-cpp": "^0.23.4"
   },
   "repository": {
     "type": "git",
