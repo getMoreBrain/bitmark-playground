@@ -6,7 +6,7 @@
   "license": "ISC",
   "homepage": "https://getmorebrain.github.io/bitmark-playground",
   "scripts": {
-    "start": "run generate-build-info && react-app-rewired start",
+    "start": "PORT=3010 && run generate-build-info && react-app-rewired start",
     "build": "run generate-build-info && react-app-rewired build",
     "test": "react-app-rewired test",
     "generate-build-info": "node ./scripts/generate-build-info.js",

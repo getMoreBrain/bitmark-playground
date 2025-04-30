@@ -31,5 +31,9 @@
   },
   // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
   // "jest.jestCommandLine": "yarn test"
-  "jest.autoRun": "off"
+  "jest.runMode": "on-demand",
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "${workspaceFolder}/.vscode/mise-tools/node"
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.vscode/mise-tools/python"
 }
