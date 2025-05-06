@@ -32,6 +32,7 @@
   // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
   // "jest.jestCommandLine": "yarn test"
   "jest.runMode": "on-demand",
+  "mise.configureExtensionsUseSymLinks": true,
   "debug.javascript.defaultRuntimeExecutable": {
     "pwa-node": "${workspaceFolder}/.vscode/mise-tools/node"
   },
