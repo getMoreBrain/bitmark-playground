@@ -6,11 +6,12 @@
   "license": "ISC",
   "homepage": "https://getmorebrain.github.io/bitmark-playground",
   "scripts": {
-    "start": "PORT=3010 && run generate-build-info && react-app-rewired start",
-    "build": "run generate-build-info && react-app-rewired build",
+    "preinstall": "npx only-allow bun",
+    "start": "PORT=3010 && bun run generate-build-info && react-app-rewired start",
+    "build": "bun run generate-build-info && react-app-rewired build",
     "test": "react-app-rewired test",
     "generate-build-info": "node ./scripts/generate-build-info.js",
-    "ncu": "yarn dlx npm-check-updates -i"
+    "ncu": "bunx npm-check-updates -i"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -46,6 +47,7 @@
     "eslint-plugin-valtio": "^0.6.2",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "prettier": "^3.0.3",
+    "only-allow": "^1.2.1",
     "react-app-rewired": "^2.2.1",
     "tree-sitter-cpp": "^0.23.4"
   },
@@ -53,12 +55,10 @@
     "type": "git",
     "url": "git+https://github.com/getMoreBrain/bitmark-playground.git"
   },
-  "packageManager": "yarn@3.5.0",
   "engines": {
     "node": ">=10",
     "npm": ">=6.8.0",
-    "git": ">=2.11.0",
-    "yarn": ">=3.5.0"
+    "git": ">=2.11.0"
   },
   "keywords": [
     "bitmark"

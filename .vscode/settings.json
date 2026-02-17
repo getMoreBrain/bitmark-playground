@@ -7,14 +7,14 @@
   "files.eol": "\n",
   "files.autoSave": "onFocusChange",
   "files.trimTrailingWhitespace": true,
-  // "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  // "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.tsserver.watchOptions": {
     "watchFile": "useFsEventsOnParentDirectory",
     "watchDirectory": "useFsEvents"
   },
-  "npm.packageManager": "yarn",
+  "npm.packageManager": "bun",
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
-  // "eslint.nodePath": ".yarn/sdks",
+  // "eslint.nodePath": "node_modules",
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
@@ -25,16 +25,17 @@
   "pasteImage.prefix": "/",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "search.exclude": {
-    // "**/.yarn": true,
     // "**/dist": true,
     // "**/docs": true
   },
-  // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
-  // "jest.jestCommandLine": "yarn test"
+  // "prettier.prettierPath": "node_modules/prettier/index.js"
+  // "jest.jestCommandLine": "bun test"
   "jest.runMode": "on-demand",
   "mise.configureExtensionsUseSymLinks": true,
   "debug.javascript.defaultRuntimeExecutable": {
     "pwa-node": "${workspaceFolder}/.vscode/mise-tools/node"
   },
-  "python.defaultInterpreterPath": "${workspaceFolder}/.vscode/mise-tools/python"
+  "python.defaultInterpreterPath": "${workspaceFolder}/.vscode/mise-tools/python",
+  "java.jdt.ls.java.home": "${workspaceFolder}/.vscode/mise-tools/java",
+  "java.import.gradle.java.home": "${workspaceFolder}/.vscode/mise-tools/java"
 }
