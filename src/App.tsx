@@ -122,17 +122,26 @@ function App() {
     </Flex>
   );
 
+  // @zen-impl: PLAN-005-Step4 (wire state data to diff panels)
   const bottomPanels = (
     <Flex sx={{ flexDirection: 'row', flexGrow: 1, minHeight: 0 }}>
       <OutputPanel
         label="bitmark"
         activeTab={uiSnap.leftOutputTab}
         onTabChange={(tab) => uiState.setLeftOutputTab(tab)}
+        original={snap.js.markup}
+        modified={snap.wasm.markup}
+        language="bitmark"
+        lexerOutput={snap.wasm.lexerOutput}
       />
       <OutputPanel
         label="JSON"
         activeTab={uiSnap.rightOutputTab}
         onTabChange={(tab) => uiState.setRightOutputTab(tab)}
+        original={snap.js.jsonAsString}
+        modified={snap.wasm.jsonAsString}
+        language="json"
+        lexerOutput={snap.wasm.lexerOutput}
       />
     </Flex>
   );

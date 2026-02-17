@@ -1,6 +1,6 @@
 # PLAN-005: Diff Panels — Coloured Diffs (Original vs WASM)
 
-**Status:** in-progress
+**Status:** completed
 **Workflow direction:** top-down
 **Traceability:** Extends PLAN-003 (bottom output panels); consumes `bitmarkState` per-parser slices (PLAN-002).
 
@@ -114,14 +114,14 @@ The diff editors are **read-only** — users cannot edit content in these panels
 
 ## Completion Criteria
 
-- [ ] "Diff" tab in left bottom panel shows coloured inline diff of JS vs WASM bitmark markup
-- [ ] "Diff" tab in right bottom panel shows coloured inline diff of JS vs WASM JSON
-- [ ] Diff editors are read-only
-- [ ] Diff editors auto-resize when bottom panel is resized via drag handle
-- [ ] Diff content updates reactively when parser outputs change (e.g. user edits markup)
-- [ ] Monaco dark theme applied to diff editors
-- [ ] "Lexer" tab still shows empty placeholder (unchanged)
-- [ ] Existing editor functionality unaffected
+- [x] "Diff" tab in left bottom panel shows coloured inline diff of JS vs WASM bitmark markup
+- [x] "Diff" tab in right bottom panel shows coloured inline diff of JS vs WASM JSON
+- [x] Diff editors are read-only
+- [x] Diff editors auto-resize when bottom panel is resized via drag handle
+- [x] Diff content updates reactively when parser outputs change (e.g. user edits markup)
+- [x] Monaco dark theme applied to diff editors
+- [x] "Lexer" tab still shows empty placeholder (unchanged)
+- [x] Existing editor functionality unaffected
 
 ## Out of Scope
 

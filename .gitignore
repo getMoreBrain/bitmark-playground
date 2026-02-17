@@ -3,6 +3,9 @@
 # IDE
 .vscode/mise-tools
 
+# AI
+.playwright-mcp
+
 # MISC
 .DS_Store
 .env.local

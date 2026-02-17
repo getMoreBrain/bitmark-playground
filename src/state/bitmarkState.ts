@@ -19,6 +19,7 @@ export interface ParserSlice {
   readonly jsonErrorAsString: string | undefined;
   readonly jsonDurationSec: number | undefined;
   readonly jsonUpdates: number;
+  readonly lexerOutput: string;
 }
 
 export interface BitmarkState {
@@ -41,6 +42,7 @@ export interface BitmarkState {
     markupError: Error | undefined,
     durationSec?: number,
   ): void;
+  setLexerOutput(parser: ParserType, output: string): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: ParserType): void;
   syncMarkupInput(markup: string): void;
@@ -59,6 +61,7 @@ const createParserSlice = (): ParserSlice => ({
   jsonErrorAsString: undefined,
   jsonDurationSec: undefined,
   jsonUpdates: 0,
+  lexerOutput: '',
 });
 
 // @zen-impl: PLAN-002-Step9 (tab query param)
@@ -148,6 +151,11 @@ const bitmarkState = proxy<BitmarkState>({
     }
     slice.markupDurationSec = durationSec;
     slice.markupUpdates += 1;
+  },
+
+  setLexerOutput: (parser: ParserType, output: string) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    slice.lexerOutput = output;
   },
 
   setActiveMarkupTab: (tab: ParserType) => {

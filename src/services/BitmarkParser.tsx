@@ -1,5 +1,6 @@
 // @zen-component: PLAN-002-BitmarkParser
 
+import type { generate as generateFn, lex as lexFn, parse as parseFn } from '@gmb/bitmark-parser';
 import {
   createContext,
   ReactElement,
@@ -14,13 +15,13 @@ import { log } from '../logging/log';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
-const BITMARK_PARSER_PACKAGE_JSON_URL =
-  'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/package.json';
 
 interface BitmarkParserModule {
   init: (wasmUrl?: string) => Promise<void>;
-  parse: (input: string) => string;
-  generate: (json: string) => string;
+  lex: typeof lexFn;
+  parse: typeof parseFn;
+  generate: typeof generateFn;
+  version: () => string;
 }
 
 interface BitmarkParserProviderProps {
@@ -30,14 +31,16 @@ interface BitmarkParserProviderProps {
 interface IBitmarkParserContext {
   loadSuccess: boolean;
   loadError: boolean;
-  parse: ((input: string) => string) | undefined;
-  generate: ((json: string) => string) | undefined;
+  lex: typeof lexFn | undefined;
+  parse: typeof parseFn | undefined;
+  generate: typeof generateFn | undefined;
   version: string;
 }
 
 const defaultState: IBitmarkParserContext = {
   loadSuccess: false,
   loadError: false,
+  lex: undefined,
   parse: undefined,
   generate: undefined,
   version: '',
@@ -58,8 +61,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const searchParams = new URLSearchParams(window.location.search);
     const version = searchParams.get('v2') ?? 'latest';
-    const moduleUrl = BITMARK_PARSER_CDN_URL.replace('${version}', version);
-    const packageJsonUrl = BITMARK_PARSER_PACKAGE_JSON_URL.replace('${version}', version);
+    const moduleUrl = `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${Date.now()}`;
 
     const load = async () => {
       try {
@@ -69,22 +71,13 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // Initialize WASM
         await module.init();
 
-        // Fetch version from package.json
-        let resolvedVersion = '';
-        try {
-          const res = await fetch(packageJsonUrl);
-          if (res.ok) {
-            const pkg = await res.json();
-            resolvedVersion = pkg.version ?? '';
-          }
-        } catch {
-          // Version fetch is best-effort
-          log.error('BitmarkParserProvider: failed to fetch version');
-        }
+        // Get version from the library itself
+        const resolvedVersion = module.version();
 
         setState({
           loadSuccess: true,
           loadError: false,
+          lex: module.lex,
           parse: module.parse,
           generate: module.generate,
           version: resolvedVersion,
@@ -94,6 +87,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         setState({
           loadSuccess: false,
           loadError: true,
+          lex: undefined,
           parse: undefined,
           generate: undefined,
           version: '',

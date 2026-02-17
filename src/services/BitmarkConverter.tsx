@@ -23,6 +23,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
     loadError: jsLoadError,
   } = useBitmarkParserGenerator();
   const {
+    lex: wasmLex,
     parse: wasmParse,
     loadSuccess: wasmLoadSuccess,
     loadError: wasmLoadError,
@@ -122,9 +123,23 @@ const useBitmarkConverter = (): BitmarkConverter => {
         );
       }
 
+      // WASM lexer
+      if (wasmLex) {
+        promises.push(
+          (async () => {
+            try {
+              const lexOutput = wasmLex(markup);
+              bitmarkState.setLexerOutput('wasm', lexOutput);
+            } catch (e) {
+              bitmarkState.setLexerOutput('wasm', `Lexer error: ${String(e)}`);
+            }
+          })(),
+        );
+      }
+
       await Promise.allSettled(promises);
     },
-    [bitmarkParserGenerator, wasmParse],
+    [bitmarkParserGenerator, wasmParse, wasmLex],
   );
 
   // @zen-impl: PLAN-002-Step3 (dual jsonToMarkup)
@@ -211,8 +226,21 @@ const useBitmarkConverter = (): BitmarkConverter => {
       }
 
       await Promise.allSettled(promises);
+
+      // Lex the resulting markup from the JS parser (WASM generate not yet available)
+      if (wasmLex) {
+        const resultMarkup = bitmarkState.js.markup;
+        if (resultMarkup) {
+          try {
+            const lexOutput = wasmLex(resultMarkup);
+            bitmarkState.setLexerOutput('wasm', lexOutput);
+          } catch (e) {
+            bitmarkState.setLexerOutput('wasm', `Lexer error: ${String(e)}`);
+          }
+        }
+      }
     },
-    [bitmarkParserGenerator, wasmLoadSuccess],
+    [bitmarkParserGenerator, wasmLoadSuccess, wasmLex],
   );
 
   return {
