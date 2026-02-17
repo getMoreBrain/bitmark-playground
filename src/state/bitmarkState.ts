@@ -5,7 +5,7 @@ import { proxy } from 'valtio';
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
-export type ParserType = 'js' | 'wasm';
+export type ParserType = 'js' | 'wasm' | 'wasmFull';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -24,6 +24,7 @@ export interface ParserSlice {
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
+  readonly wasmFull: ParserSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: ParserType;
   setJson(
@@ -66,6 +67,7 @@ const getTabFromUrl = (): ParserType | null => {
   const searchParams = new URLSearchParams(window.location.search);
   const tab = searchParams.get('tab');
   if (tab === 'wasm') return 'wasm';
+  if (tab === 'wasmFull') return 'wasmFull';
   if (tab === 'js') return 'js';
   return null;
 };
@@ -76,6 +78,7 @@ const urlTab = getTabFromUrl();
 const bitmarkState = proxy<BitmarkState>({
   js: createParserSlice(),
   wasm: createParserSlice(),
+  wasmFull: createParserSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
@@ -158,23 +161,31 @@ const bitmarkState = proxy<BitmarkState>({
   syncMarkupInput: (markup: string) => {
     const jsSlice = bitmarkState.js as Writable<ParserSlice>;
     const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
+    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
     jsSlice.markup = markup;
     jsSlice.markupError = undefined;
     jsSlice.markupErrorAsString = undefined;
     wasmSlice.markup = markup;
     wasmSlice.markupError = undefined;
     wasmSlice.markupErrorAsString = undefined;
+    wasmFullSlice.markup = markup;
+    wasmFullSlice.markupError = undefined;
+    wasmFullSlice.markupErrorAsString = undefined;
   },
 
   syncJsonInput: (json: string) => {
     const jsSlice = bitmarkState.js as Writable<ParserSlice>;
     const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
+    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
     jsSlice.jsonAsString = json;
     jsSlice.jsonError = undefined;
     jsSlice.jsonErrorAsString = undefined;
     wasmSlice.jsonAsString = json;
     wasmSlice.jsonError = undefined;
     wasmSlice.jsonErrorAsString = undefined;
+    wasmFullSlice.jsonAsString = json;
+    wasmFullSlice.jsonError = undefined;
+    wasmFullSlice.jsonErrorAsString = undefined;
   },
 });
 

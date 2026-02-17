@@ -8,13 +8,14 @@ export interface ParserTabBarProps {
   label: string;
   jsDuration: number | undefined;
   wasmDuration: number | undefined;
+  wasmFullDuration: number | undefined;
   activeTab: ParserType;
   onTabChange: (tab: ParserType) => void;
 }
 
 // @zen-impl: PLAN-002-Step4 (tab bar UI)
 const ParserTabBar = (props: ParserTabBarProps) => {
-  const { label, jsDuration, wasmDuration, activeTab, onTabChange } = props;
+  const { label, jsDuration, wasmDuration, wasmFullDuration, activeTab, onTabChange } = props;
 
   const formatDuration = (duration: number | undefined): string => {
     if (duration === undefined) return '';
@@ -79,6 +80,14 @@ const ParserTabBar = (props: ParserTabBarProps) => {
         sx={{ ...tabSx(activeTab === 'wasm'), ml: '2px' }}
       >
         WASM{formatDuration(wasmDuration)}
+      </Text>
+      <Text
+        role="tab"
+        aria-selected={activeTab === 'wasmFull'}
+        onClick={() => onTabChange('wasmFull')}
+        sx={{ ...tabSx(activeTab === 'wasmFull'), ml: '2px' }}
+      >
+        WASM (full){formatDuration(wasmFullDuration)}
       </Text>
     </Flex>
   );

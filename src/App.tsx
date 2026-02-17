@@ -50,6 +50,7 @@ function App() {
             label="bitmark"
             jsDuration={snap.js.markupDurationSec}
             wasmDuration={snap.wasm.markupDurationSec}
+            wasmFullDuration={snap.wasmFull.markupDurationSec}
             activeTab={snap.activeMarkupTab}
             onTabChange={(tab) => bitmarkState.setActiveMarkupTab(tab)}
           />
@@ -90,6 +91,7 @@ function App() {
             label="JSON"
             jsDuration={snap.js.jsonDurationSec}
             wasmDuration={snap.wasm.jsonDurationSec}
+            wasmFullDuration={snap.wasmFull.jsonDurationSec}
             activeTab={snap.activeJsonTab}
             onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
           />

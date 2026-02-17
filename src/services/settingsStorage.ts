@@ -15,9 +15,9 @@ export interface PersistedSettings {
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 1;
+export const CURRENT_VERSION = 2;
 
-const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm'];
+const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
 const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer'];
 
 // @zen-impl: PLAN-004-Step1 (migrateSettings)
@@ -26,6 +26,12 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   const obj = raw as Record<string, unknown>;
   if (typeof obj.v !== 'number') return null;
+
+  // Migrate v1 → v2: 'wasmFull' added as valid ParserType, existing values still valid
+  if (obj.v === 1) {
+    obj.v = CURRENT_VERSION;
+    // Fall through to v2 validation
+  }
 
   if (obj.v === CURRENT_VERSION) {
     // Validate shape
@@ -45,7 +51,6 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
     return null;
   }
 
-  // Future: if (obj.v < CURRENT_VERSION) apply migrations
   // Unknown or future version — discard
   return null;
 }

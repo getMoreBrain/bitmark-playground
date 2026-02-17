@@ -95,6 +95,33 @@ const useBitmarkConverter = (): BitmarkConverter => {
         );
       }
 
+      // WASM parser (full output)
+      if (wasmParse) {
+        promises.push(
+          (async () => {
+            let json: BitWrapperJson[] | undefined;
+            let jsonError: Error | undefined;
+
+            const startMark = `wasmFull-m2j-start-${Date.now()}`;
+            const endMark = `wasmFull-m2j-end-${Date.now()}`;
+            performance.mark(startMark);
+
+            try {
+              const resultStr = wasmParse(markup);
+              json = JSON.parse(resultStr) as BitWrapperJson[];
+            } catch (e) {
+              jsonError = e as Error;
+            }
+
+            performance.mark(endMark);
+            const convertTimeSecs =
+              performance.measure('wasmFull-markupToJson', startMark, endMark).duration / 1000;
+
+            bitmarkState.setJson('wasmFull', markup, json, jsonError, convertTimeSecs);
+          })(),
+        );
+      }
+
       await Promise.allSettled(promises);
     },
     [bitmarkParserGenerator, wasmParse],
@@ -160,6 +187,25 @@ const useBitmarkConverter = (): BitmarkConverter => {
               performance.measure('wasm-jsonToMarkup', startMark, endMark).duration / 1000;
 
             bitmarkState.setMarkup('wasm', json, undefined, markupError, convertTimeSecs);
+          })(),
+        );
+      }
+
+      // WASM parser (full output) — generate() not yet implemented
+      if (wasmLoadSuccess) {
+        promises.push(
+          (async () => {
+            const startMark = `wasmFull-j2m-start-${Date.now()}`;
+            const endMark = `wasmFull-j2m-end-${Date.now()}`;
+            performance.mark(startMark);
+
+            const markupError = new Error('generate() not yet implemented');
+
+            performance.mark(endMark);
+            const convertTimeSecs =
+              performance.measure('wasmFull-jsonToMarkup', startMark, endMark).duration / 1000;
+
+            bitmarkState.setMarkup('wasmFull', json, undefined, markupError, convertTimeSecs);
           })(),
         );
       }
