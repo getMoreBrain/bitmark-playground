@@ -4,9 +4,8 @@ import { useCallback } from 'react';
 
 import { bitmarkState } from '../state/bitmarkState';
 import { StringUtils } from '../utils/StringUtils';
-
-import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 import { useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
 export interface BitmarkConverter {
   jsLoadSuccess: boolean;
@@ -18,8 +17,16 @@ export interface BitmarkConverter {
 }
 
 const useBitmarkConverter = (): BitmarkConverter => {
-  const { bitmarkParserGenerator, loadSuccess: jsLoadSuccess, loadError: jsLoadError } = useBitmarkParserGenerator();
-  const { parse: wasmParse, loadSuccess: wasmLoadSuccess, loadError: wasmLoadError } = useBitmarkParser();
+  const {
+    bitmarkParserGenerator,
+    loadSuccess: jsLoadSuccess,
+    loadError: jsLoadError,
+  } = useBitmarkParserGenerator();
+  const {
+    parse: wasmParse,
+    loadSuccess: wasmLoadSuccess,
+    loadError: wasmLoadError,
+  } = useBitmarkParser();
 
   // @zen-impl: PLAN-002-Step3 (dual markupToJson)
   const markupToJson = useCallback(
@@ -47,9 +54,16 @@ const useBitmarkConverter = (): BitmarkConverter => {
             }
 
             performance.mark(endMark);
-            const convertTimeSecs = performance.measure('js-markupToJson', startMark, endMark).duration / 1000;
+            const convertTimeSecs =
+              performance.measure('js-markupToJson', startMark, endMark).duration / 1000;
 
-            bitmarkState.setJson('js', markup, json as BitWrapperJson[] | undefined, jsonError, convertTimeSecs);
+            bitmarkState.setJson(
+              'js',
+              markup,
+              json as BitWrapperJson[] | undefined,
+              jsonError,
+              convertTimeSecs,
+            );
           })(),
         );
       }
@@ -73,7 +87,8 @@ const useBitmarkConverter = (): BitmarkConverter => {
             }
 
             performance.mark(endMark);
-            const convertTimeSecs = performance.measure('wasm-markupToJson', startMark, endMark).duration / 1000;
+            const convertTimeSecs =
+              performance.measure('wasm-markupToJson', startMark, endMark).duration / 1000;
 
             bitmarkState.setJson('wasm', markup, json, jsonError, convertTimeSecs);
           })(),
@@ -114,10 +129,17 @@ const useBitmarkConverter = (): BitmarkConverter => {
             }
 
             performance.mark(endMark);
-            const convertTimeSecs = performance.measure('js-jsonToMarkup', startMark, endMark).duration / 1000;
+            const convertTimeSecs =
+              performance.measure('js-jsonToMarkup', startMark, endMark).duration / 1000;
 
             if (!markupError || markupError.message !== 'Expected string') {
-              bitmarkState.setMarkup('js', json, markup as string | undefined, markupError, convertTimeSecs);
+              bitmarkState.setMarkup(
+                'js',
+                json,
+                markup as string | undefined,
+                markupError,
+                convertTimeSecs,
+              );
             }
           })(),
         );
@@ -134,7 +156,8 @@ const useBitmarkConverter = (): BitmarkConverter => {
             const markupError = new Error('generate() not yet implemented');
 
             performance.mark(endMark);
-            const convertTimeSecs = performance.measure('wasm-jsonToMarkup', startMark, endMark).duration / 1000;
+            const convertTimeSecs =
+              performance.measure('wasm-jsonToMarkup', startMark, endMark).duration / 1000;
 
             bitmarkState.setMarkup('wasm', json, undefined, markupError, convertTimeSecs);
           })(),

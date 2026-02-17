@@ -1,7 +1,13 @@
 /** @jsxImportSource theme-ui */
 
-import { EditorDidMount, EditorWillMount, EditorWillUnmount, MonacoEditorProps, monaco } from 'react-monaco-editor';
 import { memo, useCallback, useEffect, useRef } from 'react';
+import {
+  EditorDidMount,
+  EditorWillMount,
+  EditorWillUnmount,
+  monaco,
+  MonacoEditorProps,
+} from 'react-monaco-editor';
 
 import { MonacoEditorAutoResize } from './MonacoEditorAutoResize';
 

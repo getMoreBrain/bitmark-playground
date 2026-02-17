@@ -20,7 +20,8 @@ export interface BitmarkJsonTextBoxProps extends MonacoTextAreaUncontrolledProps
 const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const { options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
-  const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, jsonToMarkup } = useBitmarkConverter();
+  const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, jsonToMarkup } =
+    useBitmarkConverter();
 
   const activeTab = bitmarkStateSnap.activeJsonTab;
   const activeSlice = bitmarkStateSnap[activeTab];
@@ -48,7 +49,14 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
 
     const value = activeSlice.jsonErrorAsString ?? activeSlice.jsonAsString;
     return (
-      <MonacoTextArea {...restProps} theme="vs-dark" language="json" value={value} options={opts} onInput={onInput} />
+      <MonacoTextArea
+        {...restProps}
+        theme="vs-dark"
+        language="json"
+        value={value}
+        options={opts}
+        onInput={onInput}
+      />
     );
   } else {
     let text = 'Loading...';

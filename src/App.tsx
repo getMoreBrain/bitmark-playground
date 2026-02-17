@@ -1,5 +1,7 @@
 // @zen-component: PLAN-002-App
 /** @jsxImportSource theme-ui */
+import './App.css';
+
 import { Flex, ThemeUIProvider } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
@@ -8,11 +10,10 @@ import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox'
 import { ParserTabBar } from './components/generic/ui/ParserTabBar';
 import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
-import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
 import { BitmarkParserProvider } from './services/BitmarkParser';
+import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
 import { bitmarkState } from './state/bitmarkState';
 import { theme } from './theme/theme';
-import './App.css';
 
 const initialMarkup = '[.article] Hello World!';
 

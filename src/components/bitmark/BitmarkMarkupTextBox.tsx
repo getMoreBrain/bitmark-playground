@@ -1,8 +1,8 @@
 // @zen-component: PLAN-002-BitmarkMarkupTextBox
 import { editor } from 'monaco-editor';
 import * as MonacoModule from 'monaco-editor';
-import { EditorDidMount } from 'react-monaco-editor';
 import { useCallback, useEffect } from 'react';
+import { EditorDidMount } from 'react-monaco-editor';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 import { Parser } from 'web-tree-sitter';
@@ -28,7 +28,8 @@ export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledPro
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { initialMarkup, options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
-  const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } = useBitmarkConverter();
+  const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } =
+    useBitmarkConverter();
 
   const activeTab = bitmarkStateSnap.activeMarkupTab;
   const activeSlice = bitmarkStateSnap[activeTab];
@@ -51,7 +52,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const editorDidMount = useCallback<EditorDidMount>((editor, _monaco) => {
     const language = new Language(treeSitterBitmarkGrammar as Grammar);
     const languageWasmPath = new URL('../../tree-sitter-bitmark.wasm', import.meta.url).toString();
-    language.init(languageWasmPath, Parser).then(() => {
+    void language.init(languageWasmPath, Parser).then(() => {
       new MonacoTreeSitter(MonacoModule, editor, language);
     });
   }, []);
@@ -59,7 +60,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   // Do initial conversion with the initial markup
   useEffect(() => {
     if (!initialMarkup) return;
-    onInput(initialMarkup ?? '');
+    void onInput(initialMarkup ?? '');
   }, [initialMarkup, onInput]);
 
   if (anyLoadSuccess) {

@@ -7,10 +7,10 @@ import { Language } from './language';
 import { provideMonacoModule } from './monaco';
 import { Theme } from './theme';
 
-export * from './theme';
-export * from './language';
-export * from './highlighter';
 export * from './highlight';
+export * from './highlighter';
+export * from './language';
+export * from './theme';
 
 function monacoPositionToParserPoint(position: MonacoModule.Position): ParserPoint {
   return { row: position.lineNumber, column: position.column };
@@ -37,9 +37,13 @@ export class MonacoTreeSitter implements MonacoModule.IDisposable {
 
     this.tree = language ? language.parser.parse(editor.getValue()) : null;
     this.buildHighlightDebounced =
-      debounceUpdate == null ? this.buildHighlight : debounce(this.buildHighlight.bind(this), debounceUpdate);
+      debounceUpdate == null
+        ? this.buildHighlight
+        : debounce(this.buildHighlight.bind(this), debounceUpdate);
 
-    const eventListener = editor.getModel()?.onDidChangeContent(this.onEditorContentChange.bind(this));
+    const eventListener = editor
+      .getModel()
+      ?.onDidChangeContent(this.onEditorContentChange.bind(this));
     this.dispose = () => {
       eventListener?.dispose();
       this.language = this.tree = null;
@@ -61,7 +65,14 @@ export class MonacoTreeSitter implements MonacoModule.IDisposable {
       const startPosition = monacoPositionToParserPoint(model.getPositionAt(startIndex));
       const oldEndPosition = monacoPositionToParserPoint(model.getPositionAt(oldEndIndex));
       const newEndPosition = monacoPositionToParserPoint(model.getPositionAt(newEndIndex));
-      this.tree.edit({ startIndex, oldEndIndex, newEndIndex, startPosition, oldEndPosition, newEndPosition });
+      this.tree.edit({
+        startIndex,
+        oldEndIndex,
+        newEndIndex,
+        startPosition,
+        oldEndPosition,
+        newEndPosition,
+      });
     }
     this.tree = this.language.parser.parse(this.editor.getValue(), this.tree); // TODO: Don't use getText, use Parser.Input
     this.buildHighlightDebounced(); // TODO: Build highlight incrementally
@@ -82,7 +93,10 @@ export class MonacoTreeSitter implements MonacoModule.IDisposable {
           monacoDecorations.push({ range, options });
         }
       }
-    this.monacoDecorationKeys = this.editor.deltaDecorations(this.monacoDecorationKeys, monacoDecorations);
+    this.monacoDecorationKeys = this.editor.deltaDecorations(
+      this.monacoDecorationKeys,
+      monacoDecorations,
+    );
   }
 
   public changeLanguage(language: Language) {

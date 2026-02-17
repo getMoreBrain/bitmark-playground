@@ -1,4 +1,4 @@
-import { Parser, Language as ParserLanguage } from 'web-tree-sitter';
+import { Language as ParserLanguage, Parser } from 'web-tree-sitter';
 
 import { Term } from './highlighter';
 import { Grammar } from './types/grammer';

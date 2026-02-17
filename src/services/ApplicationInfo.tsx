@@ -2,9 +2,8 @@
 import { useMemo } from 'react';
 
 import { buildInfo } from '../generated/build-info';
-
-import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 import { useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
 const FIRST_PUBLISHED_YEAR = 2023;
 
@@ -34,7 +33,9 @@ const useApplicationInfo = (): ApplicationInfo => {
 
     const thisYear = new Date().getFullYear();
     const copyrightYear =
-      thisYear === FIRST_PUBLISHED_YEAR ? thisYear.toString() : `${FIRST_PUBLISHED_YEAR}-${thisYear}`;
+      thisYear === FIRST_PUBLISHED_YEAR
+        ? thisYear.toString()
+        : `${FIRST_PUBLISHED_YEAR}-${thisYear}`;
 
     const copyright = `© ${copyrightYear} ${buildInfo.author}`;
 

@@ -1,5 +1,4 @@
 // @zen-component: PLAN-002-BitmarkState
-/* eslint-disable valtio/avoid-this-in-proxy */
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
@@ -88,8 +87,12 @@ const bitmarkState = proxy<BitmarkState>({
     if (jsonError) {
       slice.jsonError = jsonError;
       try {
-        slice.jsonErrorAsString = JSON.stringify(jsonError, Object.getOwnPropertyNames(jsonError), 2);
-      } catch (e) {
+        slice.jsonErrorAsString = JSON.stringify(
+          jsonError,
+          Object.getOwnPropertyNames(jsonError),
+          2,
+        );
+      } catch (_e) {
         slice.jsonErrorAsString = 'Unknown';
       }
     } else {
@@ -121,8 +124,12 @@ const bitmarkState = proxy<BitmarkState>({
     if (markupError) {
       slice.markupError = markupError;
       try {
-        slice.markupErrorAsString = JSON.stringify(markupError, Object.getOwnPropertyNames(markupError), 2);
-      } catch (e) {
+        slice.markupErrorAsString = JSON.stringify(
+          markupError,
+          Object.getOwnPropertyNames(markupError),
+          2,
+        );
+      } catch (_e) {
         slice.markupErrorAsString = 'Unknown';
       }
     } else {

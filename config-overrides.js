@@ -1,9 +1,11 @@
 // config-overrides.js
-const { override, addWebpackResolve, addWebpackPlugin } = require('customize-cra');
+const { override, addWebpackResolve, addWebpackPlugin, disableEsLint } = require('customize-cra');
 
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = override(
+  // Disable react-scripts' built-in ESLint 8 plugin — we lint separately via `bun run lint` (ESLint 9 flat config)
+  disableEsLint(),
   addWebpackResolve({
     fallback: {
       module: false,

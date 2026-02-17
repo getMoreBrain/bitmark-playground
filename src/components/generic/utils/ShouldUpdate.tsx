@@ -21,11 +21,10 @@ export interface ShouldUpdateProps {
  * @param shouldUpdate
  * @returns
  */
-function withShouldUpdate<Props = {}, State = {}>(
+function withShouldUpdate<Props = object, State = object>(
   WrappedComponent: ComponentType<Props>,
   shouldUpdate: WithShouldUpdateFunction<Props, State>,
 ): ComponentType<Props> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return class ShouldUpdate extends React.Component<Props, State> {
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
       if (shouldUpdate) {
@@ -59,4 +58,4 @@ class ShouldUpdate extends React.Component<ShouldUpdateProps> {
   }
 }
 
-export { withShouldUpdate, ShouldUpdate };
+export { ShouldUpdate, withShouldUpdate };

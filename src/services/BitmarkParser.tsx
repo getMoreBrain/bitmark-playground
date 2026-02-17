@@ -1,12 +1,21 @@
 // @zen-component: PLAN-002-BitmarkParser
-/* eslint-disable no-template-curly-in-string */
-import { useState, useEffect, useRef, createContext, useContext, ReactNode, ReactElement } from 'react';
+
+import {
+  createContext,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { log } from '../logging/log';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
-const BITMARK_PARSER_PACKAGE_JSON_URL = 'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/package.json';
+const BITMARK_PARSER_PACKAGE_JSON_URL =
+  'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/package.json';
 
 interface BitmarkParserModule {
   init: (wasmUrl?: string) => Promise<void>;
@@ -55,7 +64,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
     const load = async () => {
       try {
         // Load ES module via dynamic import
-        const module = (await import(/* webpackIgnore: true */ moduleUrl)) as BitmarkParserModule;
+        const module = (await import(/* @vite-ignore */ moduleUrl)) as BitmarkParserModule;
 
         // Initialize WASM
         await module.init();
@@ -92,10 +101,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
       }
     };
 
-    load();
+    void load();
   }, []);
 
   return <BitmarkParserContext.Provider value={state}>{children}</BitmarkParserContext.Provider>;
 };
 
-export { BitmarkParserProvider, BitmarkParserContext, useBitmarkParser };
+export { BitmarkParserContext, BitmarkParserProvider, useBitmarkParser };
