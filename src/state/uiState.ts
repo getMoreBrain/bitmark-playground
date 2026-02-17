@@ -1,6 +1,7 @@
 // @zen-component: PLAN-003-UiState
 import { proxy } from 'valtio';
 
+import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type OutputTab = 'diff' | 'lexer';
@@ -28,12 +29,15 @@ export interface UiState {
 }
 
 // @zen-impl: PLAN-003-Step1 (settings state)
+// @zen-impl: PLAN-004-Step2 (hydrate from storage)
+const stored = loadSettings();
+
 const uiState = proxy<UiState>({
-  showDiffLex: false,
+  showDiffLex: stored?.showDiffLex ?? false,
   bottomPanelHeight: 250,
   bottomPanelCollapsed: false,
-  leftOutputTab: 'diff',
-  rightOutputTab: 'diff',
+  leftOutputTab: stored?.leftOutputTab ?? 'diff',
+  rightOutputTab: stored?.rightOutputTab ?? 'diff',
   settingsOpen: false,
 
   setShowDiffLex(value: boolean) {

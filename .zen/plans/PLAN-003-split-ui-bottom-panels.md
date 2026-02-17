@@ -185,6 +185,5 @@ With "Show diff / lex" disabled (default):
 
 - Diff content rendering
 - Lexer output rendering
-- Persistence of settings across page reload (future: localStorage)
 - Any parser or conversion logic for bottom panels
 - Additional settings beyond "Show diff / lex"

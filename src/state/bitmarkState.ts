@@ -2,6 +2,7 @@
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
+import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm';
@@ -60,18 +61,23 @@ const createParserSlice = (): ParserSlice => ({
 });
 
 // @zen-impl: PLAN-002-Step9 (tab query param)
-const getDefaultTab = (): ParserType => {
+// @zen-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
+const getTabFromUrl = (): ParserType | null => {
   const searchParams = new URLSearchParams(window.location.search);
   const tab = searchParams.get('tab');
   if (tab === 'wasm') return 'wasm';
-  return 'js';
+  if (tab === 'js') return 'js';
+  return null;
 };
+
+const storedSettings = loadSettings();
+const urlTab = getTabFromUrl();
 
 const bitmarkState = proxy<BitmarkState>({
   js: createParserSlice(),
   wasm: createParserSlice(),
-  activeMarkupTab: getDefaultTab(),
-  activeJsonTab: getDefaultTab(),
+  activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
+  activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
   setJson: (
     parser: ParserType,

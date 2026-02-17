@@ -8,6 +8,7 @@ import treeSitterWasmUrl from 'web-tree-sitter/tree-sitter.wasm?url';
 import { App } from './App';
 import { Theme, ThemeConfig } from './monaco-tree-sitter/theme';
 import treeSitterTheme from './monaco-tree-sitter/themes/tomorrow.json';
+import { initSettingsPersistence } from './services/settingsPersistence';
 
 async function start(): Promise<void> {
   // Load the monaco-tree-sitter theme
@@ -17,6 +18,9 @@ async function start(): Promise<void> {
   await Parser.init({
     locateFile: () => treeSitterWasmUrl,
   });
+
+  // @zen-impl: PLAN-004-Step3 (wire persistence)
+  initSettingsPersistence();
 
   const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
   root.render(
