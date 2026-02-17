@@ -1,3 +1,4 @@
+import './monaco-setup';
 import './index.css';
 
 import React from 'react';

@@ -27,6 +27,7 @@ package.tgz
 /vscode-case-study
 .history
 tsconfig.tsbuildinfo
+bundle-stats.html
 
 # TESTING
 /coverage

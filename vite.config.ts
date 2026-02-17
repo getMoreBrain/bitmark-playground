@@ -1,14 +1,8 @@
 /// <reference types="vitest/config" />
-import path from 'path';
 import react from '@vitejs/plugin-react';
+import path from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
-import monacoEditorPluginModule from 'vite-plugin-monaco-editor';
-
-// Handle both ESM default and CJS interop
-const monacoEditorPlugin =
-  typeof monacoEditorPluginModule === 'function'
-    ? monacoEditorPluginModule
-    : (monacoEditorPluginModule as { default: typeof monacoEditorPluginModule }).default;
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,10 +10,23 @@ export default defineConfig({
     react({
       jsxImportSource: 'theme-ui',
     }),
-    monacoEditorPlugin({
-      languageWorkers: ['editorWorkerService', 'json'],
+    visualizer({
+      filename: 'bundle-stats.html',
+      gzipSize: true,
+      template: 'treemap',
     }),
   ],
+  resolve: {
+    alias: [
+      {
+        // Redirect bare 'monaco-editor' imports to the selective API entry point.
+        // This avoids pulling in editor.main.js which imports ALL languages and features.
+        // Uses regex with word boundary to avoid matching 'monaco-editor/esm/...' subpath imports.
+        find: /^monaco-editor$/,
+        replacement: 'monaco-editor/esm/vs/editor/editor.api',
+      },
+    ],
+  },
   base: '/bitmark-playground/',
   server: {
     port: 3010,
@@ -37,7 +44,10 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     css: true,
     alias: {
-      'monaco-editor/esm/vs/editor/editor.api': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
+      'monaco-editor/esm/vs/editor/editor.api': path.resolve(
+        __dirname,
+        'src/test/__mocks__/monaco-editor.ts',
+      ),
       'monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
       'react-monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/react-monaco-editor.tsx'),
     },
