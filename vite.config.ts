@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+import path from 'path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import monacoEditorPluginModule from 'vite-plugin-monaco-editor';
@@ -29,4 +31,15 @@ export default defineConfig({
   },
   // Handle .wasm files as assets
   assetsInclude: ['**/*.wasm'],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    css: true,
+    alias: {
+      'monaco-editor/esm/vs/editor/editor.api': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
+      'monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
+      'react-monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/react-monaco-editor.tsx'),
+    },
+  },
 });
