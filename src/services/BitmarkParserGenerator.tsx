@@ -1,6 +1,6 @@
 import type { BitmarkParserGenerator } from '@gmb/bitmark-parser-generator';
 import { useScript } from '@uidotdev/usehooks';
-import { createContext, ReactElement, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactElement, ReactNode, useContext, useMemo, useState } from 'react';
 
 import { log } from '../logging/log';
 
@@ -33,7 +33,10 @@ const BitmarkParserGeneratorProvider = (
 ): ReactElement => {
   const searchParams = new URLSearchParams(window.location.search);
   const version = searchParams.get('v') ?? 'latest';
-  const scriptUrl = `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`;
+  const scriptUrl = useMemo(
+    () => `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`,
+    [version],
+  );
   const { children } = props;
   const loadStatus = useScript(scriptUrl);
   const [state, setState] = useState<IBitmarkParserGeneratorContext>(defaultState);
