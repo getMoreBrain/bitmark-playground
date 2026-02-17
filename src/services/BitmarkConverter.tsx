@@ -1,3 +1,4 @@
+// @zen-component: PLAN-002-BitmarkConverter
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
 import { useCallback } from 'react';
 
@@ -5,73 +6,151 @@ import { bitmarkState } from '../state/bitmarkState';
 import { StringUtils } from '../utils/StringUtils';
 
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
+import { useBitmarkParser } from './BitmarkParser';
 
 export interface BitmarkConverter {
-  loadSuccess: boolean;
-  loadError: boolean;
+  jsLoadSuccess: boolean;
+  jsLoadError: boolean;
+  wasmLoadSuccess: boolean;
+  wasmLoadError: boolean;
   markupToJson: (markup: string, options?: ConvertOptions) => Promise<void>;
   jsonToMarkup: (json: string, options?: ConvertOptions) => Promise<void>;
 }
 
 const useBitmarkConverter = (): BitmarkConverter => {
-  const { bitmarkParserGenerator, loadSuccess, loadError } = useBitmarkParserGenerator();
+  const { bitmarkParserGenerator, loadSuccess: jsLoadSuccess, loadError: jsLoadError } = useBitmarkParserGenerator();
+  const { parse: wasmParse, loadSuccess: wasmLoadSuccess, loadError: wasmLoadError } = useBitmarkParser();
 
+  // @zen-impl: PLAN-002-Step3 (dual markupToJson)
   const markupToJson = useCallback(
     async (markup: string, options?: ConvertOptions) => {
-      if (!bitmarkParserGenerator) return;
+      // Sync raw input to both slices immediately so tab switching shows current text
+      bitmarkState.syncMarkupInput(markup);
 
-      let json: unknown;
-      let jsonError: Error | undefined;
+      const promises: Promise<void>[] = [];
 
-      performance.mark('Start');
+      // JS parser
+      if (bitmarkParserGenerator) {
+        promises.push(
+          (async () => {
+            let json: unknown;
+            let jsonError: Error | undefined;
 
-      try {
-        json = await bitmarkParserGenerator.convert(markup, options);
-      } catch (e) {
-        jsonError = e as Error;
+            const startMark = `js-m2j-start-${Date.now()}`;
+            const endMark = `js-m2j-end-${Date.now()}`;
+            performance.mark(startMark);
+
+            try {
+              json = await bitmarkParserGenerator.convert(markup, options);
+            } catch (e) {
+              jsonError = e as Error;
+            }
+
+            performance.mark(endMark);
+            const convertTimeSecs = performance.measure('js-markupToJson', startMark, endMark).duration / 1000;
+
+            bitmarkState.setJson('js', markup, json as BitWrapperJson[] | undefined, jsonError, convertTimeSecs);
+          })(),
+        );
       }
 
-      performance.mark('End');
-      const convertTimeSecs = Math.round(performance.measure('markupToJson', 'Start', 'End').duration) / 1000;
+      // WASM parser
+      if (wasmParse) {
+        promises.push(
+          (async () => {
+            let json: BitWrapperJson[] | undefined;
+            let jsonError: Error | undefined;
 
-      // Update state
-      bitmarkState.setJson(markup, json as BitWrapperJson[] | undefined, jsonError, convertTimeSecs);
+            const startMark = `wasm-m2j-start-${Date.now()}`;
+            const endMark = `wasm-m2j-end-${Date.now()}`;
+            performance.mark(startMark);
+
+            try {
+              const resultStr = wasmParse(markup);
+              json = JSON.parse(resultStr) as BitWrapperJson[];
+            } catch (e) {
+              jsonError = e as Error;
+            }
+
+            performance.mark(endMark);
+            const convertTimeSecs = performance.measure('wasm-markupToJson', startMark, endMark).duration / 1000;
+
+            bitmarkState.setJson('wasm', markup, json, jsonError, convertTimeSecs);
+          })(),
+        );
+      }
+
+      await Promise.allSettled(promises);
     },
-    [bitmarkParserGenerator],
+    [bitmarkParserGenerator, wasmParse],
   );
 
+  // @zen-impl: PLAN-002-Step3 (dual jsonToMarkup)
   const jsonToMarkup = useCallback(
     async (json: string, options?: ConvertOptions) => {
-      if (!bitmarkParserGenerator) return;
+      // Sync raw input to both slices immediately so tab switching shows current text
+      bitmarkState.syncJsonInput(json);
 
-      let markup: unknown;
-      let markupError: Error | undefined;
+      const promises: Promise<void>[] = [];
 
-      performance.mark('Start');
+      // JS parser
+      if (bitmarkParserGenerator) {
+        promises.push(
+          (async () => {
+            let markup: unknown;
+            let markupError: Error | undefined;
 
-      try {
-        markup = await bitmarkParserGenerator.convert(json, options);
-        if (!StringUtils.isString(markup)) {
-          throw new Error('Expected string');
-        }
-      } catch (e) {
-        markupError = e as Error;
+            const startMark = `js-j2m-start-${Date.now()}`;
+            const endMark = `js-j2m-end-${Date.now()}`;
+            performance.mark(startMark);
+
+            try {
+              markup = await bitmarkParserGenerator.convert(json, options);
+              if (!StringUtils.isString(markup)) {
+                throw new Error('Expected string');
+              }
+            } catch (e) {
+              markupError = e as Error;
+            }
+
+            performance.mark(endMark);
+            const convertTimeSecs = performance.measure('js-jsonToMarkup', startMark, endMark).duration / 1000;
+
+            if (!markupError || markupError.message !== 'Expected string') {
+              bitmarkState.setMarkup('js', json, markup as string | undefined, markupError, convertTimeSecs);
+            }
+          })(),
+        );
       }
 
-      performance.mark('End');
-      const convertTimeSecs = Math.round(performance.measure('jsonToMarkup', 'Start', 'End').duration) / 1000;
+      // WASM parser — generate() not yet implemented
+      if (wasmLoadSuccess) {
+        promises.push(
+          (async () => {
+            const startMark = `wasm-j2m-start-${Date.now()}`;
+            const endMark = `wasm-j2m-end-${Date.now()}`;
+            performance.mark(startMark);
 
-      // Update state (if no error)
-      if (!markupError || markupError.message !== 'Expected string') {
-        bitmarkState.setMarkup(json, markup as string | undefined, markupError, convertTimeSecs);
+            const markupError = new Error('generate() not yet implemented');
+
+            performance.mark(endMark);
+            const convertTimeSecs = performance.measure('wasm-jsonToMarkup', startMark, endMark).duration / 1000;
+
+            bitmarkState.setMarkup('wasm', json, undefined, markupError, convertTimeSecs);
+          })(),
+        );
       }
+
+      await Promise.allSettled(promises);
     },
-    [bitmarkParserGenerator],
+    [bitmarkParserGenerator, wasmLoadSuccess],
   );
 
   return {
-    loadSuccess,
-    loadError,
+    jsLoadSuccess,
+    jsLoadError,
+    wasmLoadSuccess,
+    wasmLoadError,
     markupToJson,
     jsonToMarkup,
   };

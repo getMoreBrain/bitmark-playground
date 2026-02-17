@@ -18,6 +18,11 @@ module.exports = override(
       // features: ['!gotoSymbol'],
     }),
   ),
+  // Suppress missing source map warnings from node_modules (e.g. monaco-editor's bundled marked.js)
+  (config) => {
+    config.ignoreWarnings = [/Failed to parse source map/];
+    return config;
+  },
 );
 
 // For information on customizing Monaco:

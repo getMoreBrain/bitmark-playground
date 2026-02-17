@@ -59,7 +59,7 @@ const themeDefaults: Theme = {
       },
       /* Scrollbar on Firefox */
       // Does not work here, apply directly 'scrollbar-width': 'thin' /* "auto" or "thin" */,
-      'scrollbar-color': '#7dc13a #63019B' /* scroll thumb and track */,
+      scrollbarColor: '#7dc13a #63019B' /* scroll thumb and track */,
     },
   },
 };

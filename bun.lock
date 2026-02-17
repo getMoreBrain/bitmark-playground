@@ -17,11 +17,11 @@
         "@types/react-dom": "^18.2.14",
         "@uidotdev/usehooks": "^2.4.0",
         "lodash": "^4.17.21",
-        "monaco-editor": "^0.44.0",
-        "monaco-editor-core": "^0.44.0",
+        "monaco-editor": "^0.52.0",
+        "monaco-editor-core": "^0.52.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-monaco-editor": "^0.54.0",
+        "react-monaco-editor": "^0.59.0",
         "react-scripts": "5.0.1",
         "theme-ui": "^0.16.1",
         "typescript": "^5.2.2",
@@ -1657,9 +1657,9 @@
 
     "mkdirp": ["mkdirp@0.5.6", "", { "dependencies": { "minimist": "^1.2.6" }, "bin": { "mkdirp": "bin/cmd.js" } }, "sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw=="],
 
-    "monaco-editor": ["monaco-editor@0.44.0", "", {}, "sha512-5SmjNStN6bSuSE5WPT2ZV+iYn1/yI9sd4Igtk23ChvqB7kDk9lZbB9F5frsuvpB+2njdIeGGFf2G4gbE6rCC9Q=="],
+    "monaco-editor": ["monaco-editor@0.52.2", "", {}, "sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ=="],
 
-    "monaco-editor-core": ["monaco-editor-core@0.44.0", "", {}, "sha512-gPhXfbi0RCnIRXMUzkvjRc8tUiD56lkuw7uRr2dUv00owYthFRlyot2R0ECFuA5F3YKei4OlFjALDahxIC/6Jg=="],
+    "monaco-editor-core": ["monaco-editor-core@0.52.2", "", {}, "sha512-5TOyTUymNx7jB24TGP4Qs5UEVrntDKSMzDUvW3ADaI1CFRO1t7FPhbT2u4m3iIKZf85zTM+mkCxiUSgj+v/YtA=="],
 
     "monaco-editor-webpack-plugin": ["monaco-editor-webpack-plugin@7.1.1", "", { "dependencies": { "loader-utils": "^2.0.2" }, "peerDependencies": { "monaco-editor": ">= 0.31.0", "webpack": "^4.5.0 || 5.x" } }, "sha512-WxdbFHS3Wtz4V9hzhe/Xog5hQRSMxmDLkEEYZwqMDHgJlkZo00HVFZR0j5d0nKypjTUkkygH3dDSXERLG4757A=="],
 
@@ -1989,7 +1989,7 @@
 
     "react-is": ["react-is@16.13.1", "", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 
-    "react-monaco-editor": ["react-monaco-editor@0.54.0", "", { "dependencies": { "prop-types": "^15.8.1" }, "peerDependencies": { "@types/react": ">=16 <= 18", "monaco-editor": "^0.39.0", "react": ">=16 <= 18" } }, "sha512-9JwO69851mfpuhYLHlKbae7omQWJ/2ICE2lbL0VHyNyZR8rCOH7440u+zAtDgiOMpLwmYdY1sEZCdRefywX6GQ=="],
+    "react-monaco-editor": ["react-monaco-editor@0.59.0", "", { "peerDependencies": { "monaco-editor": "^0.52.0", "react": ">=16.8.0 <20.0.0", "react-dom": ">=16.8.0 <20.0.0" } }, "sha512-SggqfZCdUauNk7GI0388bk5n25zYsQ1ai1i+VhxAgwbCH+MTGl7L1fBNTJ6V+oXeUApf+bpzikprHJEZm9J/zA=="],
 
     "react-refresh": ["react-refresh@0.11.0", "", {}, "sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A=="],
 

@@ -1,175 +1,130 @@
+// @zen-component: PLAN-002-App
 /** @jsxImportSource theme-ui */
-import { Flex, Text, ThemeUIProvider } from 'theme-ui';
+import { Flex, ThemeUIProvider } from 'theme-ui';
+import { useSnapshot } from 'valtio';
 
-import { BitmarkJsonDuration } from './components/bitmark/BitmarkJsonDuration';
 import { BitmarkJsonTextBox } from './components/bitmark/BitmarkJsonTextBox';
-import { BitmarkMarkupDuration } from './components/bitmark/BitmarkMarkupDuration';
 import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox';
+import { ParserTabBar } from './components/generic/ui/ParserTabBar';
 import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { BitmarkParserProvider } from './services/BitmarkParser';
+import { bitmarkState } from './state/bitmarkState';
 import { theme } from './theme/theme';
 import './App.css';
 
 const initialMarkup = '[.article] Hello World!';
-// const initialMarkup = `
-// [.article:bitmark++&video]
 
-// Here is some inline 'style' applied **here is __the__ text** is this bold.
-// Here is some __italic__ text ==the text==|test| is that correct **bold**
-
-// [.article:bitmark++]
-// Here is some inline 'style' applied ==here is the text==|bold|italic|subscript|, nice huh?
-
-// **bold**
-
-// [.image]
-// [@id:304379]
-// [@backgroundWallpaper:https://miro.medium.com/background.png]
-// [&image:https://miro.medium.com/v2/resizefit1400/1nT_Rrk9LCI5XWiLGzzOzBQ*.gif][@search:testing **123**]
-
-// [.image]
-// [@id:304379]
-// [@levelCEFRp:levelCEFRp]
-// [@levelCEFR:levelCEFR]
-// [@levelILR:levelILR]
-// [@levelACTFL:levelACTFL]
-// [&image:https://miro.medium.com/v2/resizefit1400/1nT_Rrk9LCI5XWiLGzzOzBQ$.gif][@zoomDisabled]
-
-// [.article]
-
-// [@ip:false]
-// `.trim();
-
+// @zen-impl: PLAN-002-Step5 (tab bar integration)
+// @zen-impl: PLAN-002-Step7 (provider nesting)
 function App() {
+  const snap = useSnapshot(bitmarkState);
+
   return (
     <ThemeUIProvider theme={theme}>
       <BitmarkParserGeneratorProvider>
-        <Flex
-          sx={{
-            flexDirection: 'column',
-            height: '100vh',
-            width: '100vw',
-            backgroundColor: 'background',
-          }}
-        >
+        <BitmarkParserProvider>
           <Flex
             sx={{
-              flexDirection: 'row',
-              height: '100%',
+              flexDirection: 'column',
+              height: '100vh',
+              width: '100vw',
+              backgroundColor: 'background',
             }}
           >
             <Flex
               sx={{
-                flexDirection: 'column',
-                flexGrow: 1,
-                width: '50%',
+                flexDirection: 'row',
+                height: '100%',
               }}
             >
               <Flex
                 sx={{
-                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  width: '50%',
                 }}
               >
-                <Text
+                <ParserTabBar
+                  label="bitmark"
+                  jsDuration={snap.js.markupDurationSec}
+                  wasmDuration={snap.wasm.markupDurationSec}
+                  activeTab={snap.activeMarkupTab}
+                  onTabChange={(tab) => bitmarkState.setActiveMarkupTab(tab)}
+                />
+                <Flex
                   sx={{
-                    variant: 'header.code',
+                    resize: 'none',
+                    variant: 'textarea.code',
+                    flexGrow: 1,
                   }}
                 >
-                  bitmark
-                </Text>
-                <BitmarkMarkupDuration
-                  sx={{
-                    variant: 'text.parserDuration',
-                  }}
-                />
+                  <BitmarkMarkupTextBox
+                    className={'markup-editor'}
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'accent',
+                    }}
+                    initialMarkup={initialMarkup}
+                    options={{
+                      wordWrap: 'on',
+                    }}
+                  />
+                </Flex>
               </Flex>
               <Flex
                 sx={{
-                  resize: 'none',
-                  variant: 'textarea.code',
+                  flexDirection: 'column',
                   flexGrow: 1,
+                  width: '50%',
                 }}
               >
-                <BitmarkMarkupTextBox
-                  className={'markup-editor'}
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'accent',
-                  }}
-                  initialMarkup={initialMarkup}
-                  options={{
-                    wordWrap: 'on',
-                    // bracketPairColorization: {
-                    //   enabled: false,
-                    //   independentColorPoolPerBracketType: false,
-                    // },
-                  }}
+                <ParserTabBar
+                  label="JSON"
+                  jsDuration={snap.js.jsonDurationSec}
+                  wasmDuration={snap.wasm.jsonDurationSec}
+                  activeTab={snap.activeJsonTab}
+                  onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
                 />
+                <Flex
+                  sx={{
+                    resize: 'none',
+                    variant: 'textarea.code',
+                    flexGrow: 1,
+                  }}
+                >
+                  <BitmarkJsonTextBox
+                    className={'json-editor'}
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'accent',
+                    }}
+                    options={{
+                      wordWrap: 'on',
+                    }}
+                  />
+                </Flex>
               </Flex>
             </Flex>
             <Flex
               sx={{
-                flexDirection: 'column',
-                flexGrow: 1,
-                width: '50%',
+                justifyContent: 'space-between',
               }}
             >
-              <Flex
+              <Version
                 sx={{
-                  alignItems: 'flex-end',
+                  variant: 'text.copyright',
                 }}
-              >
-                <Text
-                  sx={{
-                    variant: 'header.code',
-                  }}
-                >
-                  JSON
-                </Text>
-                <BitmarkJsonDuration
-                  sx={{
-                    variant: 'text.parserDuration',
-                  }}
-                />
-              </Flex>
-              <Flex
+              />
+              <Copyright
                 sx={{
-                  resize: 'none',
-                  variant: 'textarea.code',
-                  flexGrow: 1,
+                  variant: 'text.copyright',
                 }}
-              >
-                <BitmarkJsonTextBox
-                  className={'json-editor'}
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'accent',
-                  }}
-                  options={{
-                    wordWrap: 'on',
-                  }}
-                />
-              </Flex>
+              />
             </Flex>
           </Flex>
-          <Flex
-            sx={{
-              justifyContent: 'space-between',
-            }}
-          >
-            <Version
-              sx={{
-                variant: 'text.copyright',
-              }}
-            />
-            <Copyright
-              sx={{
-                variant: 'text.copyright',
-              }}
-            />
-          </Flex>
-        </Flex>
+        </BitmarkParserProvider>
       </BitmarkParserGeneratorProvider>
     </ThemeUIProvider>
   );
