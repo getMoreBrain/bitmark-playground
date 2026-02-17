@@ -1,9 +1,17 @@
-import { Term, terms, buildHighlightInfo } from './highlighter';
+import { buildHighlightInfo, Term, terms } from './highlighter';
 import { Language } from './language';
 import { Theme } from './theme';
 
 export function escapeHtml(text: string, escapeQuotes: boolean = false) {
-  text = text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split(' ').join('&nbsp;');
+  text = text
+    .split('&')
+    .join('&amp;')
+    .split('<')
+    .join('&lt;')
+    .split('>')
+    .join('&gt;')
+    .split(' ')
+    .join('&nbsp;');
   if (escapeQuotes) text = text.split('"').join('&quot;');
   return text;
 }
@@ -36,7 +44,10 @@ export function highlight(
   const termCssClassName: Record<Term, string> | null = useInlineStyle
     ? null
     : (Object.fromEntries(
-        terms.map((term) => [term, getCssClassName ? escapeHtml(getCssClassName(term), true) : `mts-${term}`]),
+        terms.map((term) => [
+          term,
+          getCssClassName ? escapeHtml(getCssClassName(term), true) : `mts-${term}`,
+        ]),
       ) as unknown as Record<Term, string>);
 
   // TODO: Use a tree-traversal based algorithm to handle nested terms.
@@ -47,8 +58,10 @@ export function highlight(
     if (startIndex < currentIndex) continue;
 
     const text = code.substring(startIndex, endIndex);
-    if (useInlineStyle) result += `<span style="${Theme.generateStyleOfTerm(term)}">${escapeHtml(text)}</span>`;
-    else if (termCssClassName) result += `<span class="${termCssClassName[term]}">${escapeHtml(text)}</span>`;
+    if (useInlineStyle)
+      result += `<span style="${Theme.generateStyleOfTerm(term)}">${escapeHtml(text)}</span>`;
+    else if (termCssClassName)
+      result += `<span class="${termCssClassName[term]}">${escapeHtml(text)}</span>`;
     else result += `<span>${escapeHtml(text)}</span>`;
 
     currentIndex = endIndex;

@@ -1,7 +1,8 @@
+// @zen-component: PLAN-002-ApplicationInfo
 import { useMemo } from 'react';
 
 import { buildInfo } from '../generated/build-info';
-
+import { useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
 const FIRST_PUBLISHED_YEAR = 2023;
@@ -14,10 +15,15 @@ export interface ApplicationInfo {
   description: string;
   copyright: string;
   bitmarkParserGeneratorVersion: string;
+  bitmarkParserGeneratorLoadError: boolean;
+  // @zen-impl: PLAN-002-Step8 (bp version in app info)
+  bitmarkParserVersion: string;
+  bitmarkParserLoadError: boolean;
 }
 
 const useApplicationInfo = (): ApplicationInfo => {
-  const { bitmarkParserGenerator } = useBitmarkParserGenerator();
+  const { bitmarkParserGenerator, loadError: bpgLoadError } = useBitmarkParserGenerator();
+  const { version: bitmarkParserVersion, loadError: bpLoadError } = useBitmarkParser();
 
   const appInfo = useMemo<ApplicationInfo>(() => {
     let bitmarkParserGeneratorVersion = '';
@@ -27,7 +33,9 @@ const useApplicationInfo = (): ApplicationInfo => {
 
     const thisYear = new Date().getFullYear();
     const copyrightYear =
-      thisYear === FIRST_PUBLISHED_YEAR ? thisYear.toString() : `${FIRST_PUBLISHED_YEAR}-${thisYear}`;
+      thisYear === FIRST_PUBLISHED_YEAR
+        ? thisYear.toString()
+        : `${FIRST_PUBLISHED_YEAR}-${thisYear}`;
 
     const copyright = `© ${copyrightYear} ${buildInfo.author}`;
 
@@ -35,8 +43,11 @@ const useApplicationInfo = (): ApplicationInfo => {
       ...buildInfo,
       copyright,
       bitmarkParserGeneratorVersion,
+      bitmarkParserGeneratorLoadError: bpgLoadError,
+      bitmarkParserVersion,
+      bitmarkParserLoadError: bpLoadError,
     };
-  }, [bitmarkParserGenerator]);
+  }, [bitmarkParserGenerator, bpgLoadError, bitmarkParserVersion, bpLoadError]);
 
   return appInfo;
 };

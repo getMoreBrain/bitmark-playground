@@ -1,5 +1,5 @@
-import MonacoEditor, { MonacoEditorProps } from 'react-monaco-editor';
 import React, { createRef } from 'react';
+import MonacoEditor, { MonacoEditorProps } from 'react-monaco-editor';
 
 export interface MonacoEditorAutoResizeProps extends MonacoEditorProps {
   //

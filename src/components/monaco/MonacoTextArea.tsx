@@ -1,7 +1,13 @@
 /** @jsxImportSource theme-ui */
 
-import { EditorDidMount, EditorWillMount, EditorWillUnmount, MonacoEditorProps, monaco } from 'react-monaco-editor';
 import { memo, useCallback, useEffect, useRef } from 'react';
+import {
+  EditorDidMount,
+  EditorWillMount,
+  EditorWillUnmount,
+  monaco,
+  MonacoEditorProps,
+} from 'react-monaco-editor';
 
 import { MonacoEditorAutoResize } from './MonacoEditorAutoResize';
 
@@ -13,6 +19,7 @@ export interface MonacoTextAreaUncontrolledProps extends MonacoEditorProps {
 interface MonacoEditorRef {
   editor?: monaco.editor.IStandaloneCodeEditor;
   monaco?: typeof monaco;
+  isProgrammaticChange?: boolean;
 }
 
 /**
@@ -65,14 +72,15 @@ const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
     const monacoEditor = ref.current.editor;
 
     const onDidChangeModelContent = () => {
+      if (ref.current.isProgrammaticChange) return;
       const value = monacoEditor.getValue() ?? ''; // monacoRef.value ?? '';
       if (onInput) onInput(value);
     };
 
-    monacoEditor.onDidChangeModelContent(onDidChangeModelContent);
+    const disposable = monacoEditor.onDidChangeModelContent(onDidChangeModelContent);
 
     return () => {
-      // No need to remove the handler, as the editor will be destroyed
+      disposable.dispose();
     };
   }, [ref.current.editor, onInput]);
 
@@ -82,7 +90,11 @@ const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
       const monacoEditor = ref.current.editor;
       const hasFocus = monacoEditor.hasTextFocus();
       const currentValue = monacoEditor.getValue();
-      if (!hasFocus && currentValue !== value) monacoEditor.setValue(value ?? '');
+      if (!hasFocus && currentValue !== value) {
+        ref.current.isProgrammaticChange = true;
+        monacoEditor.setValue(value ?? '');
+        ref.current.isProgrammaticChange = false;
+      }
     }
   }, [value]);
 

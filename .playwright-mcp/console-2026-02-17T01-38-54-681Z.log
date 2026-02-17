@@ -1,0 +1,746 @@
+[     427ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229138:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:731:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:867:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6158:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6199:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6158:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6199:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6158:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6199:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6158:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6199:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3952:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2298:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2448:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7559:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5812:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6052:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7559:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7568:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8045:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203106
+[   74749ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229141:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:731:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:867:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6161:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6202:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6161:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6202:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6161:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6202:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6161:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6202:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3955:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2301:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2451:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7562:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5815:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6055:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7562:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7571:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8048:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203109
+[  429731ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229142:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6162:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6203:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6162:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6203:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6162:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6203:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6162:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6203:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3956:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2302:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2452:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7563:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5816:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6056:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7563:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7572:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8049:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203110
+[  518026ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229147:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6167:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6208:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6167:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6208:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6167:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6208:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6167:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6208:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3961:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2307:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2457:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7568:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5821:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6061:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7568:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8054:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203115
+[  585911ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229152:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2312:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2462:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5826:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6066:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7582:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8059:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203120
+[  695367ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229152:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2312:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2462:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5826:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6066:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7582:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8059:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203120
+[  699665ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229152:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2312:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2462:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5826:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6066:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7582:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8059:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203120
+[  705995ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229152:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2312:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2462:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5826:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6066:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7582:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8059:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203120
+[  706277ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.1-alpha.1/dist/browser/bitmark-parser.min.js:0
+[  706277ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.1-alpha.1/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2352
+[  713172ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229152:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6172:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6213:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3966:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2312:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2462:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5826:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6066:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7573:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7582:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8059:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203120
+[  854107ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229156:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2316:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2466:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5830:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6070:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7586:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8063:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203124
+[  854726ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js:0
+[  854727ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2356
+[  864876ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js:0
+[  864877ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2356
+[  865955ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  865955ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  875470ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js:0
+[  875471ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2356
+[  876056ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  876056ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  889136ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229156:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2316:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2466:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5830:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6070:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7586:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8063:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203124
+[  889165ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  889165ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  895862ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229156:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2316:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2466:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5830:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6070:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7586:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8063:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203124
+[  896920ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  896920ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  901504ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229156:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6176:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6217:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3970:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2316:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2466:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5830:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6070:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7577:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7586:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8063:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203124
+[  913710ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  913710ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2492
+[  913713ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js:0
+[  913713ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2356
+[ 1000792ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2514
+[ 1000792ms] [ERROR] BitmarkParserGeneratorProvider: failed to load @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2514
+[ 1001164ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js:0
+[ 1001164ms] [ERROR] BitmarkParserProvider: failed to load TypeError: Failed to fetch dynamically imported module: https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@v3.0.0-alpha.2/dist/browser/bitmark-parser.min.js @ http://localhost:3000/bitmark-playground/static/js/bundle.js:2378
+[ 1004238ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229178:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2338:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2488:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7599:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5852:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6092:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7599:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7608:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8085:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203146
+[ 1006595ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229178:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6198:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6239:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:3992:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2338:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2488:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7599:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5852:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6092:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7599:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7608:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8085:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203146
+[ 1761697ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229200:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6220:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6261:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6220:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6261:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6220:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6261:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6220:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6261:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4014:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2352:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2502:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7621:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5874:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6114:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7621:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7630:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8107:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203168
+[ 1973903ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229212:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2352:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2502:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7633:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5886:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6126:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7633:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7642:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8119:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203180
+[ 2018078ms] [ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s MonacoEditor 
+    at MonacoEditor (http://localhost:3000/bitmark-playground/static/js/bundle.js:229212:18)
+    at div
+    at MonacoEditorAutoResize (http://localhost:3000/bitmark-playground/static/js/bundle.js:735:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:871:5
+    at BitmarkMarkupTextBox (http://localhost:3000/bitmark-playground/static/js/bundle.js:450:5)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at div
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Box (http://localhost:3000/bitmark-playground/static/js/bundle.js:6232:66)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at Flex (http://localhost:3000/bitmark-playground/static/js/bundle.js:6273:16)
+    at http://localhost:3000/bitmark-playground/static/js/bundle.js:4026:66
+    at BitmarkParserProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2352:5)
+    at BitmarkParserGeneratorProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:2502:5)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7633:3)
+    at TopLevelColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:5886:3)
+    at ColorModeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:6126:3)
+    at __ThemeUIInternalBaseThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7633:3)
+    at ThemeProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:7642:3)
+    at ThemeUIProvider (http://localhost:3000/bitmark-playground/static/js/bundle.js:8119:3)
+    at App (http://localhost:3000/bitmark-playground/static/js/bundle.js:55:67) @ http://localhost:3000/bitmark-playground/static/js/bundle.js:203180
+[ 2303757ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/bitmark-playground/static/js/bundle.js:235670
+[ 2363763ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/bitmark-playground/static/js/bundle.js:250705

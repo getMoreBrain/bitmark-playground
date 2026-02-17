@@ -1,7 +1,6 @@
-/* eslint-disable no-template-curly-in-string */
 import type { BitmarkParserGenerator } from '@gmb/bitmark-parser-generator';
 import { useScript } from '@uidotdev/usehooks';
-import { useState, createContext, useContext, ReactNode, ReactElement } from 'react';
+import { createContext, ReactElement, ReactNode, useContext, useMemo, useState } from 'react';
 
 import { log } from '../logging/log';
 
@@ -29,10 +28,15 @@ const BitmarkParserGeneratorContext = createContext<IBitmarkParserGeneratorConte
 
 const useBitmarkParserGenerator = () => useContext(BitmarkParserGeneratorContext);
 
-const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderProps): ReactElement => {
+const BitmarkParserGeneratorProvider = (
+  props: BitmarkParserGeneratorProviderProps,
+): ReactElement => {
   const searchParams = new URLSearchParams(window.location.search);
   const version = searchParams.get('v') ?? 'latest';
-  const scriptUrl = `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`;
+  const scriptUrl = useMemo(
+    () => `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`,
+    [version],
+  );
   const { children } = props;
   const loadStatus = useScript(scriptUrl);
   const [state, setState] = useState<IBitmarkParserGeneratorContext>(defaultState);
@@ -67,7 +71,11 @@ const BitmarkParserGeneratorProvider = (props: BitmarkParserGeneratorProviderPro
     }
   }
 
-  return <BitmarkParserGeneratorContext.Provider value={state}>{children}</BitmarkParserGeneratorContext.Provider>;
+  return (
+    <BitmarkParserGeneratorContext.Provider value={state}>
+      {children}
+    </BitmarkParserGeneratorContext.Provider>
+  );
 };
 
-export { BitmarkParserGeneratorProvider, BitmarkParserGeneratorContext, useBitmarkParserGenerator };
+export { BitmarkParserGeneratorContext, BitmarkParserGeneratorProvider, useBitmarkParserGenerator };
