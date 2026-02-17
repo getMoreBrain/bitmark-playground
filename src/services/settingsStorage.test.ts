@@ -52,6 +52,25 @@ describe('settingsStorage', () => {
       expect(migrateSettings({ ...validSettings, v: 999 })).toBeNull();
     });
 
+    it('migrates v1 settings to v2', () => {
+      const v1Settings = {
+        v: 1,
+        activeMarkupTab: 'js',
+        activeJsonTab: 'wasm',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      const result = migrateSettings(v1Settings);
+      expect(result).toEqual({ ...v1Settings, v: CURRENT_VERSION });
+    });
+
+    it('accepts wasmFull as valid ParserType', () => {
+      expect(
+        migrateSettings({ ...validSettings, activeJsonTab: 'wasmFull' }),
+      ).toEqual({ ...validSettings, activeJsonTab: 'wasmFull' });
+    });
+
     it('returns null for invalid activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'invalid' })).toBeNull();
     });
