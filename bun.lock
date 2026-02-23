@@ -25,7 +25,7 @@
         "@eslint/js": "^9.28.0",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@gmb/bitmark-parser": "3.0.1-alpha.5",
+        "@gmb/bitmark-parser": "^3.0.2",
         "@gmb/bitmark-parser-generator": "^1.5.28",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -212,7 +212,7 @@
 
     "@exodus/bytes": ["@exodus/bytes@1.14.1", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ=="],
 
-    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@3.0.1-alpha.5", "", { "dependencies": { "commander": "^14.0.0" }, "bin": { "bitmark-parser-wasm": "dist/cli.js" } }, "sha512-LplcHYa4nw4TRLD1IQ36dhGYvbIVGh3Qs+89T28HYwh7M7nXD9BeU2YmvGG/qjq185CNHqdn3SFi/Appca9uhA=="],
+    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@3.0.2", "", { "dependencies": { "commander": "^14.0.0" }, "bin": { "bitmark-parser-wasm": "dist/cli.js" } }, "sha512-B+4TPVBFIowJx11SpESpYNvPuxu1YplQ6kDF1Ipe3Zesx2+ne3EOxcuP72XxWfQdVRN1VQk1vuU5nYa0/15Ycw=="],
 
     "@gmb/bitmark-parser-generator": ["@gmb/bitmark-parser-generator@1.35.0", "", { "dependencies": { "@ncoderz/superenum": "^0.2.4", "@types/fs-extra": "^11.0.4", "@ungap/structured-clone": "^1.2.0", "fs-extra": "^11.2.0" } }, "sha512-zVIM2xfpoTxVtou7Cxx92Xa8rI/9AByqnoT5eWVBxPwunjPsmM0vRFqGDVOxANc2wd3kYa+LSxQgNALP95UyLQ=="],
 
