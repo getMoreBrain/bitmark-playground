@@ -7,7 +7,6 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -65,10 +64,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const searchParams = new URLSearchParams(window.location.search);
     const version = searchParams.get('v2') ?? 'latest';
-    const moduleUrl = useMemo(
-      () => `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${_cacheBuster}`,
-      [version],
-    );
+    const moduleUrl = `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${_cacheBuster}`;
 
     const load = async () => {
       try {
