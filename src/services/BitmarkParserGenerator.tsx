@@ -7,6 +7,9 @@ import { log } from '../logging/log';
 const BITMARK_PARSER_GENERATOR_SCRIPT_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser-generator@${version}/dist/browser/bitmark-parser-generator.min.js';
 
+// Single cache-buster timestamp
+const _cacheBuster = Date.now();
+
 interface BitmarkParserGeneratorProviderProps {
   children?: ReactNode;
 }
@@ -34,7 +37,7 @@ const BitmarkParserGeneratorProvider = (
   const searchParams = new URLSearchParams(window.location.search);
   const version = searchParams.get('v') ?? 'latest';
   const scriptUrl = useMemo(
-    () => `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${Date.now()}`,
+    () => `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${_cacheBuster}`,
     [version],
   );
   const { children } = props;
