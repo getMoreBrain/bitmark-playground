@@ -7,7 +7,6 @@ import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 import { Parser } from 'web-tree-sitter';
 
-import { buildInfo } from '../../generated/build-info';
 import treeSitterBitmarkGrammar from '../../monaco-tree-sitter/grammars/bitmark.json';
 import { Language } from '../../monaco-tree-sitter/language';
 import { MonacoTreeSitter } from '../../monaco-tree-sitter/monaco-tree-sitter';
@@ -54,10 +53,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     const language = new Language(treeSitterBitmarkGrammar as Grammar);
 
     // Apply the language to the editor
-    const languageWasmPath = new URL(
-      `../../tree-sitter-bitmark.wasm?${buildInfo.version}`,
-      import.meta.url,
-    ).toString();
+    const languageWasmPath = new URL(`../../tree-sitter-bitmark.wasm`, import.meta.url).toString();
     void language.init(languageWasmPath, Parser).then(() => {
       new MonacoTreeSitter(MonacoModule, editor, language);
     });
