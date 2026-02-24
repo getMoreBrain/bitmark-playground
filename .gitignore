@@ -3,6 +3,9 @@
 # IDE
 .vscode/mise-tools
 
+# AI
+.playwright-mcp
+
 # MISC
 .DS_Store
 .env.local
@@ -12,20 +15,6 @@
 .playwright-mcp
 bundle-stats.html
 
-
-# YARN
-**/.yarn/*
-!**/.yarn/releases
-!**/.yarn/plugins
-!**/.yarn/sdks
-**/yarn-error.log
-**/yarn-debug.log
-**/npm-debug.log
-
-# Swap the comments on the following lines if you don't wish to use zero-installs
-# Documentation here: https://yarnpkg.com/features/zero-installs
-# !/.yarn/cache
-**/.pnp.*
 
 # DEPENDENCIES
 /node_modules
@@ -40,6 +29,7 @@ package.tgz
 /vscode-case-study
 .history
 tsconfig.tsbuildinfo
+bundle-stats.html
 
 # TESTING
 /coverage

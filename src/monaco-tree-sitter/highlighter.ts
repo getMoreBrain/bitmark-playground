@@ -1,5 +1,5 @@
 import * as MonacoModule from 'monaco-editor';
-import { Tree as ParserTree, Node as ParserNode } from 'web-tree-sitter';
+import { Node as ParserNode, Tree as ParserTree } from 'web-tree-sitter';
 
 import { Language } from './language';
 import { Monaco } from './monaco';
@@ -104,7 +104,11 @@ export function buildHighlightInfo(tree: ParserTree, language: Language) {
 
           const orderScopes: string[] = [];
           for (let i = 0; i < scopes.length; i++)
-            orderScopes.push(scopes[i], scopes[i] + '[' + index + ']', scopes[i] + '[' + rindex + ']');
+            orderScopes.push(
+              scopes[i],
+              scopes[i] + '[' + index + ']',
+              scopes[i] + '[' + rindex + ']',
+            );
           scopes = orderScopes;
         }
         // Use most complex scope
@@ -125,7 +129,8 @@ export function buildHighlightInfo(tree: ParserTree, language: Language) {
 }
 
 export function buildDecorations(tree: ParserTree, language: Language) {
-  if (!Monaco) throw new TypeError('Please provide the monaco-editor module via provideMonacoModule() first.');
+  if (!Monaco)
+    throw new TypeError('Please provide the monaco-editor module via provideMonacoModule() first.');
 
   const decorations: Record<Term, MonacoModule.Range[]> = Object.fromEntries(
     terms.map((term) => [term, []]),

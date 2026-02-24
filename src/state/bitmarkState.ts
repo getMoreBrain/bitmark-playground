@@ -1,10 +1,13 @@
-/* eslint-disable valtio/avoid-this-in-proxy */
+// @zen-component: PLAN-002-BitmarkState
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
+import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
-export interface BitmarkState {
+export type ParserType = 'js' | 'wasm' | 'wasmFull';
+
+export interface ParserSlice {
   readonly markup: string;
   readonly markupError: Error | undefined;
   readonly markupErrorAsString: string | undefined;
@@ -16,15 +19,37 @@ export interface BitmarkState {
   readonly jsonErrorAsString: string | undefined;
   readonly jsonDurationSec: number | undefined;
   readonly jsonUpdates: number;
-  // AST not implemented yet
-  // ast: BitmarkAst | undefined;
-  // astError: string | undefined;
-  // astUpdates: number;
-  setJson(markup: string, json: BitWrapperJson[] | undefined, jsonError: Error | undefined, durationSec?: number): void;
-  setMarkup(json: string, markup: string | undefined, markupError: Error | undefined, durationSec?: number): void;
+  readonly lexerOutput: string;
 }
 
-const bitmarkState = proxy<BitmarkState>({
+export interface BitmarkState {
+  readonly js: ParserSlice;
+  readonly wasm: ParserSlice;
+  readonly wasmFull: ParserSlice;
+  readonly activeMarkupTab: ParserType;
+  readonly activeJsonTab: ParserType;
+  setJson(
+    parser: ParserType,
+    markup: string,
+    json: BitWrapperJson[] | undefined,
+    jsonError: Error | undefined,
+    durationSec?: number,
+  ): void;
+  setMarkup(
+    parser: ParserType,
+    json: string,
+    markup: string | undefined,
+    markupError: Error | undefined,
+    durationSec?: number,
+  ): void;
+  setLexerOutput(parser: ParserType, output: string): void;
+  setActiveMarkupTab(tab: ParserType): void;
+  setActiveJsonTab(tab: ParserType): void;
+  syncMarkupInput(markup: string): void;
+  syncJsonInput(json: string): void;
+}
+
+const createParserSlice = (): ParserSlice => ({
   markup: '',
   markupError: undefined,
   markupErrorAsString: undefined,
@@ -36,51 +61,139 @@ const bitmarkState = proxy<BitmarkState>({
   jsonErrorAsString: undefined,
   jsonDurationSec: undefined,
   jsonUpdates: 0,
-  setJson: (markup: string, json: BitWrapperJson[] | undefined, jsonError: Error | undefined, durationSec?: number) => {
-    const state = bitmarkState as Writable<BitmarkState>;
+  lexerOutput: '',
+});
 
-    state.markup = markup;
+// @zen-impl: PLAN-002-Step9 (tab query param)
+// @zen-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
+const getTabFromUrl = (): ParserType | null => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const tab = searchParams.get('tab');
+  if (tab === 'wasm') return 'wasm';
+  if (tab === 'wasmFull') return 'wasmFull';
+  if (tab === 'js') return 'js';
+  return null;
+};
+
+const storedSettings = loadSettings();
+const urlTab = getTabFromUrl();
+
+const bitmarkState = proxy<BitmarkState>({
+  js: createParserSlice(),
+  wasm: createParserSlice(),
+  wasmFull: createParserSlice(),
+  activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
+  activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
+
+  setJson: (
+    parser: ParserType,
+    markup: string,
+    json: BitWrapperJson[] | undefined,
+    jsonError: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+
+    slice.markup = markup;
 
     if (jsonError) {
-      state.jsonError = jsonError;
+      slice.jsonError = jsonError;
       try {
-        state.jsonErrorAsString = JSON.stringify(jsonError, Object.getOwnPropertyNames(jsonError), 2);
-      } catch (e) {
-        state.markupErrorAsString = 'Unknown';
+        slice.jsonErrorAsString = JSON.stringify(
+          jsonError,
+          Object.getOwnPropertyNames(jsonError),
+          2,
+        );
+      } catch (_e) {
+        slice.jsonErrorAsString = 'Unknown';
       }
     } else {
-      state.json = json ?? [];
+      slice.json = json ?? [];
       try {
-        state.jsonAsString = JSON.stringify(state.json, undefined, 2);
-        state.jsonError = undefined;
-        state.jsonErrorAsString = undefined;
+        slice.jsonAsString = JSON.stringify(slice.json, undefined, 2);
+        slice.jsonError = undefined;
+        slice.jsonErrorAsString = undefined;
       } catch (e) {
-        state.jsonError = e as Error;
-        state.jsonErrorAsString = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
+        slice.jsonError = e as Error;
+        slice.jsonErrorAsString = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
       }
     }
-    state.jsonDurationSec = durationSec;
-    state.jsonUpdates += 1;
+    slice.jsonDurationSec = durationSec;
+    slice.jsonUpdates += 1;
   },
-  setMarkup: (json: string, markup: string | undefined, markupError: Error | undefined, durationSec?: number) => {
-    const state = bitmarkState as Writable<BitmarkState>;
 
-    state.jsonAsString = json;
+  setMarkup: (
+    parser: ParserType,
+    json: string,
+    markup: string | undefined,
+    markupError: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+
+    slice.jsonAsString = json;
 
     if (markupError) {
-      state.markupError = markupError;
+      slice.markupError = markupError;
       try {
-        state.markupErrorAsString = JSON.stringify(markupError, Object.getOwnPropertyNames(markupError), 2);
-      } catch (e) {
-        state.markupErrorAsString = 'Unknown';
+        slice.markupErrorAsString = JSON.stringify(
+          markupError,
+          Object.getOwnPropertyNames(markupError),
+          2,
+        );
+      } catch (_e) {
+        slice.markupErrorAsString = 'Unknown';
       }
     } else {
-      state.markup = markup ?? '';
-      state.markupError = undefined;
-      state.markupErrorAsString = undefined;
+      slice.markup = markup ?? '';
+      slice.markupError = undefined;
+      slice.markupErrorAsString = undefined;
     }
-    state.markupDurationSec = durationSec;
-    state.markupUpdates += 1;
+    slice.markupDurationSec = durationSec;
+    slice.markupUpdates += 1;
+  },
+
+  setLexerOutput: (parser: ParserType, output: string) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    slice.lexerOutput = output;
+  },
+
+  setActiveMarkupTab: (tab: ParserType) => {
+    (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
+  },
+
+  setActiveJsonTab: (tab: ParserType) => {
+    (bitmarkState as Writable<BitmarkState>).activeJsonTab = tab;
+  },
+
+  syncMarkupInput: (markup: string) => {
+    const jsSlice = bitmarkState.js as Writable<ParserSlice>;
+    const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
+    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
+    jsSlice.markup = markup;
+    jsSlice.markupError = undefined;
+    jsSlice.markupErrorAsString = undefined;
+    wasmSlice.markup = markup;
+    wasmSlice.markupError = undefined;
+    wasmSlice.markupErrorAsString = undefined;
+    wasmFullSlice.markup = markup;
+    wasmFullSlice.markupError = undefined;
+    wasmFullSlice.markupErrorAsString = undefined;
+  },
+
+  syncJsonInput: (json: string) => {
+    const jsSlice = bitmarkState.js as Writable<ParserSlice>;
+    const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
+    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
+    jsSlice.jsonAsString = json;
+    jsSlice.jsonError = undefined;
+    jsSlice.jsonErrorAsString = undefined;
+    wasmSlice.jsonAsString = json;
+    wasmSlice.jsonError = undefined;
+    wasmSlice.jsonErrorAsString = undefined;
+    wasmFullSlice.jsonAsString = json;
+    wasmFullSlice.jsonError = undefined;
+    wasmFullSlice.jsonErrorAsString = undefined;
   },
 });
 
