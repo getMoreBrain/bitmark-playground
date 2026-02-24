@@ -15,6 +15,7 @@ import { Grammar } from '../../monaco-tree-sitter/types/grammer';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
+import { buildInfo } from '../../generated/build-info';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   renderWhitespace: 'all',
@@ -63,7 +64,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
 
     // TODO - this loads the language WASM file (is async, should be awaited)
     // const languageWasmPath = new URL('../../tree-sitter-typescript.wasm', import.meta.url).toString();
-    const languageWasmPath = new URL('../../tree-sitter-bitmark.wasm', import.meta.url).toString();
+    const languageWasmPath = new URL(`../../tree-sitter-bitmark.wasm?${buildInfo.version}`, import.meta.url).toString();
     language.init(languageWasmPath, Parser).then(() => {
       // Apply the language to the editor
       new MonacoTreeSitter(MonacoModule, editor, language);

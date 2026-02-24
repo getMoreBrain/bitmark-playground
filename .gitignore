@@ -9,6 +9,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.playwright-mcp
+bundle-stats.html
 
 
 # YARN
