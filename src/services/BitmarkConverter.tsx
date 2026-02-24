@@ -81,7 +81,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
             performance.mark(startMark);
 
             try {
-              const resultStr = wasmParse(markup);
+              const resultStr = wasmParse(markup, { mode: 'optimized' });
               json = JSON.parse(resultStr) as BitWrapperJson[];
             } catch (e) {
               jsonError = e as Error;
@@ -108,7 +108,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
             performance.mark(startMark);
 
             try {
-              const resultStr = wasmParse(markup);
+              const resultStr = wasmParse(markup, { mode: 'full' });
               json = JSON.parse(resultStr) as BitWrapperJson[];
             } catch (e) {
               jsonError = e as Error;
@@ -132,6 +132,18 @@ const useBitmarkConverter = (): BitmarkConverter => {
               bitmarkState.setLexerOutput('wasm', lexOutput);
             } catch (e) {
               bitmarkState.setLexerOutput('wasm', `Lexer error: ${String(e)}`);
+            }
+          })(),
+        );
+
+        // WASM lexer (JSON output)
+        promises.push(
+          (async () => {
+            try {
+              const lexOutput = wasmLex(markup, { stage: 'lex-json' });
+              bitmarkState.setLexerOutput('wasmFull', lexOutput);
+            } catch (e) {
+              bitmarkState.setLexerOutput('wasmFull', `Lexer error: ${String(e)}`);
             }
           })(),
         );
@@ -236,6 +248,12 @@ const useBitmarkConverter = (): BitmarkConverter => {
             bitmarkState.setLexerOutput('wasm', lexOutput);
           } catch (e) {
             bitmarkState.setLexerOutput('wasm', `Lexer error: ${String(e)}`);
+          }
+          try {
+            const lexOutput = wasmLex(resultMarkup, { stage: 'lex-json' });
+            bitmarkState.setLexerOutput('wasmFull', lexOutput);
+          } catch (e) {
+            bitmarkState.setLexerOutput('wasmFull', `Lexer error: ${String(e)}`);
           }
         }
       }

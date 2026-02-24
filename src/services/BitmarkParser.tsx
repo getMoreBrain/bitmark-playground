@@ -7,6 +7,7 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -15,6 +16,9 @@ import { log } from '../logging/log';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
+
+// Single cache-buster timestamp
+const _cacheBuster = Date.now();
 
 interface BitmarkParserModule {
   init: (wasmUrl?: string) => Promise<void>;
@@ -61,7 +65,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const searchParams = new URLSearchParams(window.location.search);
     const version = searchParams.get('v2') ?? 'latest';
-    const moduleUrl = `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${Date.now()}`;
+    const moduleUrl = useMemo(
+      () => `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${_cacheBuster}`,
+      [version],
+    );
 
     const load = async () => {
       try {

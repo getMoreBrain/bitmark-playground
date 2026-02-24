@@ -71,11 +71,18 @@ const SettingsMenu = () => {
             mt: '2px',
           }}
         >
-          <Text sx={{ color: 'primary', fontSize: 1, fontWeight: 'bold', display: 'block' }}>Settings</Text>
+          <Text sx={{ color: 'primary', fontSize: 1, fontWeight: 'bold', display: 'block' }}>
+            Settings
+          </Text>
 
-          <Box as="hr" sx={{ border: 'none', borderTop: '1px solid', borderColor: 'accent', my: 2 }} />
+          <Box
+            as="hr"
+            sx={{ border: 'none', borderTop: '1px solid', borderColor: 'accent', my: 2 }}
+          />
 
-          <Text sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mb: 1, display: 'block' }}>UI</Text>
+          <Text sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mb: 1, display: 'block' }}>
+            UI
+          </Text>
 
           <Flex sx={{ alignItems: 'center', gap: 2 }}>
             <Label

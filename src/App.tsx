@@ -141,7 +141,7 @@ function App() {
         original={snap.js.jsonAsString}
         modified={snap.wasm.jsonAsString}
         language="json"
-        lexerOutput={snap.wasm.lexerOutput}
+        lexerOutput={snap.wasmFull.lexerOutput}
       />
     </Flex>
   );
