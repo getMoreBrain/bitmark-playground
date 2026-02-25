@@ -1,9 +1,8 @@
-// @zen-test: PLAN-004-Step3 (settingsPersistence integration)
+// @awa-test: PLAN-004-Step3 (settingsPersistence integration)
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bitmarkState } from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
-
 import { DEBOUNCE_MS, initSettingsPersistence } from './settingsPersistence';
 import { STORAGE_KEY } from './settingsStorage';
 

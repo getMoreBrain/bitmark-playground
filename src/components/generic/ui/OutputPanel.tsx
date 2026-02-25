@@ -1,5 +1,5 @@
-// @zen-component: PLAN-003-OutputPanel
-// @zen-component: PLAN-005-OutputPanel
+// @awa-component: PLAN-003-OutputPanel
+// @awa-component: PLAN-005-OutputPanel
 /** @jsxImportSource theme-ui */
 import { Flex } from 'theme-ui';
 
@@ -26,8 +26,8 @@ export interface OutputPanelProps {
   lexerOutput?: string;
 }
 
-// @zen-impl: PLAN-003-Step5 (output panel)
-// @zen-impl: PLAN-005-Step3 (wire DiffPanel into OutputPanel)
+// @awa-impl: PLAN-003-Step5 (output panel)
+// @awa-impl: PLAN-005-Step3 (wire DiffPanel into OutputPanel)
 const OutputPanel = ({
   label,
   activeTab,

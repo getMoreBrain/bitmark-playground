@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-BitmarkMarkupTextBox
+// @awa-component: PLAN-002-BitmarkMarkupTextBox
 import { editor } from 'monaco-editor';
 import * as MonacoModule from 'monaco-editor';
 import { useCallback, useEffect } from 'react';
@@ -24,7 +24,7 @@ export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledPro
   initialMarkup?: string;
 }
 
-// @zen-impl: PLAN-002-Step6 (editor reads from active tab)
+// @awa-impl: PLAN-002-Step6 (editor reads from active tab)
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { initialMarkup, options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);

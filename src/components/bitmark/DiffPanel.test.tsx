@@ -1,13 +1,13 @@
-// @zen-test: PLAN-005-Step2 (DiffPanel renders diff editor)
-// @zen-test: PLAN-005-Step3 (OutputPanel renders DiffPanel for diff tab)
+// @awa-test: PLAN-005-Step2 (DiffPanel renders diff editor)
+// @awa-test: PLAN-005-Step3 (OutputPanel renders DiffPanel for diff tab)
 /** @jsxImportSource theme-ui */
 import { render, screen } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';
 import { describe, expect, it } from 'vitest';
 
-import { DiffPanel } from './DiffPanel';
-import { OutputPanel } from '../generic/ui/OutputPanel';
 import { theme } from '../../theme/theme';
+import { OutputPanel } from '../generic/ui/OutputPanel';
+import { DiffPanel } from './DiffPanel';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeUIProvider theme={theme}>{children}</ThemeUIProvider>
@@ -15,10 +15,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('DiffPanel', () => {
   it('renders a MonacoDiffEditor with original and modified values', () => {
-    render(
-      <DiffPanel original="hello" modified="world" language="json" />,
-      { wrapper },
-    );
+    render(<DiffPanel original="hello" modified="world" language="json" />, { wrapper });
     const diffEditor = screen.getByTestId('monaco-diff-editor');
     expect(diffEditor).toBeInTheDocument();
     expect(diffEditor).toHaveAttribute('original', 'hello');
@@ -28,10 +25,7 @@ describe('DiffPanel', () => {
   });
 
   it('passes read-only and inline diff options', () => {
-    render(
-      <DiffPanel original="" modified="" language="bitmark" />,
-      { wrapper },
-    );
+    render(<DiffPanel original="" modified="" language="bitmark" />, { wrapper });
     const diffEditor = screen.getByTestId('monaco-diff-editor');
     // options is passed as an object prop — verify it exists on the element
     // The mock spreads all props, so options will be serialized
@@ -75,14 +69,7 @@ describe('OutputPanel with diff content', () => {
   });
 
   it('does not render DiffPanel when no content is provided', () => {
-    render(
-      <OutputPanel
-        label="bitmark"
-        activeTab="diff"
-        onTabChange={() => {}}
-      />,
-      { wrapper },
-    );
+    render(<OutputPanel label="bitmark" activeTab="diff" onTabChange={() => {}} />, { wrapper });
     expect(screen.queryByTestId('monaco-diff-editor')).not.toBeInTheDocument();
   });
 });

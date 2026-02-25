@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-App
+// @awa-component: PLAN-002-App
 /** @jsxImportSource theme-ui */
 import './App.css';
 
@@ -21,9 +21,9 @@ import { theme } from './theme/theme';
 
 const initialMarkup = '[.article] Hello World!';
 
-// @zen-impl: PLAN-002-Step5 (tab bar integration)
-// @zen-impl: PLAN-002-Step7 (provider nesting)
-// @zen-impl: PLAN-003-Step6 (App integration)
+// @awa-impl: PLAN-002-Step5 (tab bar integration)
+// @awa-impl: PLAN-002-Step7 (provider nesting)
+// @awa-impl: PLAN-003-Step6 (App integration)
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
@@ -122,7 +122,7 @@ function App() {
     </Flex>
   );
 
-  // @zen-impl: PLAN-005-Step4 (wire state data to diff panels)
+  // @awa-impl: PLAN-005-Step4 (wire state data to diff panels)
   const bottomPanels = (
     <Flex sx={{ flexDirection: 'row', flexGrow: 1, minHeight: 0 }}>
       <OutputPanel

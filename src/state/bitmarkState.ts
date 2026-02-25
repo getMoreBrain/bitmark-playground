@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-BitmarkState
+// @awa-component: PLAN-002-BitmarkState
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
@@ -64,8 +64,8 @@ const createParserSlice = (): ParserSlice => ({
   lexerOutput: '',
 });
 
-// @zen-impl: PLAN-002-Step9 (tab query param)
-// @zen-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
+// @awa-impl: PLAN-002-Step9 (tab query param)
+// @awa-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
 const getTabFromUrl = (): ParserType | null => {
   const searchParams = new URLSearchParams(window.location.search);
   const tab = searchParams.get('tab');

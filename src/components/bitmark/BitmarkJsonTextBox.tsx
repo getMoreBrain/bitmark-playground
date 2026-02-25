@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-BitmarkJsonTextBox
+// @awa-component: PLAN-002-BitmarkJsonTextBox
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
@@ -16,7 +16,7 @@ export interface BitmarkJsonTextBoxProps extends MonacoTextAreaUncontrolledProps
   //
 }
 
-// @zen-impl: PLAN-002-Step6 (editor reads from active tab)
+// @awa-impl: PLAN-002-Step6 (editor reads from active tab)
 const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const { options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);

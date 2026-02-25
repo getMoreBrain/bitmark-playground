@@ -1,4 +1,4 @@
-// @zen-test: PLAN-004-Step1 (settingsStorage utility)
+// @awa-test: PLAN-004-Step1 (settingsStorage utility)
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -66,9 +66,10 @@ describe('settingsStorage', () => {
     });
 
     it('accepts wasmFull as valid ParserType', () => {
-      expect(
-        migrateSettings({ ...validSettings, activeJsonTab: 'wasmFull' }),
-      ).toEqual({ ...validSettings, activeJsonTab: 'wasmFull' });
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'wasmFull' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'wasmFull',
+      });
     });
 
     it('returns null for invalid activeMarkupTab', () => {

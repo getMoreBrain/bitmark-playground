@@ -1,4 +1,4 @@
-// @zen-component: PLAN-003-ResizableLayout
+// @awa-component: PLAN-003-ResizableLayout
 /** @jsxImportSource theme-ui */
 import { useCallback, useRef } from 'react';
 import { Box, Flex } from 'theme-ui';
@@ -21,7 +21,7 @@ export interface ResizableLayoutProps {
 const MIN_BOTTOM_HEIGHT = 80;
 const MAX_BOTTOM_RATIO = 0.7;
 
-// @zen-impl: PLAN-003-Step3 (resizable layout)
+// @awa-impl: PLAN-003-Step3 (resizable layout)
 const ResizableLayout = ({
   top,
   bottom,
@@ -75,7 +75,15 @@ const ResizableLayout = ({
       }}
     >
       {/* Top section */}
-      <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {top}
       </Box>
 

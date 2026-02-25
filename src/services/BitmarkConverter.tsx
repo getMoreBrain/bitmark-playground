@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-BitmarkConverter
+// @awa-component: PLAN-002-BitmarkConverter
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
 import { useCallback } from 'react';
 
@@ -29,7 +29,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
     loadError: wasmLoadError,
   } = useBitmarkParser();
 
-  // @zen-impl: PLAN-002-Step3 (dual markupToJson)
+  // @awa-impl: PLAN-002-Step3 (dual markupToJson)
   const markupToJson = useCallback(
     async (markup: string, options?: ConvertOptions) => {
       // Sync raw input to both slices immediately so tab switching shows current text
@@ -154,7 +154,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
     [bitmarkParserGenerator, wasmParse, wasmLex],
   );
 
-  // @zen-impl: PLAN-002-Step3 (dual jsonToMarkup)
+  // @awa-impl: PLAN-002-Step3 (dual jsonToMarkup)
   const jsonToMarkup = useCallback(
     async (json: string, options?: ConvertOptions) => {
       // Sync raw input to both slices immediately so tab switching shows current text

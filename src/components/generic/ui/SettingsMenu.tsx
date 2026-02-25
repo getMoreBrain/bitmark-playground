@@ -1,4 +1,4 @@
-// @zen-component: PLAN-003-SettingsMenu
+// @awa-component: PLAN-003-SettingsMenu
 /** @jsxImportSource theme-ui */
 import { useCallback, useEffect, useRef } from 'react';
 import { Box, Flex, Label, Text } from 'theme-ui';
@@ -6,7 +6,7 @@ import { useSnapshot } from 'valtio';
 
 import { uiState } from '../../../state/uiState';
 
-// @zen-impl: PLAN-003-Step2 (settings menu)
+// @awa-impl: PLAN-003-Step2 (settings menu)
 const SettingsMenu = () => {
   const snap = useSnapshot(uiState);
   const containerRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-BitmarkParser
+// @awa-component: PLAN-002-BitmarkParser
 
 import type { generate as generateFn, lex as lexFn, parse as parseFn } from '@gmb/bitmark-parser';
 import {

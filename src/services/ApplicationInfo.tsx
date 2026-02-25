@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-ApplicationInfo
+// @awa-component: PLAN-002-ApplicationInfo
 import { useMemo } from 'react';
 
 import { buildInfo } from '../generated/build-info';
@@ -16,7 +16,7 @@ export interface ApplicationInfo {
   copyright: string;
   bitmarkParserGeneratorVersion: string;
   bitmarkParserGeneratorLoadError: boolean;
-  // @zen-impl: PLAN-002-Step8 (bp version in app info)
+  // @awa-impl: PLAN-002-Step8 (bp version in app info)
   bitmarkParserVersion: string;
   bitmarkParserLoadError: boolean;
 }

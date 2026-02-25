@@ -1,8 +1,7 @@
-// @zen-component: PLAN-004-SettingsStorage
-import type { OutputTab } from '../state/uiState';
-import type { ParserType } from '../state/bitmarkState';
-
+// @awa-component: PLAN-004-SettingsStorage
 import { log } from '../logging/log';
+import type { ParserType } from '../state/bitmarkState';
+import type { OutputTab } from '../state/uiState';
 
 export interface PersistedSettings {
   /** Schema version — bump on breaking changes */
@@ -20,7 +19,7 @@ export const CURRENT_VERSION = 2;
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
 const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer'];
 
-// @zen-impl: PLAN-004-Step1 (migrateSettings)
+// @awa-impl: PLAN-004-Step1 (migrateSettings)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -55,7 +54,7 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
   return null;
 }
 
-// @zen-impl: PLAN-004-Step1 (loadSettings)
+// @awa-impl: PLAN-004-Step1 (loadSettings)
 function loadSettings(): PersistedSettings | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -68,7 +67,7 @@ function loadSettings(): PersistedSettings | null {
   }
 }
 
-// @zen-impl: PLAN-004-Step1 (saveSettings)
+// @awa-impl: PLAN-004-Step1 (saveSettings)
 function saveSettings(settings: PersistedSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -78,4 +77,4 @@ function saveSettings(settings: PersistedSettings): void {
   }
 }
 
-export { loadSettings, saveSettings, migrateSettings };
+export { loadSettings, migrateSettings, saveSettings };

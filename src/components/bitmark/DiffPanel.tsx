@@ -1,4 +1,4 @@
-// @zen-component: PLAN-005-DiffPanel
+// @awa-component: PLAN-005-DiffPanel
 /** @jsxImportSource theme-ui */
 
 import { MonacoDiffEditorAutoResize } from '../monaco/MonacoDiffEditorAutoResize';
@@ -12,7 +12,7 @@ export interface DiffPanelProps {
   language: string;
 }
 
-// @zen-impl: PLAN-005-Step2 (read-only inline diff viewer)
+// @awa-impl: PLAN-005-Step2 (read-only inline diff viewer)
 const DiffPanel = ({ original, modified, language }: DiffPanelProps) => {
   return (
     <MonacoDiffEditorAutoResize

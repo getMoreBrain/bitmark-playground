@@ -1,16 +1,16 @@
-// @zen-test: PLAN-003-Step2 (settings menu rendering)
-// @zen-test: PLAN-003-Step4 (output tab bar rendering)
-// @zen-test: PLAN-003-Step5 (output panel rendering)
+// @awa-test: PLAN-003-Step2 (settings menu rendering)
+// @awa-test: PLAN-003-Step4 (output tab bar rendering)
+// @awa-test: PLAN-003-Step5 (output panel rendering)
 /** @jsxImportSource theme-ui */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { uiState } from '../../../state/uiState';
+import { theme } from '../../../theme/theme';
 import { OutputPanel } from './OutputPanel';
 import { OutputTabBar } from './OutputTabBar';
 import { SettingsMenu } from './SettingsMenu';
-import { uiState } from '../../../state/uiState';
-import { theme } from '../../../theme/theme';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeUIProvider theme={theme}>{children}</ThemeUIProvider>

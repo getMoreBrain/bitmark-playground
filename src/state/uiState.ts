@@ -1,4 +1,4 @@
-// @zen-component: PLAN-003-UiState
+// @awa-component: PLAN-003-UiState
 import { proxy } from 'valtio';
 
 import { loadSettings } from '../services/settingsStorage';
@@ -28,8 +28,8 @@ export interface UiState {
   setSettingsOpen(value: boolean): void;
 }
 
-// @zen-impl: PLAN-003-Step1 (settings state)
-// @zen-impl: PLAN-004-Step2 (hydrate from storage)
+// @awa-impl: PLAN-003-Step1 (settings state)
+// @awa-impl: PLAN-004-Step2 (hydrate from storage)
 const stored = loadSettings();
 
 const uiState = proxy<UiState>({

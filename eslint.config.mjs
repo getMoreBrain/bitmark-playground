@@ -25,7 +25,7 @@ const config = [
       'specs',
       'plans',
       '.github',
-      '.zen',
+      '.awa',
       'src/generated',
       '**/*.d.ts',
     ],

@@ -1,4 +1,4 @@
-// @zen-component: PLAN-004-SettingsPersistence
+// @awa-component: PLAN-004-SettingsPersistence
 import { subscribe } from 'valtio';
 
 import { bitmarkState } from '../state/bitmarkState';
@@ -9,7 +9,7 @@ import type { PersistedSettings } from './settingsStorage';
 
 const DEBOUNCE_MS = 300;
 
-// @zen-impl: PLAN-004-Step3 (persist on change)
+// @awa-impl: PLAN-004-Step3 (persist on change)
 function collectSettings(): PersistedSettings {
   return {
     v: CURRENT_VERSION,

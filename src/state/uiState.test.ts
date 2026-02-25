@@ -1,4 +1,4 @@
-// @zen-test: PLAN-003-Step1 (uiState defaults and mutations)
+// @awa-test: PLAN-003-Step1 (uiState defaults and mutations)
 import { describe, expect, it } from 'vitest';
 
 import { uiState } from './uiState';

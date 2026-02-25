@@ -30,7 +30,7 @@ async function start(): Promise<void> {
     locateFile: () => treeSitterWasmUrl,
   });
 
-  // @zen-impl: PLAN-004-Step3 (wire persistence)
+  // @awa-impl: PLAN-004-Step3 (wire persistence)
   initSettingsPersistence();
 
   const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);

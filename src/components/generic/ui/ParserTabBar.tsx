@@ -1,4 +1,4 @@
-// @zen-component: PLAN-002-ParserTabBar
+// @awa-component: PLAN-002-ParserTabBar
 /** @jsxImportSource theme-ui */
 import { Flex, Text } from 'theme-ui';
 
@@ -13,7 +13,7 @@ export interface ParserTabBarProps {
   onTabChange: (tab: ParserType) => void;
 }
 
-// @zen-impl: PLAN-002-Step4 (tab bar UI)
+// @awa-impl: PLAN-002-Step4 (tab bar UI)
 const ParserTabBar = (props: ParserTabBarProps) => {
   const { label, jsDuration, wasmDuration, wasmFullDuration, activeTab, onTabChange } = props;
 
