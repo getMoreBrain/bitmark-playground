@@ -1,0 +1,83 @@
+# Structural rules for ALIGN-{x}-WITH-{y}-{nnn}.md files
+target-files: ".awa/align/ALIGN-*.md"
+description: >
+  Alignment report comparing a source artifact (x) with a target artifact (y).
+  Each finding has a severity (CRITICAL/MAJOR/MINOR/INFO), confidence
+  (CERTAIN/LIKELY/UNCERTAIN), and type (MISSING/DIFFERENCE/CONFLICT/INCOMPLETE/
+  UNTESTED/ORPHAN/SUPERSET). Findings are checkbox items with SOURCE, TARGET,
+  ISSUE, and RESOLUTION fields. Summary section has severity counts and STATUS.
+line-limit: 800
+
+sections:
+  # Top-level heading
+  - heading: "ALIGNMENT REPORT"
+    level: 1
+    required: true
+    description: >
+      Document title followed by the comparison line:
+      {source-artifact} ↔ {target-artifact}
+      Then a list of findings as checkbox items.
+    contains:
+      # Findings are checkbox list items
+      - list:
+          pattern: "\\[[ x]\\].*\\b(CRITICAL|MAJOR|MINOR|INFO)\\b"
+          min: 1
+          label: "finding items"
+        description: >
+          Checkbox items for each finding. Format:
+          - [ ] N. {SEVERITY} [{CONFIDENCE}] {TYPE}
+            SOURCE: {location}
+            > {source text}
+            TARGET: {location}
+            > {target text}
+            ISSUE: {description}
+            RESOLUTION: {action}
+        required: false
+
+  # Summary section
+  - heading: "Summary"
+    level: 2
+    required: true
+    description: >
+      Severity counts and pass/fail status. Format:
+      CRITICAL: {n}
+      MAJOR: {n}
+      MINOR: {n}
+      INFO: {n}
+      STATUS: PASSED or FAILED
+    contains:
+      - pattern: "^(CRITICAL|MAJOR|MINOR|INFO):"
+        label: "severity count"
+        description: "One line per severity level with count."
+      - pattern: "^STATUS:"
+        label: "STATUS line"
+        description: "STATUS: PASSED or STATUS: FAILED (with optional emoji)."
+
+example: |
+  # ALIGNMENT REPORT
+
+  DESIGN-WKS-workspace.md ↔ src/workspace/**
+
+  - [ ] 1. CRITICAL [CERTAIN] MISSING
+    SOURCE: WKS-WorkspaceConfig (IMPLEMENTS: WKS-1_AC-1)
+    > pub fn load(root: &Path) -> Result<Self, WorkspaceError>
+    TARGET: (not found)
+    ISSUE: Design component declares IMPLEMENTS: WKS-1_AC-1, but no code file contains @awa-component: WKS-WorkspaceConfig.
+    RESOLUTION: Add @awa-component: WKS-WorkspaceConfig to src/workspace/config.rs
+
+  - [ ] 2. MAJOR [CERTAIN] DIFFERENCE
+    SOURCE: WKS-WorkspaceValidator (IMPLEMENTS: WKS-2_AC-3)
+    > fn validate(&self) -> Result<(), ValidationError>
+    TARGET: src/workspace/validator.rs:45
+    > fn validate(&self) -> bool
+    ISSUE: Return type mismatch. Design specifies Result but implementation returns bool.
+    RESOLUTION: Update validator.rs to return Result<(), ValidationError>
+
+  ## Summary
+
+  CRITICAL: 1
+  MAJOR: 1
+  MINOR: 0
+  INFO: 0
+
+  STATUS: FAILED

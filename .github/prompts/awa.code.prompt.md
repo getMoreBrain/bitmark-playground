@@ -25,7 +25,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 <file type="architecture" path=".awa/specs/ARCHITECTURE.md" />
 <file type="feat" path=".awa/specs/FEAT-{CODE}-{feature-name}.md" required="if relevant" />
-<file type="examples" path=".awa/specs/EXAMPLES-{CODE}-{feature-name}-{nnn}.md" required="if relevant" />
+<file type="examples" path=".awa/specs/EXAMPLE-{CODE}-{feature-name}-{nnn}.md" required="if relevant" />
 <file type="requirements" path=".awa/specs/REQ-{CODE}-{feature-name}.md" required="if relevant" />
 <file type="design" path=".awa/specs/DESIGN-{CODE}-{feature-name}.md" required="if relevant" />
 <file type="api" path=".awa/specs/API-{CODE}-{feature-name}.md" required="if relevant" />
@@ -43,18 +43,18 @@ You MUST add these markers to create explicit traces:
 ```
 // @awa-component: {CODE}-{ComponentName}
 ```
-Place at the top of each file/module that implements a design component.
+Place directly before the code that implements a design component, and before associated tests.
 
 ```
 // @awa-impl: {CODE}-{n}[.{p}]_AC-{m}
 ```
-Place above code that satisfies an acceptance criterion. Multiple markers allowed per block.
+Place directly before the code that satisfies an acceptance criterion. Multiple markers allowed per block.
 
 ```
 // @awa-test: {CODE}_P-{n}
 // @awa-test: {CODE}-{n}[.{p}]_AC-{m}
 ```
-Place above tests. Use P- for property-based tests, AC- for direct acceptance tests.
+Place directly before tests. Use P- for property-based tests, AC- for direct acceptance tests.
 
 ## Implementation Process
 
@@ -77,23 +77,29 @@ Place above tests. Use P- for property-based tests, AC- for direct acceptance te
   - Start with bootstrapping, then types/interfaces, then core logic, then entry points
 
 5. FOR EACH COMPONENT
-  - Add @awa-component marker at file/module top
+  - Add @awa-component marker directly before component code
   - Implement interface as specified in DESIGN
   - Add @awa-impl marker above code satisfying each AC
   - One AC may require multiple @awa-impl markers across files
-  - Update REQ file AC checkmark when fully implemented
 
 6. FOR EACH TEST
+  - Add @awa-component marker directly before test code
   - Property tests (@awa-test: {CODE}_P-{n}): Use property-based testing framework
   - Acceptance tests (@awa-test: {CODE}-{n}[.{p}]_AC-{m}): Use example-based assertions
   - A single test may verify multiple ACs or properties
-  - Update DESIGN file Correctness Property checkmark when fully implemented
+
+7. UPDATE DOCUMENTATION
+  - If user-facing behavior changed: update user docs
+  - If CLI commands or options changed: update CLI reference docs
+  - If project structure changed: update ARCHITECTURE.md
+  - If no user-facing changes: skip this step
 
 ## Outputs
 
 - source code files with appropriate markers
 - test files with appropriate markers
 - associated project configuration files if needed
+- updated documentation if necessary
 
 ## Constraints
 
@@ -168,5 +174,7 @@ You SHALL use any tools you need to help write and test code (e.g. MCP tools for
 You MUST add traceability markers (`@awa-component`, `@awa-impl`, `@awa-test`) to all code and tests.
 You MUST ensure every feature implementation traces to at least one acceptance criterion.
 You MUST ensure every test file traces to at least one design property.
+You MUST run `awa check` after implementation to verify all traceability markers resolve to spec IDs and no acceptance criteria are left uncovered.
+You SHALL update user-facing documentation when implementation changes user-facing behavior, CLI, API, or configuration.
 You SHALL clarify open points with user.
 You MAY use todos and tools as needed.

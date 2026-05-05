@@ -1,25 +1,27 @@
 // @awa-component: PLAN-004-SettingsStorage
 import { log } from '../logging/log';
-import type { ParserType } from '../state/bitmarkState';
+import type { JsonTabType, ParserType } from '../state/bitmarkState';
 import type { OutputTab } from '../state/uiState';
 
 export interface PersistedSettings {
   /** Schema version — bump on breaking changes */
   v: number;
   activeMarkupTab: ParserType;
-  activeJsonTab: ParserType;
+  activeJsonTab: JsonTabType;
   showDiffLex: boolean;
   leftOutputTab: OutputTab;
   rightOutputTab: OutputTab;
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 2;
+export const CURRENT_VERSION = 3;
 
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
+const VALID_JSON_TABS: readonly string[] = ['js', 'wasm', 'wasmFull', 'wasmCheck'];
 const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer'];
 
 // @awa-impl: PLAN-004-Step1 (migrateSettings)
+// @awa-impl: PLAN-006-Step7 (v2 → v3 migration)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -28,8 +30,14 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v1 → v2: 'wasmFull' added as valid ParserType, existing values still valid
   if (obj.v === 1) {
+    obj.v = 2;
+    // Fall through
+  }
+
+  // Migrate v2 → v3: 'wasmCheck' added as valid ParserType, existing values still valid
+  if (obj.v === 2) {
     obj.v = CURRENT_VERSION;
-    // Fall through to v2 validation
+    // Fall through to v3 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
@@ -38,7 +46,7 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
       typeof obj.activeMarkupTab === 'string' &&
       VALID_PARSER_TYPES.includes(obj.activeMarkupTab) &&
       typeof obj.activeJsonTab === 'string' &&
-      VALID_PARSER_TYPES.includes(obj.activeJsonTab) &&
+      VALID_JSON_TABS.includes(obj.activeJsonTab) &&
       typeof obj.showDiffLex === 'boolean' &&
       typeof obj.leftOutputTab === 'string' &&
       VALID_OUTPUT_TABS.includes(obj.leftOutputTab) &&

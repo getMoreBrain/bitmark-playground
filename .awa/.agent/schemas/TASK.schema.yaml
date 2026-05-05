@@ -1,0 +1,205 @@
+# Structural rules for TASK-{CODE}-{feature-name}-{nnn}.md files
+target-files: ".awa/tasks/TASK-*.md"
+description: >
+  Implementation tasks only. Dependency-ordered. Traceable to REQ and DESIGN.
+  Each task has an ID (T-{CODE}-{nnn}), a description, and a target file path.
+  Phases group tasks by execution order; requirement phases carry [MUST]/[SHOULD]/[COULD]
+  priority markers and include GOAL, TEST CRITERIA, IMPLEMENTS, and TESTS lines.
+  Setup/foundation/polish/documentation phases must NOT include IMPLEMENTS or TESTS.
+  A Documentation phase is required after Polish. It lists doc files to update
+  (README.md, docs/) for user-facing changes. If no doc updates are needed,
+  include a single task stating so (e.g., "No doc changes — internal only").
+line-limit: 800
+
+sections:
+  # Top-level heading: "Implementation Tasks"
+  - heading: "Implementation Tasks"
+    level: 1
+    required: true
+    description: >
+      Document title. Followed by FEATURE (name from REQ) and SOURCE
+      (comma-separated paths to REQ and DESIGN files).
+    contains:
+      - pattern: "^FEATURE:"
+        label: "FEATURE declaration"
+        description: "Feature name this task list implements (from REQ)."
+      - pattern: "^SOURCE:"
+        label: "SOURCE declaration"
+        description: "Comma-separated paths to the REQ and DESIGN source files."
+
+  # Phase headings: "## Phase N: Name [PRIORITY]"
+  - heading: "Phase \\d+:.*"
+    level: 2
+    required: true
+    repeatable: true
+    description: >
+      Numbered phases in execution order. Requirement phases append a priority
+      marker: [MUST], [SHOULD], or [COULD]. Setup/foundation/polish/documentation
+      phases have no priority marker. A Documentation phase is required as the
+      final phase listing doc files to update for user-facing changes, or
+      stating no changes needed. Each phase contains checkbox task items.
+    contains:
+      # Tasks as checkbox items: "- [ ] T-{CODE}-{nnn} ... → path"
+      - list:
+          pattern: "\\[[ x]\\] T-[A-Z][A-Z0-9]*-\\d+"
+          min: 1
+          label: "task checkbox items"
+        description: >
+          Task items as checkboxes. Format:
+          - [ ] T-{CODE}-{nnn} [P]? [{CODE}-{n}]? Description → target/path.
+          [P] marks parallelizable tasks. [{CODE}-{n}] is the requirement ID
+          (only on requirement phases). Always unchecked when generating tasks;
+          checked boxes ([x]) are filled during task list implementation.
+      # Tasks must have file path targets (→)
+      - pattern: "→"
+        label: "file path targets"
+        description: "Every task line must include → followed by the target file path."
+      # GOAL required on requirement phases (those with [MUST], [SHOULD], [COULD])
+      - pattern: "^GOAL:"
+        label: "GOAL statement"
+        description: "One-line goal for the phase, derived from the requirement's user story."
+        when:
+          heading-matches: "\\[(MUST|SHOULD|COULD)\\]"
+      # TEST CRITERIA required on requirement phases
+      - pattern: "^TEST CRITERIA:"
+        label: "TEST CRITERIA statement"
+        description: "How to verify the phase is complete."
+        when:
+          heading-matches: "\\[(MUST|SHOULD|COULD)\\]"
+      # IMPLEMENTS forbidden on setup/foundation/polish phases (no priority marker)
+      - pattern: "IMPLEMENTS:"
+        prohibited: true
+        label: "IMPLEMENTS trace line (not allowed in setup/polish phases)"
+        description: >
+          IMPLEMENTS: {CODE}-{n}[.{p}]_AC-{m} — traces a task to the AC it implements.
+          Only allowed on requirement phases (those with a priority marker).
+        when:
+          heading-not-matches: "\\[(MUST|SHOULD|COULD)\\]"
+      # TESTS forbidden on setup/foundation/polish phases
+      - pattern: "TESTS:"
+        prohibited: true
+        label: "TESTS trace line (not allowed in setup/polish phases)"
+        description: >
+          TESTS: {CODE}_P-{n} or {CODE}-{n}[.{p}]_AC-{m} — traces a task to the
+          property or AC it tests. Only allowed on requirement phases.
+        when:
+          heading-not-matches: "\\[(MUST|SHOULD|COULD)\\]"
+      # Requirement labels forbidden on setup/foundation/polish phases
+      - pattern: "\\[[A-Z]+-\\d+\\]"
+        prohibited: true
+        label: "requirement label (not allowed in setup/polish phases)"
+        description: >
+          [{CODE}-{n}] requirement labels are only allowed on requirement phases
+          (those with a priority marker like [MUST], [SHOULD], [COULD]).
+        when:
+          heading-not-matches: "\\[(MUST|SHOULD|COULD)\\]"
+
+  # Dependencies section
+  - heading: "Dependencies"
+    level: 2
+    required: true
+    description: >
+      Lists inter-requirement dependencies. Format:
+      {CODE}-{n} → {CODE}-{n} (reason) or {CODE}-{n} → (none).
+
+  # Parallel Opportunities section
+  - heading: "Parallel Opportunities"
+    level: 2
+    required: true
+    description: >
+      Identifies tasks within each phase that can execute concurrently.
+      Format: Phase N: T-{CODE}-{nnn}, T-{CODE}-{nnn} can run parallel after T-{CODE}-{nnn}.
+
+  # Requirements Traceability section
+  - heading: "Requirements Traceability"
+    level: 2
+    required: true
+    description: >
+      Trace matrix grouped by source REQ file. Each H3 is a REQ file path,
+      containing bullet entries mapping ACs to tasks and tests, followed by
+      properties to tests.
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        required: true
+        description: >
+          Source REQ file heading. Format: ### REQ-{CODE}-{feature}.md
+          Followed by bullet list of AC and property trace entries.
+          AC format: - {AC-ID} → {Task} ({Test})
+          Property format: - {Property-ID} → {Test}
+
+sections-prohibited:
+  - "**"
+
+example: |
+  # Implementation Tasks
+
+  FEATURE: Configuration System
+  SOURCE: REQ-CFG-config.md, DESIGN-CFG-config.md
+
+  ## Phase 1: Setup
+
+  - [ ] T-CFG-001 Initialize module structure → src/config/
+  - [ ] T-CFG-002 [P] Add dependencies (smol-toml) → package.json
+
+  ## Phase 2: Foundation
+
+  - [ ] T-CFG-003 Define Config and RawConfig types → src/config/types.ts
+  - [ ] T-CFG-004 Define ConfigError variants → src/config/errors.ts
+
+  ## Phase 3: Config Loading [MUST]
+
+  GOAL: Load and merge configuration from file with defaults
+  TEST CRITERIA: Can load valid TOML, missing keys get defaults
+
+  - [ ] T-CFG-010 [CFG-1] Implement load function → src/config/loader.ts
+    IMPLEMENTS: CFG-1_AC-1
+  - [ ] T-CFG-011 [CFG-1] Implement merge function → src/config/loader.ts
+    IMPLEMENTS: CFG-1_AC-2
+  - [ ] T-CFG-012 [P] [CFG-1] Property test for default preservation → tests/config/loader.test.ts
+    TESTS: CFG_P-1
+  - [ ] T-CFG-013 [P] [CFG-1] Test load from valid path → tests/config/loader.test.ts
+    TESTS: CFG-1_AC-1
+
+  ## Phase 4: Config Validation [SHOULD]
+
+  GOAL: Validate loaded config against schema
+  TEST CRITERIA: Invalid config rejected with clear error
+
+  - [ ] T-CFG-020 [CFG-2] Implement validate function → src/config/validator.ts
+    IMPLEMENTS: CFG-2_AC-1
+  - [ ] T-CFG-021 [P] [CFG-2] Test schema validation → tests/config/validator.test.ts
+    TESTS: CFG-2_AC-1
+
+  ## Phase 5: Polish
+
+  - [ ] T-CFG-030 Integration test: load → validate → use → tests/config/integration.test.ts
+    TESTS: CFG-1_AC-1, CFG-2_AC-1
+
+  ## Phase 6: Documentation
+
+  - [ ] T-CFG-040 Update CLI reference with new config options → docs/configuration.md
+  - [ ] T-CFG-041 No README changes needed (internal refactor) → README.md
+
+  ---
+
+  ## Dependencies
+
+  CFG-1 → (none)
+  CFG-2 → CFG-1 (validates loaded config)
+
+  ## Parallel Opportunities
+
+  Phase 3: T-CFG-012, T-CFG-013 can run parallel after T-CFG-011
+  Phase 4: T-CFG-021 can run parallel with T-CFG-020
+
+  ## Requirements Traceability
+
+  ### REQ-CFG-config.md
+
+  - CFG-1_AC-1 → T-CFG-010 (T-CFG-013)
+  - CFG-1_AC-2 → T-CFG-011 (T-CFG-012)
+  - CFG-2_AC-1 → T-CFG-020 (T-CFG-021)
+  - CFG_P-1 → T-CFG-012
+

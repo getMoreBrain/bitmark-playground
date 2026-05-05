@@ -3,8 +3,8 @@
 /** @jsxImportSource theme-ui */
 import { Flex } from 'theme-ui';
 
-import { DiffPanel } from '../../bitmark/DiffPanel';
 import { OutputTab as OutputTabType } from '../../../state/uiState';
+import { DiffPanel } from '../../bitmark/DiffPanel';
 import { OutputTabBar } from './OutputTabBar';
 
 const OUTPUT_TABS = [

@@ -1,0 +1,137 @@
+# Structural rules for README.md
+target-files: "README.md"
+description: >
+  Project README. Succinct, user-facing language. Link to detailed docs in
+  /docs folder rather than including lengthy content inline. Required sections:
+  title, description, installation, and usage. Keep it concise — the README
+  is the front door, not the whole house.
+line-limit: 800
+
+sections:
+  # Project title (H1)
+  - heading: ".*"
+    level: 1
+    required: true
+    description: >
+      Project name as H1. Optionally followed by badge images and a one-paragraph
+      description of what the project does and why it exists.
+
+  # Features section (optional)
+  - heading: "Features"
+    level: 2
+    description: "Bullet list of key features. Keep to 5-10 items."
+
+  # Installation section
+  - heading: "Installation"
+    level: 2
+    required: true
+    description: >
+      How to install the project. May contain Prerequisites and Install
+      subsections. Include code blocks with shell commands.
+    contains:
+      - code-block: true
+        label: "install command"
+        description: "Shell command(s) to install the project."
+
+  # Usage section
+  - heading: "Usage"
+    level: 2
+    required: true
+    description: >
+      Quick start example showing minimal usage. Include at least one code block.
+      Additional examples can be H3 subsections.
+    contains:
+      - code-block: true
+        label: "usage example"
+        description: "Code block demonstrating basic usage."
+
+  # Documentation section (optional)
+  - heading: "Documentation"
+    level: 2
+    description: >
+      Links to detailed documentation in /docs folder.
+      Format: - [Title](docs/file.md) - Description
+
+  # Contributing section (optional)
+  - heading: "Contributing"
+    level: 2
+    description: "Brief instructions or link to CONTRIBUTING.md."
+
+  # License section (optional)
+  - heading: "License"
+    level: 2
+    description: "License name and link to LICENSE file."
+
+  # Acknowledgments section (optional)
+  - heading: "Acknowledgments"
+    level: 2
+    description: "Credits to libraries, tools, or contributors."
+
+example: |
+  # awa CLI
+
+  [![npm version](https://img.shields.io/npm/v/awa-cli.svg)](https://www.npmjs.com/package/awa-cli)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+  awa CLI generates AI coding agent configuration files from templates, enabling developers to quickly scaffold consistent agent setups across projects.
+
+  ## Features
+
+  - Template-based configuration generation
+  - Feature flag support for conditional content
+  - Multiple output formats (Markdown, YAML, JSON)
+  - Diff mode to preview changes before applying
+  - Local and remote template sources
+
+  ## Installation
+
+  ### Prerequisites
+
+  - Node.js 20 or higher
+  - npm or pnpm
+
+  ### Install
+
+  ```bash
+  npm install -g awa-cli
+  ```
+
+  ## Usage
+
+  ```bash
+  # Generate configuration from default template
+  awa template generate
+
+  # Generate with specific features enabled
+  awa template generate --features typescript,testing
+
+  # Preview changes without writing files
+  awa template diff
+  ```
+
+  ### Examples
+
+  #### Custom Template
+
+  ```bash
+  awa template generate --template ./my-templates --output ./.ai
+  ```
+
+  ## Documentation
+
+  - [Configuration Guide](docs/configuration.md) — Configure templates and options
+  - [Template Authoring](docs/templates.md) — Create custom templates
+  - [CLI Reference](docs/cli-reference.md) — Complete command documentation
+
+  ## Contributing
+
+  See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+  ## License
+
+  [MIT](LICENSE)
+
+  ## Acknowledgments
+
+  - Eta templating engine
+  - Citty CLI framework

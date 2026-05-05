@@ -11,7 +11,6 @@
 
 // Import only the JSON language contribution (worker + language features)
 import 'monaco-editor/esm/vs/language/json/monaco.contribution';
-
 // Import codicon font (needed for Monaco's UI icons: folding arrows, suggestions, etc.)
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles';
 

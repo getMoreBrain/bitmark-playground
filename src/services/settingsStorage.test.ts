@@ -52,7 +52,7 @@ describe('settingsStorage', () => {
       expect(migrateSettings({ ...validSettings, v: 999 })).toBeNull();
     });
 
-    it('migrates v1 settings to v2', () => {
+    it('migrates v1 settings to current version', () => {
       const v1Settings = {
         v: 1,
         activeMarkupTab: 'js',
@@ -65,11 +65,43 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v1Settings, v: CURRENT_VERSION });
     });
 
+    // @awa-test: PLAN-006-Step7 (v2 → v3 migration preserves prior values)
+    it('migrates v2 settings to current version', () => {
+      const v2Settings = {
+        v: 2,
+        activeMarkupTab: 'js',
+        activeJsonTab: 'wasmFull',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      const result = migrateSettings(v2Settings);
+      expect(result).toEqual({ ...v2Settings, v: CURRENT_VERSION });
+    });
+
     it('accepts wasmFull as valid ParserType', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'wasmFull' })).toEqual({
         ...validSettings,
         activeJsonTab: 'wasmFull',
       });
+    });
+
+    // @awa-test: PLAN-006-Step7 ('wasmCheck' accepted as activeJsonTab at v3)
+    it('accepts wasmCheck as valid activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'wasmCheck' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'wasmCheck',
+      });
+    });
+
+    // @awa-test: PLAN-006-Step7 ('wasmCheck' rejected as activeMarkupTab)
+    it('rejects wasmCheck as activeMarkupTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'wasmCheck' })).toBeNull();
+    });
+
+    // @awa-test: PLAN-006-Step7 ('wasmCheck' rejected as OutputTab)
+    it('rejects wasmCheck as leftOutputTab', () => {
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'wasmCheck' })).toBeNull();
     });
 
     it('returns null for invalid activeMarkupTab', () => {

@@ -1,0 +1,7 @@
+# Structural rules for API-{CODE}-{api-name}.tsp files
+target-files: ".awa/specs/API-*.tsp"
+description: >
+  TypeSpec API specification. Defines major APIs using TypeSpec format
+  conventions. Write in TypeSpec unless explicitly requested otherwise.
+  One file per API surface area, named with the feature CODE prefix.
+line-limit: 800

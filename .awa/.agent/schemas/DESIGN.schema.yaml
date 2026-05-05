@@ -1,0 +1,384 @@
+# Structural rules for DESIGN-{CODE}-{feature-name}.md files
+target-files: ".awa/specs/DESIGN-*.md"
+description: >
+  Design specification describing HOW to implement requirements (not WHAT).
+  Succinct language. Do not overspecify. Omit irrelevant information.
+  Each component has a name ({CODE}-{ComponentName}), description, IMPLEMENTS
+  trace, and interface code block. Correctness properties use {CODE}_P-{n} IDs
+  and link back to requirements via VALIDATES.
+line-limit: 800
+
+sections:
+  # Top-level heading: "Design Specification"
+  - heading: "Design Specification"
+    level: 1
+    required: true
+    description: "Document title. No metadata in this section."
+
+  # Overview section
+  - heading: "Overview"
+    level: 2
+    required: true
+    description: >
+      Technical approach and rationale. Reference REQ document, do not restate
+      requirements. Explain the design strategy and why it was chosen.
+
+  # Architecture section
+  - heading: "Architecture"
+    level: 2
+    required: true
+    description: >
+      System architecture with diagram, module layout, and key decisions.
+      Optional AFFECTED LAYERS line listing impacted layers.
+    children:
+      - heading: "High-Level Architecture"
+        level: 3
+        required: true
+        description: >
+          Description of the architecture with a mermaid diagram showing
+          components, data flow, and dependencies.
+        contains:
+          - code-block: true
+            label: "architecture diagram (mermaid)"
+            description: "Mermaid diagram (flowchart, sequence, etc.) showing architecture."
+      - heading: "Module Organization"
+        level: 3
+        required: true
+        description: "Directory tree showing file/module layout."
+        contains:
+          - code-block: true
+            label: "directory structure"
+            description: "Code block with directory tree (no mermaid, plain text tree)."
+      - heading: "Architectural Decisions"
+        level: 3
+        description: >
+          Key design decisions with rationale. Format:
+          - DECISION: rationale. Alternatives: alt1, alt2
+
+  # Design Constraints section (optional)
+  - heading: "Design Constraints"
+    level: 2
+    description: >
+      Optional section for quantitative parameters, thresholds, formulas, and
+      platform-specific details that shape the implementation but do not belong
+      in a component interface or data model. Each H3 groups related constraints
+      by topic. Format per item:
+      - CONSTRAINT_NAME: value — rationale
+      Include IMPLEMENTS trace when a constraint directly satisfies an AC.
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        description: >
+          Constraint group heading (e.g., ### Protocol Parameters,
+          ### Operational Thresholds, ### Platform Details).
+          Bullet list of named constraints in CAPITALS.
+          Optional IMPLEMENTS line tracing to ACs.
+
+  # Components and Interfaces section
+  - heading: "Components and Interfaces"
+    level: 2
+    required: true
+    description: >
+      One H3 per component. Each component describes HOW it works (not WHAT),
+      lists which ACs it implements, and provides a code interface.
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        required: true
+        description: >
+          Component heading: ### {CODE}-{ComponentName}
+          Name pattern: {CODE}-{ComponentName} (e.g., CFG-ConfigLoader, CLI-Parser).
+          Must describe HOW the component works, include IMPLEMENTS trace, and
+          provide an interface code block.
+        contains:
+          - pattern: "IMPLEMENTS:"
+            label: "IMPLEMENTS trace line"
+            description: >
+              IMPLEMENTS: {CODE}-{n}[.{p}]_AC-{m}, ... — comma-separated list of
+              acceptance criteria this component implements.
+          - code-block: true
+            label: "interface definition"
+            description: "TypeScript/language interface showing the component's public API."
+
+  # Data Models section
+  - heading: "Data Models"
+    level: 2
+    required: true
+    description: >
+      Core types, entities, and data structures grouped by H3 subsection.
+      Each subsection contains named types (CAPITALS) with descriptions
+      and optional code blocks.
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        required: true
+        description: >
+          Data model group (e.g., ### Core Types, ### API Types).
+          Contains bullet list of named types in CAPITALS with descriptions,
+          and optional code blocks with type definitions.
+
+  # Correctness Properties section
+  - heading: "Correctness Properties"
+    level: 2
+    required: true
+    description: >
+      Formal invariants for property-based testing. Each property has an ID
+      ({CODE}_P-{n}), a short name in brackets, a description, and VALIDATES
+      trace back to ACs or requirements. Format:
+      - {CODE}_P-{n} [{ShortName}]: {one-line description}
+        VALIDATES: {CODE}-{n}[.{p}]_AC-{m}, ...
+      The [{ShortName}] is required and names the invariant (e.g., [CLI Override]).
+    contains:
+      - pattern: "_P-\\d+"
+        label: "property ID"
+        description: "Property ID in {CODE}_P-{n} format (e.g., CFG_P-1, GEN_P-2)."
+      - pattern: "VALIDATES:"
+        label: "VALIDATES trace line"
+        description: "VALIDATES: comma-separated list of AC or REQ IDs this property validates."
+
+  # Error Handling section
+  - heading: "Error Handling"
+    level: 2
+    required: true
+    description: >
+      Error types with named variants, and a Strategy subsection with PRINCIPLES.
+      Each error type is an H3 with variant bullet list, followed by ### Strategy.
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        description: >
+          Error type heading. Format: ### {ErrorTypeName}
+          Followed by a sentence describing the error category, then a bullet list
+          of named variants: - VARIANT_NAME: description.
+      - heading: "Strategy"
+        level: 3
+        required: true
+        description: "Error handling strategy with PRINCIPLES bullet list."
+        contains:
+          - pattern: "PRINCIPLES"
+            label: "PRINCIPLES keyword"
+            description: "The Strategy subsection must contain a PRINCIPLES bullet list."
+
+  # Testing Strategy section
+  - heading: "Testing Strategy"
+    level: 2
+    required: true
+    description: >
+      Testing approach with subsections for property-based testing (required),
+      unit testing, and integration testing.
+    children:
+      - heading: "Property-Based Testing"
+        level: 3
+        required: true
+        description: >
+          Defines the property testing framework, minimum iterations, tag format,
+          and example test code blocks. Format:
+          - FRAMEWORK: {name}
+          - MINIMUM_ITERATIONS: {number}
+          - TAG_FORMAT: @awa-test: {CODE}_P-{n}
+      - heading: "Unit Testing"
+        level: 3
+        description: "Unit testing strategy with AREAS list."
+      - heading: "Integration Testing"
+        level: 3
+        description: "Integration testing strategy with SCENARIOS list."
+
+  # Requirements Traceability section
+  - heading: "Requirements Traceability"
+    level: 2
+    required: true
+    description: >
+      Trace matrix grouped by source REQ file. Each H3 is a REQ file path,
+      containing bullet list entries mapping ACs to components and properties.
+      Format per entry: - {CODE}-{n}[.{p}]_AC-{m} → {CODE}-{ComponentName} ({CODE}_P-{n}) [{status}] {notes}
+    children:
+      - heading: ".*"
+        level: 3
+        repeatable: true
+        required: true
+        description: >
+          Source REQ file heading. Format: ### REQ-{CODE}-{feature}.md
+          Followed by bullet list of trace entries from that file.
+          Each entry: - {AC-ID} → {Component} ({Property}) [{status}] {notes}
+          Omit [{status}] if implemented. Omit ({Property}) if none.
+
+  # Library Usage section (optional)
+  - heading: "Library Usage"
+    level: 2
+    description: >
+      Framework features and external libraries used. Subsections:
+      ### Framework Features — - FEATURE: usage
+      ### External Libraries — - name (version): purpose
+    children:
+      - heading: "Framework Features"
+        level: 3
+        description: "Framework features used. Format: - FEATURE: usage description."
+      - heading: "External Libraries"
+        level: 3
+        description: "External libraries used. Format: - name (version): purpose."
+
+sections-prohibited:
+  - "**"
+  - "~~"
+
+example: |
+  # Design Specification
+
+  ## Overview
+
+  This design implements a CLI pipeline architecture for template-based code generation. The pipeline flows through argument parsing, configuration loading, template resolution, rendering, and file output with conflict resolution.
+
+  ## Architecture
+
+  AFFECTED LAYERS: CLI Layer, Core Engine, I/O Layer
+
+  ### High-Level Architecture
+
+  Sequential pipeline for predictable flow and error handling.
+
+  ```mermaid
+  flowchart LR
+      Args[CLI Args] --> Parser
+      Config[.awa.toml] --> ConfigLoader
+      Parser --> ConfigLoader
+      ConfigLoader --> Engine[TemplateEngine]
+      Engine --> Generator[FileGenerator]
+      Generator --> Files[Output]
+  ```
+
+  ### Module Organization
+
+  ```
+  src/
+  ├── cli/
+  │   └── index.ts
+  ├── core/
+  │   ├── config.ts
+  │   ├── template.ts
+  │   └── generator.ts
+  └── utils/
+      └── fs.ts
+  ```
+
+  ### Architectural Decisions
+
+  - PIPELINE OVER EVENT: Sequential pipeline for predictable flow and error handling. Alternatives: event-driven, middleware chain
+
+  ## Design Constraints
+
+  ### Generation Limits
+
+  - MAX_TEMPLATE_DEPTH: 10 — prevents infinite recursion in nested templates
+  - MAX_OUTPUT_FILES: 500 — safeguard against runaway generation
+
+  IMPLEMENTS: GEN-3_AC-1, GEN-3_AC-2
+
+  ### Platform Details
+
+  - LINE_ENDINGS: LF on POSIX, CRLF on Windows — match OS convention for generated files
+  - PATH_SEPARATOR: Use `path.sep` — portable across platforms
+
+  ## Components and Interfaces
+
+  ### CFG-ConfigLoader
+
+  Loads TOML configuration from file, merges with CLI arguments (CLI wins), and produces resolved options with defaults applied.
+
+  IMPLEMENTS: CFG-1_AC-1, CFG-1_AC-2, CFG-4_AC-1
+
+  ```typescript
+  interface ConfigLoader {
+    load(configPath: string | null): Promise<FileConfig | null>;
+    merge(cli: RawCliOptions, file: FileConfig | null): ResolvedOptions;
+  }
+  ```
+
+  ## Data Models
+
+  ### Core Types
+
+  - RESOLVED_OPTIONS: Fully resolved configuration with all defaults applied
+
+  ```typescript
+  interface ResolvedOptions {
+    readonly output: string;
+    readonly template: string | null;
+    readonly features: readonly string[];
+    readonly force: boolean;
+  }
+  ```
+
+  ## Correctness Properties
+
+  - CFG_P-1 [CLI Override]: CLI arguments always override config file values for the same option
+    VALIDATES: CFG-4_AC-1, CFG-4_AC-2
+
+  - GEN_P-2 [Dry Run Immutable]: Dry-run mode never modifies the file system
+    VALIDATES: GEN-6_AC-1, GEN-6_AC-2
+
+  ## Error Handling
+
+  ### ConfigError
+
+  Configuration loading and parsing errors
+
+  - FILE_NOT_FOUND: Config file does not exist when --config provided
+  - PARSE_ERROR: TOML syntax error with line number
+
+  ### Strategy
+
+  PRINCIPLES:
+
+  - Fail fast on first error
+  - Provide actionable error messages with file paths
+  - Exit with non-zero code on any error
+
+  ## Testing Strategy
+
+  ### Property-Based Testing
+
+  - FRAMEWORK: fast-check
+  - MINIMUM_ITERATIONS: 100
+  - TAG_FORMAT: @awa-test: {CODE}_P-{n}
+
+  ```typescript
+  // @awa-test: CFG_P-1
+  test.prop([fc.string(), fc.string()])('CLI overrides config', (cliValue, configValue) => {
+    const cli = { output: cliValue };
+    const config = { output: configValue };
+    const result = configLoader.merge(cli, config);
+    expect(result.output).toBe(cliValue);
+  });
+  ```
+
+  ### Unit Testing
+
+  Test individual components in isolation
+
+  - AREAS: CFG-ConfigLoader merge logic, TPL-TemplateResolver type detection
+
+  ## Requirements Traceability
+
+  ### REQ-CFG-config.md
+
+  - CFG-1_AC-1 → CFG-ConfigLoader (CFG_P-1)
+  - CFG-4_AC-1 → CFG-ConfigLoader (CFG_P-1)
+
+  ### REQ-GEN-generator.md
+
+  - GEN-6_AC-1 → GEN-FileGenerator (GEN_P-2) [partial] pending review
+
+  ## Library Usage
+
+  ### Framework Features
+
+  - CITTY: Command definition, argument parsing, help generation
+
+  ### External Libraries
+
+  - citty (latest): CLI framework
+  - smol-toml (1.x): TOML parser

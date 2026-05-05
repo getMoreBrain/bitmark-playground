@@ -1,21 +1,36 @@
 // @awa-component: PLAN-002-ParserTabBar
+// @awa-component: PLAN-006-ParserTabBar
 /** @jsxImportSource theme-ui */
 import { Flex, Text } from 'theme-ui';
 
-import { ParserType } from '../../../state/bitmarkState';
+import { JsonTabType, ParserType } from '../../../state/bitmarkState';
 
 export interface ParserTabBarProps {
   label: string;
   jsDuration: number | undefined;
   wasmDuration: number | undefined;
   wasmFullDuration: number | undefined;
-  activeTab: ParserType;
-  onTabChange: (tab: ParserType) => void;
+  activeTab: JsonTabType;
+  onTabChange: (tab: JsonTabType) => void;
+  /** Show the WASM Check tab (JSON side only). */
+  showWasmCheck?: boolean;
+  /** Duration for the WASM Check round-trip (JS parser). */
+  wasmCheckDuration?: number | undefined;
 }
 
 // @awa-impl: PLAN-002-Step4 (tab bar UI)
+// @awa-impl: PLAN-006-Step3 (optional WASM Check tab)
 const ParserTabBar = (props: ParserTabBarProps) => {
-  const { label, jsDuration, wasmDuration, wasmFullDuration, activeTab, onTabChange } = props;
+  const {
+    label,
+    jsDuration,
+    wasmDuration,
+    wasmFullDuration,
+    activeTab,
+    onTabChange,
+    showWasmCheck = false,
+    wasmCheckDuration,
+  } = props;
 
   const formatDuration = (duration: number | undefined): string => {
     if (duration === undefined) return '';
@@ -49,6 +64,8 @@ const ParserTabBar = (props: ParserTabBarProps) => {
       },
     }) as const;
 
+  const handleParserTabChange = (tab: ParserType) => onTabChange(tab);
+
   return (
     <Flex
       sx={{
@@ -68,7 +85,7 @@ const ParserTabBar = (props: ParserTabBarProps) => {
       <Text
         role="tab"
         aria-selected={activeTab === 'js'}
-        onClick={() => onTabChange('js')}
+        onClick={() => handleParserTabChange('js')}
         sx={tabSx(activeTab === 'js')}
       >
         Original{formatDuration(jsDuration)}
@@ -76,7 +93,7 @@ const ParserTabBar = (props: ParserTabBarProps) => {
       <Text
         role="tab"
         aria-selected={activeTab === 'wasm'}
-        onClick={() => onTabChange('wasm')}
+        onClick={() => handleParserTabChange('wasm')}
         sx={{ ...tabSx(activeTab === 'wasm'), ml: '2px' }}
       >
         WASM{formatDuration(wasmDuration)}
@@ -84,11 +101,21 @@ const ParserTabBar = (props: ParserTabBarProps) => {
       <Text
         role="tab"
         aria-selected={activeTab === 'wasmFull'}
-        onClick={() => onTabChange('wasmFull')}
+        onClick={() => handleParserTabChange('wasmFull')}
         sx={{ ...tabSx(activeTab === 'wasmFull'), ml: '2px' }}
       >
         WASM (full){formatDuration(wasmFullDuration)}
       </Text>
+      {showWasmCheck ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'wasmCheck'}
+          onClick={() => onTabChange('wasmCheck')}
+          sx={{ ...tabSx(activeTab === 'wasmCheck'), ml: '2px' }}
+        >
+          WASM Check{formatDuration(wasmCheckDuration)}
+        </Text>
+      ) : null}
     </Flex>
   );
 };

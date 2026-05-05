@@ -1,0 +1,42 @@
+# Structural rules for .awa/specs/deprecated/DEPRECATED.md
+target-files: ".awa/specs/deprecated/DEPRECATED.md"
+description: >
+  Tombstone file for deprecated requirements, acceptance criteria, properties,
+  and components. Contains only bare IDs grouped by feature code. No natural
+  language descriptions, user stories, or design detail
+line-limit: 800
+
+sections:
+  - heading: "[A-Z][A-Z0-9]*"
+    level: 1
+    repeatable: true
+    required: true
+    description: >
+      Feature code heading. Format: # {CODE} (e.g., # GEN, # DIFF).
+      Each heading groups the deprecated IDs for that feature code.
+      Under the heading, each non-empty line contains a comma-separated
+      list of deprecated IDs: requirement IDs, AC IDs, property IDs,
+      or component names.
+
+sections-prohibited:
+  - "**"
+  - "AS A"
+  - "I WANT"
+  - "SO THAT"
+  - "ACCEPTANCE CRITERIA"
+  - "IMPLEMENTS:"
+  - "VALIDATES:"
+  - "DEPENDS ON:"
+
+example: |
+  # GEN
+
+  GEN-5, GEN-5.1
+  GEN-5_AC-1, GEN-5_AC-2, GEN-5.1_AC-1
+  GEN_P-3
+  GEN-CacheManager
+
+  # DIFF
+
+  DIFF-4
+  DIFF-4_AC-1, DIFF-4_AC-2

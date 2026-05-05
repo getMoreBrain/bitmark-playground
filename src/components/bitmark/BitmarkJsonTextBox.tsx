@@ -1,4 +1,5 @@
 // @awa-component: PLAN-002-BitmarkJsonTextBox
+// @awa-component: PLAN-006-BitmarkJsonTextBox
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
@@ -7,6 +8,7 @@ import { useSnapshot } from 'valtio';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
+import { WasmCheckPanel } from './WasmCheckPanel';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   //
@@ -24,7 +26,6 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     useBitmarkConverter();
 
   const activeTab = bitmarkStateSnap.activeJsonTab;
-  const activeSlice = bitmarkStateSnap[activeTab];
 
   // At least one parser must be loaded
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
@@ -40,6 +41,18 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     },
     [jsonToMarkup],
   );
+
+  // @awa-impl: PLAN-006-Step4 (render WasmCheckPanel when wasmCheck tab is active)
+  if (activeTab === 'wasmCheck') {
+    return (
+      <WasmCheckPanel
+        markup={bitmarkStateSnap.wasmCheck.markup}
+        errorAsString={bitmarkStateSnap.wasmCheck.markupErrorAsString}
+      />
+    );
+  }
+
+  const activeSlice = bitmarkStateSnap[activeTab];
 
   if (anyLoadSuccess) {
     const opts = {

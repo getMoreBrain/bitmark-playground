@@ -1,0 +1,89 @@
+# Structural rules for EXAMPLE-{CODE}-{feature-name}-{nnn}.md files
+target-files: ".awa/specs/EXAMPLE-*.md"
+description: >
+  Concrete usage examples for a feature. Detailed, hands-on, reproducible.
+  Use the same {CODE} as the corresponding FEAT/REQ for the feature.
+  Number files sequentially (-001, -002, ...) when splitting at the line-limit.
+  Each example must have a title, context, and code/demonstration block.
+  Marked [INFORMATIVE]. Prohibited: normative language (SHALL/SHOULD/MAY),
+  acceptance criteria, traceability IDs, design decisions.
+line-limit: 800
+
+sections:
+  # Top-level heading with INFORMATIVE marker
+  - heading: ".*\\[INFORMATIVE\\]"
+    level: 1
+    required: true
+    description: >
+      Document title including [INFORMATIVE] marker.
+      Format: # Usage Examples: {Feature Name} [INFORMATIVE]
+
+  # Prerequisites section (optional)
+  - heading: "Prerequisites"
+    level: 2
+    description: "Required tools, setup, or prior knowledge before running examples."
+
+  # At least one example heading
+  - heading: "Example \\d+:.*"
+    level: 2
+    required: true
+    repeatable: true
+    description: >
+      Individual example with title, context paragraph, and code block.
+      Format: ## Example N: {Title}
+      Context explaining when to use this and what it demonstrates.
+      Followed by a code or CLI demonstration block.
+      Optional: EXPECTED OUTPUT code block, NOTES bullet list.
+    contains:
+      - code-block: true
+        label: "code or CLI demonstration"
+        description: "Fenced code block with language tag (bash, typescript, etc.)."
+
+sections-prohibited:
+  - "SHALL "
+  - "SHOULD "
+  - "MAY "
+  - "**"
+  - "_AC-"
+  - "_P-"
+  - "IMPLEMENTS:"
+  - "VALIDATES:"
+
+example: |
+  # Usage Examples: Template Engine [INFORMATIVE]
+
+  ## Prerequisites
+
+  - Node.js 20 or higher
+  - awa CLI installed globally
+
+  ## Example 1: Basic Generation
+
+  Generate configuration files with default settings.
+
+  ```bash
+  awa generate
+  ```
+
+  EXPECTED OUTPUT:
+
+  ```
+  Created .github/agents/copilot.md
+  Created .github/agents/claude.md
+  ```
+
+  ## Example 2: Feature Flags
+
+  Enable specific features when generating.
+
+  ```bash
+  awa template generate --features copilot,claude,cursor
+  ```
+
+  ## Example 3: Custom Template Source
+
+  Use a Git repository as the template source.
+
+  ```bash
+  awa template generate --template owner/repo --features copilot
+  ```

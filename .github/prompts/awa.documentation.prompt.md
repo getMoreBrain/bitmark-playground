@@ -11,7 +11,7 @@ argument-hint: "<documentation-instructions>"
  <read path=".awa/.agent/awa.core.md" required="true" error="on not found" />
  <read path=".awa/rules/*.md" required="true" />
  <read path=".awa/specs/ARCHITECTURE.md" required="true" error="on not found" />
- <read path=".awa/.agent/schemas/README.schema.md" required="true" error="on not found" />
+ <read path=".awa/.agent/schemas/README.schema.yaml" required="true" error="on not found" />
 </tool>
 
 ## User Input
@@ -61,7 +61,7 @@ docs/
    - Each file covers one topic
    - Reference style for commands/APIs
    - Tutorial style for guides
-   - Keep files under 500 lines; split if larger
+   - Keep files under the specified line-limit; split if larger
 
 3. Derive from specifications
    - Do not duplicate; summarize and link

@@ -1,0 +1,160 @@
+# Structural rules for REQ-{CODE}-{feature-name}.md files
+target-files: ".awa/specs/REQ-*.md"
+description: >
+  Requirements specification using EARS (Easy Approach to Requirements Syntax).
+  Succinct language. Do not overspecify. Omit irrelevant information.
+  Each requirement has an ID ({CODE}-{n}), a user story (AS A/I WANT/SO THAT),
+  and acceptance criteria with INCOSE-compliant types.
+  Subrequirements use dotted IDs ({CODE}-{n}.{p}).
+line-limit: 800
+
+sections:
+  # Top-level heading: "Requirements Specification"
+  - heading: "Requirements Specification"
+    level: 1
+    required: true
+    description: "Document title. No metadata in this section."
+
+  # Introduction section
+  - heading: "Introduction"
+    level: 2
+    required: true
+    description: "Brief context for the requirements. One or two paragraphs."
+
+  # Glossary section (optional)
+  - heading: "Glossary"
+    level: 2
+    description: >
+      Domain terms in TERM: definition format. Use CAPITALS for term names.
+      Format: - TERM: Definition
+
+  # Stakeholders section (optional)
+  - heading: "Stakeholders"
+    level: 2
+    description: >
+      Roles that interact with or are affected by this feature.
+      Format: - ROLE: Description
+
+  # Requirements section with repeatable requirement headings
+  - heading: "Requirements"
+    level: 2
+    required: true
+    description: >
+      Container for all requirements. Each child heading is a requirement
+      with ID, title, optional priority, user story, and acceptance criteria.
+    children:
+      - heading: "[A-Z]+-\\d+.*"
+        level: 3
+        required: true
+        repeatable: true
+        description: >
+          Individual requirement heading. Format: ### {CODE}-{n}: Title [{PRIORITY}]
+          where PRIORITY is MUST, SHOULD, COULD, or WONT (optional).
+          Contains a user story, optional rationale blockquote, ACCEPTANCE CRITERIA
+          heading, AC items, and optional DEPENDS ON line.
+        contains:
+          # User story format
+          - pattern: "AS AN? .*, I WANT .*, SO THAT"
+            label: "user story"
+            description: >
+              User story in AS A(N) {role}, I WANT {want}, SO THAT {benefit} format.
+              One sentence. Role, want, and benefit are all required.
+          # Acceptance criteria heading
+          - pattern: "ACCEPTANCE CRITERIA"
+            label: "AC heading"
+            description: "Literal text ACCEPTANCE CRITERIA (no markdown heading, just text)."
+          # At least one AC item
+          - list:
+              pattern: "_AC-\\d+\\s*\\[(ubiquitous|event|state|conditional|optional|complex)\\]"
+              min: 1
+              label: "acceptance criteria items"
+            description: >
+              Acceptance criteria items. Format:
+              - {CODE}-{n}_AC-{m} [{type}]: {statement} - {notes}
+              Types (EARS/INCOSE):
+              - ubiquitous: always true, no trigger ("The system SHALL ...")
+              - event: triggered by a stimulus ("WHEN x THEN system SHALL ...")
+              - state: true while a condition holds ("WHILE x THE system SHALL ...")
+              - conditional: depends on a boolean condition ("IF x THEN system SHALL ...")
+              - optional: feature activated by trigger ("WHERE x IS ENABLED THE system SHALL ...")
+              - complex: combines multiple EARS patterns
+
+  # Assumptions section (optional)
+  - heading: "Assumptions"
+    level: 2
+    description: "Bullet list of assumptions underlying the requirements."
+
+  # Constraints section (optional)
+  - heading: "Constraints"
+    level: 2
+    description: "Bullet list of constraints on the implementation."
+
+  # Out of Scope section (optional)
+  - heading: "Out of Scope"
+    level: 2
+    description: "Bullet list of explicitly excluded functionality."
+
+sections-prohibited:
+  - "**"
+
+example: |
+  # Requirements Specification
+
+  ## Introduction
+
+  Core engine requirements for game framework.
+
+  ## Glossary
+
+  - GAME LOOP: Core cycle of update-render that drives the engine
+  - CONTEXT: Runtime state container for engine subsystems
+
+  ## Stakeholders
+
+  - GAME DEVELOPER: Builds games using the engine API
+  - ENGINE MAINTAINER: Maintains and extends engine internals
+
+  ## Requirements
+
+  ### ENG-1: Core Engine Framework [MUST]
+
+  AS A game developer, I WANT a game loop, SO THAT predictable execution.
+
+  > Foundation for all games.
+
+  ACCEPTANCE CRITERIA
+
+  - ENG-1_AC-1 [event]: WHEN engine initializes THEN system SHALL create context
+  - ENG-1_AC-2 [event]: WHEN `--verbose` flag is provided THEN system SHALL enable debug logging
+  - ENG-1_AC-3 [ubiquitous]: The system SHALL maintain 60fps minimum frame rate
+
+  ### ENG-1.1: Subsystem Registration [SHOULD]
+
+  AS A engine maintainer, I WANT subsystems to self-register, SO THAT modular architecture.
+
+  ACCEPTANCE CRITERIA
+
+  - ENG-1.1_AC-1 [event]: WHEN subsystem loads THEN it SHALL register with context
+
+  ### ENG-2: Resource Management [MUST]
+
+  AS A game developer, I WANT automatic resource loading, SO THAT simplified asset management.
+
+  ACCEPTANCE CRITERIA
+
+  - ENG-2_AC-1 [event]: WHEN resource requested THEN system SHALL load asynchronously
+  - ENG-2_AC-2 [ubiquitous]: The system SHALL cache loaded resources
+
+  DEPENDS ON: ENG-1
+
+  ## Assumptions
+
+  - Target platform supports OpenGL 3.3 or higher
+
+  ## Constraints
+
+  - Must run on Windows, macOS, and Linux
+
+  ## Out of Scope
+
+  - Mobile platform support

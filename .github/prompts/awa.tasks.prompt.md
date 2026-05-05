@@ -11,9 +11,9 @@ argument-hint: "<design> [<instructions>]"
  <read path=".awa/.agent/awa.core.md" required="true" error="on not found" />
  <read path=".awa/rules/*.md" required="true" />
  <read path=".awa/specs/ARCHITECTURE.md" required="true" error="on not found" />
- <read path=".awa/.agent/schemas/DESIGN.schema.md" optional="true" />
- <read path=".awa/.agent/schemas/REQ.schema.md" optional="true" />
- <read path=".awa/.agent/schemas/TASK.schema.md" required="true" error="on not found" />
+ <read path=".awa/.agent/schemas/DESIGN.schema.yaml" optional="true" />
+ <read path=".awa/.agent/schemas/REQ.schema.yaml" optional="true" />
+ <read path=".awa/.agent/schemas/TASK.schema.yaml" required="true" error="on not found" />
 </tool>
 
 ## User Input
@@ -28,7 +28,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 <file type="architecture" path=".awa/specs/ARCHITECTURE.md" />
 <file type="feat" path=".awa/specs/FEAT-{CODE}-{feature-name}.md" required="if relevant" />
-<file type="examples" path=".awa/specs/EXAMPLES-{CODE}-{feature-name}-{nnn}.md" required="if relevant" />
+<file type="examples" path=".awa/specs/EXAMPLE-{CODE}-{feature-name}-{nnn}.md" required="if relevant" />
 <file type="requirements" path=".awa/specs/REQ-{CODE}-{feature-name}.md" required="if relevant" />
 <file type="design" path=".awa/specs/DESIGN-{CODE}-{feature-name}.md" required="if relevant" />
 <file type="api" path=".awa/specs/API-{CODE}-{feature-name}.md" required="if relevant" />
@@ -125,9 +125,14 @@ Each phase should be independently testable after completion.
 ### Final Phase: Polish
 
 - Integration tests across requirements
-- Documentation updates
 - Cross-cutting concerns
 - No requirement labels
+
+### Documentation Phase
+
+- Documentation update tasks for any changed user-facing behavior, CLI, API, or configuration
+- If no user-facing changes, include a single task: "No doc changes — internal only"
+- No requirement labels, no IMPLEMENTS lines
 
 ## Validation Checklist
 
@@ -141,6 +146,7 @@ Before output, verify:
 - [ ] Dependencies match DESIGN component order
 - [ ] Each requirement phase has clear test criteria
 - [ ] Trace summary accounts for all ACs and Ps
+- [ ] Documentation phase present with doc update tasks or explicit "no changes" task
 
 ## Outputs
 

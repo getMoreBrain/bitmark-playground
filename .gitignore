@@ -3,6 +3,10 @@
 # IDE
 .vscode/mise-tools
 
+# Local
+*.local
+*.local.*
+
 # AI
 .playwright-mcp
 

@@ -3,9 +3,8 @@ import { subscribe } from 'valtio';
 
 import { bitmarkState } from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
-
-import { CURRENT_VERSION, saveSettings } from './settingsStorage';
 import type { PersistedSettings } from './settingsStorage';
+import { CURRENT_VERSION, saveSettings } from './settingsStorage';
 
 const DEBOUNCE_MS = 300;
 
@@ -43,4 +42,4 @@ function initSettingsPersistence(): () => void {
   };
 }
 
-export { initSettingsPersistence, collectSettings, DEBOUNCE_MS };
+export { collectSettings, DEBOUNCE_MS, initSettingsPersistence };

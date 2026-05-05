@@ -6,6 +6,8 @@ import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm' | 'wasmFull';
+/** Tab id for the JSON parser tab bar — adds the read-only round-trip view. */
+export type JsonTabType = ParserType | 'wasmCheck';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -22,12 +24,21 @@ export interface ParserSlice {
   readonly lexerOutput: string;
 }
 
+export interface WasmCheckSlice {
+  readonly markup: string;
+  readonly markupError: Error | undefined;
+  readonly markupErrorAsString: string | undefined;
+  readonly markupDurationSec: number | undefined;
+  readonly markupUpdates: number;
+}
+
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
   readonly wasmFull: ParserSlice;
+  readonly wasmCheck: WasmCheckSlice;
   readonly activeMarkupTab: ParserType;
-  readonly activeJsonTab: ParserType;
+  readonly activeJsonTab: JsonTabType;
   setJson(
     parser: ParserType,
     markup: string,
@@ -43,8 +54,13 @@ export interface BitmarkState {
     durationSec?: number,
   ): void;
   setLexerOutput(parser: ParserType, output: string): void;
+  setWasmCheck(
+    markup: string | undefined,
+    markupError: Error | undefined,
+    durationSec?: number,
+  ): void;
   setActiveMarkupTab(tab: ParserType): void;
-  setActiveJsonTab(tab: ParserType): void;
+  setActiveJsonTab(tab: JsonTabType): void;
   syncMarkupInput(markup: string): void;
   syncJsonInput(json: string): void;
 }
@@ -62,6 +78,15 @@ const createParserSlice = (): ParserSlice => ({
   jsonDurationSec: undefined,
   jsonUpdates: 0,
   lexerOutput: '',
+});
+
+// @awa-component: PLAN-006-WasmCheckSlice
+const createWasmCheckSlice = (): WasmCheckSlice => ({
+  markup: '',
+  markupError: undefined,
+  markupErrorAsString: undefined,
+  markupDurationSec: undefined,
+  markupUpdates: 0,
 });
 
 // @awa-impl: PLAN-002-Step9 (tab query param)
@@ -82,6 +107,7 @@ const bitmarkState = proxy<BitmarkState>({
   js: createParserSlice(),
   wasm: createParserSlice(),
   wasmFull: createParserSlice(),
+  wasmCheck: createWasmCheckSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
@@ -158,11 +184,39 @@ const bitmarkState = proxy<BitmarkState>({
     slice.lexerOutput = output;
   },
 
+  // @awa-impl: PLAN-006-Step1 (setWasmCheck setter)
+  setWasmCheck: (
+    markup: string | undefined,
+    markupError: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState.wasmCheck as Writable<WasmCheckSlice>;
+
+    if (markupError) {
+      slice.markupError = markupError;
+      try {
+        slice.markupErrorAsString = JSON.stringify(
+          markupError,
+          Object.getOwnPropertyNames(markupError),
+          2,
+        );
+      } catch (_e) {
+        slice.markupErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.markup = markup ?? '';
+      slice.markupError = undefined;
+      slice.markupErrorAsString = undefined;
+    }
+    slice.markupDurationSec = durationSec;
+    slice.markupUpdates += 1;
+  },
+
   setActiveMarkupTab: (tab: ParserType) => {
     (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
   },
 
-  setActiveJsonTab: (tab: ParserType) => {
+  setActiveJsonTab: (tab: JsonTabType) => {
     (bitmarkState as Writable<BitmarkState>).activeJsonTab = tab;
   },
 

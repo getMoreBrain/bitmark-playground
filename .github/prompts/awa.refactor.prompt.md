@@ -44,8 +44,10 @@ Refactor the specified cod or docs as instructed, following awa conventions.
 
 You SHALL preserve existing behavior unless explicitly asked to change it.
 You SHALL maintain all traceability markers (@awa-component, @awa-impl, @awa-test).
+You SHALL run `awa check` after refactoring to verify all traceability markers are preserved and still resolve correctly.
 You SHALL ensure tests pass before and after refactoring.
 You SHALL make incremental changes, not wholesale rewrites.
 You SHALL NOT change public interfaces without explicit approval.
+You SHALL update user-facing documentation when implementation changes user-facing behavior, CLI, API, or configuration.
 You SHALL clarify scope and risks with user before major refactors.
 You MAY use todos and tools as needed.

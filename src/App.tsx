@@ -15,6 +15,7 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { WasmCheckRunner } from './services/WasmCheckRunner';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
 import { theme } from './theme/theme';
@@ -52,7 +53,9 @@ function App() {
             wasmDuration={snap.wasm.markupDurationSec}
             wasmFullDuration={snap.wasmFull.markupDurationSec}
             activeTab={snap.activeMarkupTab}
-            onTabChange={(tab) => bitmarkState.setActiveMarkupTab(tab)}
+            onTabChange={(tab) => {
+              if (tab !== 'wasmCheck') bitmarkState.setActiveMarkupTab(tab);
+            }}
           />
         </Flex>
         <Flex
@@ -94,6 +97,8 @@ function App() {
             wasmFullDuration={snap.wasmFull.jsonDurationSec}
             activeTab={snap.activeJsonTab}
             onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
+            showWasmCheck
+            wasmCheckDuration={snap.wasmCheck.markupDurationSec}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -150,6 +155,7 @@ function App() {
     <ThemeUIProvider theme={theme}>
       <BitmarkParserGeneratorProvider>
         <BitmarkParserProvider>
+          <WasmCheckRunner />
           <Flex
             sx={{
               flexDirection: 'column',

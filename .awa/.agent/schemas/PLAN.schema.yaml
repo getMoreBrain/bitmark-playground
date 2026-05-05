@@ -1,0 +1,146 @@
+# Structural rules for PLAN-{nnn}-{plan-name}.md files
+target-files: ".awa/plans/PLAN-*.md"
+description: >
+  Ad-hoc plan for features, improvements, refactors, or other work.
+  Succinct language. Break down work into actionable steps (checkbox items).
+  Status and direction metadata required. Structure is flexible —
+  organize sections as the plan demands. Plans should not contain significant
+  code (short snippets for explanation are fine).
+  Traceability links to REQ/DESIGN/code/tests are optional but encouraged.
+line-limit: 800
+
+sections:
+  # H1 title with status/direction metadata
+  - heading: ".*"
+    level: 1
+    required: true
+    description: >
+      Plan title. Descriptive but concise (e.g., "Refactor Config Loader",
+      "Add Diff Preview Feature"). Followed immediately by STATUS and
+      DIRECTION metadata lines, and optional TRACEABILITY links.
+    contains:
+      - pattern: "^STATUS:"
+        label: "STATUS declaration"
+        description: >
+          Current plan status. One of: in-progress, completed, blocked.
+          Format: STATUS: in-progress
+      - pattern: "^DIRECTION:"
+        label: "DIRECTION declaration"
+        description: >
+          Workflow direction for this plan. One of: top-down (architecture
+          first), bottom-up (implementation first), lateral (cross-cutting).
+          Format: DIRECTION: top-down
+
+  # Context section (optional)
+  - heading: "Context"
+    level: 2
+    description: >
+      Why this plan exists. What problem or goal it addresses.
+      Brief — one or two paragraphs. Reference FEAT/REQ docs if they exist
+      rather than restating.
+
+  # Steps section (optional — steps may also appear in domain-specific H2s)
+  - heading: "Steps"
+    level: 2
+    description: >
+      Actionable steps as checkbox items. The core of the plan.
+      Format: - [ ] Step description
+      Mark completed steps with [x]. Group with H3 subsections if needed.
+      Each step should be concrete and verifiable.
+
+  # Risks section (optional)
+  - heading: "Risks"
+    level: 2
+    description: >
+      Known risks, unknowns, or potential blockers. Bullet list.
+      Include mitigation strategies where possible.
+
+  # Dependencies section (optional)
+  - heading: "Dependencies"
+    level: 2
+    description: >
+      Prerequisites or upstream work that must complete first.
+      Reference other plans, tasks, or external factors.
+
+  # Completion Criteria section (optional)
+  - heading: "Completion Criteria"
+    level: 2
+    description: >
+      How to know when this plan is done. Concrete, verifiable conditions.
+      Format: - [ ] Criterion description
+
+  # Open Questions section (optional)
+  - heading: "Open Questions"
+    level: 2
+    description: >
+      Unresolved questions needing clarification from the user or team.
+      Format: - [ ] Question (resolved questions marked [x] with answer).
+
+  # References section (optional)
+  - heading: "References"
+    level: 2
+    description: >
+      Links to related artifacts: REQ, DESIGN, TASK, FEAT, code files,
+      external docs. Format: - {artifact}: {path or description}
+
+sections-prohibited:
+  - "**"
+
+example: |
+  # Refactor Config Loader
+
+  STATUS: in-progress
+  DIRECTION: bottom-up
+  TRACEABILITY: REQ-CFG-config.md, DESIGN-CFG-config.md
+
+  ## Context
+
+  The config loader has grown organically and now mixes parsing, validation,
+  and merging in a single function. This makes it hard to test and extend.
+  Split into discrete pipeline stages.
+
+  ## Steps
+
+  - [x] Extract TOML parsing into standalone function
+  - [x] Extract validation into ConfigValidator
+  - [ ] Extract merge logic into ConfigMerger
+  - [ ] Update all call sites to use new pipeline
+  - [ ] Remove old monolithic load function
+
+  ### Testing
+
+  - [ ] Add property tests for ConfigMerger (CLI overrides file)
+  - [ ] Add unit tests for ConfigValidator edge cases
+  - [ ] Verify integration test still passes end-to-end
+
+  ### Documentation
+
+  - [ ] Update docs/configuration.md with new pipeline stages
+  - [ ] No README changes needed (no user-facing behavior change)
+
+  ## Risks
+
+  - Merge logic has implicit ordering assumptions that may break when extracted
+  - Call sites in CLI layer may depend on intermediate state
+
+  ## Dependencies
+
+  - TASK-CFG-config-001.md Phase 3 must be complete (defines the types)
+
+  ## Completion Criteria
+
+  - [ ] All existing tests pass
+  - [ ] New property tests cover merge invariants
+  - [ ] No function exceeds 40 lines
+  - [ ] Config pipeline is documented in DESIGN
+
+  ## Open Questions
+
+  - [x] Should validation happen before or after merge? — After merge (validate final state)
+  - [ ] Do we need a separate error type for merge failures?
+
+  ## References
+
+  - REQ: .awa/specs/REQ-CFG-config.md
+  - DESIGN: .awa/specs/DESIGN-CFG-config.md
+  - Code: src/core/config.ts
