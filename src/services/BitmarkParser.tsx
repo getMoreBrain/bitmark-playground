@@ -1,6 +1,6 @@
 // @awa-component: PLAN-002-BitmarkParser
 
-import type { generate as generateFn, lex as lexFn, parse as parseFn } from '@gmb/bitmark-parser';
+import type { convert as convertFn, lex as lexFn, parse as parseFn } from '@gmb/bitmark-parser';
 import {
   createContext,
   ReactElement,
@@ -23,7 +23,7 @@ interface BitmarkParserModule {
   init: (wasmUrl?: string) => Promise<void>;
   lex: typeof lexFn;
   parse: typeof parseFn;
-  generate: typeof generateFn;
+  convert: typeof convertFn;
   version: () => string;
 }
 
@@ -36,7 +36,7 @@ interface IBitmarkParserContext {
   loadError: boolean;
   lex: typeof lexFn | undefined;
   parse: typeof parseFn | undefined;
-  generate: typeof generateFn | undefined;
+  convert: typeof convertFn | undefined;
   version: string;
 }
 
@@ -45,7 +45,7 @@ const defaultState: IBitmarkParserContext = {
   loadError: false,
   lex: undefined,
   parse: undefined,
-  generate: undefined,
+  convert: undefined,
   version: '',
 };
 
@@ -82,7 +82,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           loadError: false,
           lex: module.lex,
           parse: module.parse,
-          generate: module.generate,
+          convert: module.convert,
           version: resolvedVersion,
         });
       } catch (e) {
@@ -92,7 +92,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           loadError: true,
           lex: undefined,
           parse: undefined,
-          generate: undefined,
+          convert: undefined,
           version: '',
         });
       }

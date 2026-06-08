@@ -104,6 +104,38 @@ describe('settingsStorage', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'wasmCheck' })).toBeNull();
     });
 
+    // @awa-test: PLAN-007-Step7 (v3 settings migrate to current version)
+    it('migrates v3 settings to current version', () => {
+      const v3Settings = {
+        v: 3,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'wasmCheck',
+        showDiffLex: false,
+        leftOutputTab: 'lexer',
+        rightOutputTab: 'diff',
+      };
+      const result = migrateSettings(v3Settings);
+      expect(result).toEqual({ ...v3Settings, v: CURRENT_VERSION });
+    });
+
+    // @awa-test: PLAN-007-Step7 ('tableHtml' accepted as activeJsonTab at v4)
+    it('accepts tableHtml as valid activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'tableHtml' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'tableHtml',
+      });
+    });
+
+    // @awa-test: PLAN-007-Step7 ('tableHtml' rejected as activeMarkupTab)
+    it('rejects tableHtml as activeMarkupTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'tableHtml' })).toBeNull();
+    });
+
+    // @awa-test: PLAN-007-Step7 ('tableHtml' rejected as OutputTab)
+    it('rejects tableHtml as leftOutputTab', () => {
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'tableHtml' })).toBeNull();
+    });
+
     it('returns null for invalid activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'invalid' })).toBeNull();
     });

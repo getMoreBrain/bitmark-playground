@@ -2,6 +2,7 @@
 /** @jsxImportSource theme-ui */
 import './App.css';
 
+import { useMemo } from 'react';
 import { Flex, ThemeUIProvider } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
@@ -15,10 +16,13 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { TableHtmlRunner } from './services/TableHtmlRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
 import { theme } from './theme/theme';
+import { parserJsonMatch, WasmCheckLed } from './utils/parserJsonMatch';
+import { reorderJsonStringToReference } from './utils/reorderJsonKeys';
 
 const initialMarkup = '[.article] Hello World!';
 
@@ -28,6 +32,18 @@ const initialMarkup = '[.article] Hello World!';
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
+
+  // @awa-impl: PLAN-009-Step3 (Original vs WASM-opt match LED, recomputed on data change)
+  const wasmCheckLed = useMemo<WasmCheckLed>(() => {
+    if (snap.js.jsonError || snap.wasm.jsonError) return 'neutral';
+    return parserJsonMatch(snap.js.json, snap.wasm.json);
+  }, [snap.js.json, snap.wasm.json, snap.js.jsonError, snap.wasm.jsonError]);
+
+  // @awa-impl: PLAN-010 (reorder WASM JSON keys to match Original before the JSON diff)
+  const wasmJsonForDiff = useMemo(
+    () => reorderJsonStringToReference(snap.js.jsonAsString, snap.wasm.jsonAsString),
+    [snap.js.jsonAsString, snap.wasm.jsonAsString],
+  );
 
   const editorPanels = (
     <Flex
@@ -54,7 +70,7 @@ function App() {
             wasmFullDuration={snap.wasmFull.markupDurationSec}
             activeTab={snap.activeMarkupTab}
             onTabChange={(tab) => {
-              if (tab !== 'wasmCheck') bitmarkState.setActiveMarkupTab(tab);
+              if (tab !== 'wasmCheck' && tab !== 'tableHtml') bitmarkState.setActiveMarkupTab(tab);
             }}
           />
         </Flex>
@@ -99,6 +115,9 @@ function App() {
             onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
             showWasmCheck
             wasmCheckDuration={snap.wasmCheck.markupDurationSec}
+            wasmCheckLed={wasmCheckLed}
+            showTableHtml
+            tableHtmlDuration={snap.tableHtml.htmlDurationSec}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -144,7 +163,7 @@ function App() {
         activeTab={uiSnap.rightOutputTab}
         onTabChange={(tab) => uiState.setRightOutputTab(tab)}
         original={snap.js.jsonAsString}
-        modified={snap.wasm.jsonAsString}
+        modified={wasmJsonForDiff}
         language="json"
         lexerOutput={snap.wasmFull.lexerOutput}
       />
@@ -156,6 +175,7 @@ function App() {
       <BitmarkParserGeneratorProvider>
         <BitmarkParserProvider>
           <WasmCheckRunner />
+          <TableHtmlRunner />
           <Flex
             sx={{
               flexDirection: 'column',

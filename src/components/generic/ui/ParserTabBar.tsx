@@ -1,9 +1,18 @@
 // @awa-component: PLAN-002-ParserTabBar
 // @awa-component: PLAN-006-ParserTabBar
+// @awa-component: PLAN-007-ParserTabBar
+// @awa-component: PLAN-009-ParserTabBar
 /** @jsxImportSource theme-ui */
-import { Flex, Text } from 'theme-ui';
+import { Box, Flex, Text } from 'theme-ui';
 
 import { JsonTabType, ParserType } from '../../../state/bitmarkState';
+import { WasmCheckLed } from '../../../utils/parserJsonMatch';
+
+const LED_COLOR: Record<WasmCheckLed, string> = {
+  match: '#3fb950',
+  mismatch: '#f85149',
+  neutral: '#444',
+};
 
 export interface ParserTabBarProps {
   label: string;
@@ -16,10 +25,18 @@ export interface ParserTabBarProps {
   showWasmCheck?: boolean;
   /** Duration for the WASM Check round-trip (JS parser). */
   wasmCheckDuration?: number | undefined;
+  /** Show the Table (HTML) tab (JSON side only). */
+  showTableHtml?: boolean;
+  /** Duration for the last HTML-table conversion. */
+  tableHtmlDuration?: number | undefined;
+  /** Match LED status shown at the far right of the WASM Check tab. */
+  wasmCheckLed?: WasmCheckLed;
 }
 
 // @awa-impl: PLAN-002-Step4 (tab bar UI)
 // @awa-impl: PLAN-006-Step3 (optional WASM Check tab)
+// @awa-impl: PLAN-007-Step4 (optional Table (HTML) tab)
+// @awa-impl: PLAN-009-Step2 (WASM Check match LED)
 const ParserTabBar = (props: ParserTabBarProps) => {
   const {
     label,
@@ -30,6 +47,9 @@ const ParserTabBar = (props: ParserTabBarProps) => {
     onTabChange,
     showWasmCheck = false,
     wasmCheckDuration,
+    showTableHtml = false,
+    tableHtmlDuration,
+    wasmCheckLed,
   } = props;
 
   const formatDuration = (duration: number | undefined): string => {
@@ -114,6 +134,34 @@ const ParserTabBar = (props: ParserTabBarProps) => {
           sx={{ ...tabSx(activeTab === 'wasmCheck'), ml: '2px' }}
         >
           WASM Check{formatDuration(wasmCheckDuration)}
+          {wasmCheckLed ? (
+            <Box
+              as="span"
+              role="status"
+              aria-label={`wasm-check-led-${wasmCheckLed}`}
+              sx={{
+                display: 'inline-block',
+                width: '8px',
+                height: '8px',
+                ml: '6px',
+                borderRadius: '50%',
+                verticalAlign: 'middle',
+                backgroundColor: LED_COLOR[wasmCheckLed],
+                boxShadow:
+                  wasmCheckLed === 'neutral' ? 'none' : `0 0 4px ${LED_COLOR[wasmCheckLed]}`,
+              }}
+            />
+          ) : null}
+        </Text>
+      ) : null}
+      {showTableHtml ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'tableHtml'}
+          onClick={() => onTabChange('tableHtml')}
+          sx={{ ...tabSx(activeTab === 'tableHtml'), ml: '2px' }}
+        >
+          Table (HTML){formatDuration(tableHtmlDuration)}
         </Text>
       ) : null}
     </Flex>

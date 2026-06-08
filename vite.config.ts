@@ -29,6 +29,7 @@ export default defineConfig({
   },
   base: '/bitmark-playground/',
   server: {
+    host: true,
     port: 3010,
     open: true,
   },
@@ -47,6 +48,12 @@ export default defineConfig({
       'monaco-editor/esm/vs/editor/editor.api': path.resolve(
         __dirname,
         'src/test/__mocks__/monaco-editor.ts',
+      ),
+      // Stub basic-language contributions (side-effect only) so the bare
+      // 'monaco-editor' alias below does not greedily redirect their subpaths.
+      'monaco-editor/esm/vs/basic-languages/html/html.contribution': path.resolve(
+        __dirname,
+        'src/test/__mocks__/monaco-basic-language.ts',
       ),
       'monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
       'react-monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/react-monaco-editor.tsx'),

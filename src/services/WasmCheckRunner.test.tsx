@@ -29,7 +29,7 @@ const makeWrapper = (convert: (json: string) => Promise<string>) => {
 describe('useWasmCheckRunner', () => {
   beforeEach(() => {
     // Reset wasm and wasmCheck slices to clean state
-    bitmarkState.syncJsonInput('');
+    bitmarkState.setEditedJson('wasm', '');
     bitmarkState.setWasmCheck('', undefined, undefined);
   });
 
@@ -41,7 +41,7 @@ describe('useWasmCheckRunner', () => {
     const convert = vi.fn().mockResolvedValue(ROUND_TRIPPED_MARKUP);
     renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.syncJsonInput('{"x":1}');
+    bitmarkState.setEditedJson('wasm', '{"x":1}');
 
     await waitFor(() => {
       expect(convert).toHaveBeenCalledWith('{"x":1}', expect.any(Object));
@@ -54,7 +54,7 @@ describe('useWasmCheckRunner', () => {
     const convert = vi.fn().mockRejectedValue(new Error('boom'));
     renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.syncJsonInput('garbage');
+    bitmarkState.setEditedJson('wasm', 'garbage');
 
     await waitFor(() => {
       expect(bitmarkState.wasmCheck.markupError).toBeDefined();
@@ -67,12 +67,12 @@ describe('useWasmCheckRunner', () => {
     const convert = vi.fn().mockResolvedValue(ROUND_TRIPPED_MARKUP);
     renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.syncJsonInput('{"x":1}');
+    bitmarkState.setEditedJson('wasm', '{"x":1}');
     await waitFor(() => {
       expect(bitmarkState.wasmCheck.markup).toBe(ROUND_TRIPPED_MARKUP);
     });
 
-    bitmarkState.syncJsonInput('');
+    bitmarkState.setEditedJson('wasm', '');
     await waitFor(() => {
       expect(bitmarkState.wasmCheck.markup).toBe('');
       expect(bitmarkState.wasmCheck.markupError).toBeUndefined();
@@ -94,7 +94,7 @@ describe('useWasmCheckRunner', () => {
     );
     renderHook(() => useWasmCheckRunner(), { wrapper });
 
-    bitmarkState.syncJsonInput('{"x":1}');
+    bitmarkState.setEditedJson('wasm', '{"x":1}');
     // small wait to confirm no microtask runs convert
     await new Promise((r) => setTimeout(r, 10));
     expect(convert).not.toHaveBeenCalled();

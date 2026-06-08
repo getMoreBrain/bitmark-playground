@@ -15,6 +15,7 @@ const fakeParserGenerator = {
   loadError: false,
   bitmarkParserGenerator: {
     convert: async () => '',
+    convertHtmlTable: () => '',
   } as unknown as Parameters<
     typeof BitmarkParserGeneratorContext.Provider
   >[0]['value']['bitmarkParserGenerator'],
@@ -24,7 +25,7 @@ const fakeWasmParser = {
   loadSuccess: true,
   loadError: false,
   parse: () => '',
-  generate: () => '',
+  convert: () => '',
   lex: () => '',
   version: 'test',
 };
@@ -43,6 +44,7 @@ describe('BitmarkJsonTextBox', () => {
   beforeEach(() => {
     bitmarkState.setActiveJsonTab('js');
     bitmarkState.setWasmCheck('', undefined, undefined);
+    bitmarkState.setTableHtml('', undefined, undefined);
   });
 
   afterEach(() => {
@@ -63,5 +65,16 @@ describe('BitmarkJsonTextBox', () => {
     const editor = screen.getByTestId('monaco-editor');
     expect(editor).toHaveAttribute('language', 'bitmark');
     expect(editor).toHaveAttribute('data-default-value', '[.article] round-tripped');
+  });
+
+  // @awa-test: PLAN-007-Step5 (BitmarkJsonTextBox swaps to TableHtmlPanel for tableHtml tab)
+  it('renders the TableHtmlPanel (language=html) when activeJsonTab is tableHtml', () => {
+    bitmarkState.setTableHtml('<table><tr><td>x</td></tr></table>', undefined, undefined);
+    bitmarkState.setActiveJsonTab('tableHtml');
+
+    render(<BitmarkJsonTextBox />, { wrapper });
+    const editor = screen.getByTestId('monaco-editor');
+    expect(editor).toHaveAttribute('language', 'html');
+    expect(editor).toHaveAttribute('data-default-value', '<table><tr><td>x</td></tr></table>');
   });
 });

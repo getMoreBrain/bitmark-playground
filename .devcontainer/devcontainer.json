@@ -1,0 +1,56 @@
+{
+  "name": "bitmark-playground",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "containerEnv": {
+    "MISE_YES": "1",
+    "CONTAINER_WORKSPACE_FOLDER": "${containerWorkspaceFolder}"
+  },
+  "mounts": [
+    // Keep high-churn build artifacts on a local named volume instead virtiofs workspace share
+    // It intermittently returns EACCES on the burst of parallel rename
+    "source=bitmark-playground-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=bitmark-playground-claude,target=/home/vscode/.claude,type=volume",
+    // Claude Code
+    "source=bitmark-playground-claude,target=/home/vscode/.claude,type=volume",
+    "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/vscode/.claude/CLAUDE.md,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/commands,target=/home/vscode/.claude/commands,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/agents,target=/home/vscode/.claude/agents,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/skills,target=/home/vscode/.claude/skills,type=bind,readonly"
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.tabSize": 2,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ],
+        "eslint.format.enable": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "npm.packageManager": "npm"
+      },
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "hverlin.mise-vscode",
+        "niceandfair.vscode-tombi"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+  "remoteUser": "vscode"
+}

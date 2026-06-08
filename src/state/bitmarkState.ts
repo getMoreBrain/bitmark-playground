@@ -1,4 +1,5 @@
 // @awa-component: PLAN-002-BitmarkState
+// @awa-component: PLAN-008-BitmarkState
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
@@ -6,8 +7,8 @@ import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm' | 'wasmFull';
-/** Tab id for the JSON parser tab bar — adds the read-only round-trip view. */
-export type JsonTabType = ParserType | 'wasmCheck';
+/** Tab id for the JSON parser tab bar — adds the round-trip and HTML-table views. */
+export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -32,23 +33,31 @@ export interface WasmCheckSlice {
   readonly markupUpdates: number;
 }
 
+// @awa-component: PLAN-007-TableHtmlSlice
+export interface TableHtmlSlice {
+  readonly html: string;
+  readonly htmlError: Error | undefined;
+  readonly htmlErrorAsString: string | undefined;
+  readonly htmlDurationSec: number | undefined;
+  readonly htmlUpdates: number;
+}
+
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
   readonly wasmFull: ParserSlice;
   readonly wasmCheck: WasmCheckSlice;
+  readonly tableHtml: TableHtmlSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
   setJson(
     parser: ParserType,
-    markup: string,
     json: BitWrapperJson[] | undefined,
     jsonError: Error | undefined,
     durationSec?: number,
   ): void;
   setMarkup(
     parser: ParserType,
-    json: string,
     markup: string | undefined,
     markupError: Error | undefined,
     durationSec?: number,
@@ -59,10 +68,13 @@ export interface BitmarkState {
     markupError: Error | undefined,
     durationSec?: number,
   ): void;
+  setTableHtml(html: string | undefined, htmlError: Error | undefined, durationSec?: number): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: JsonTabType): void;
-  syncMarkupInput(markup: string): void;
-  syncJsonInput(json: string): void;
+  /** Set the edited tab's markup verbatim (raw user input; clears markup error). */
+  setEditedMarkup(parser: ParserType, markup: string): void;
+  /** Set the edited tab's JSON verbatim (raw user input; clears JSON error). */
+  setEditedJson(parser: ParserType, json: string): void;
 }
 
 const createParserSlice = (): ParserSlice => ({
@@ -89,6 +101,15 @@ const createWasmCheckSlice = (): WasmCheckSlice => ({
   markupUpdates: 0,
 });
 
+// @awa-component: PLAN-007-TableHtmlSlice
+const createTableHtmlSlice = (): TableHtmlSlice => ({
+  html: '',
+  htmlError: undefined,
+  htmlErrorAsString: undefined,
+  htmlDurationSec: undefined,
+  htmlUpdates: 0,
+});
+
 // @awa-impl: PLAN-002-Step9 (tab query param)
 // @awa-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
 const getTabFromUrl = (): ParserType | null => {
@@ -108,19 +129,18 @@ const bitmarkState = proxy<BitmarkState>({
   wasm: createParserSlice(),
   wasmFull: createParserSlice(),
   wasmCheck: createWasmCheckSlice(),
+  tableHtml: createTableHtmlSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
+  // @awa-impl: PLAN-008-Step1 (setJson sets only the JSON side — no cross-write)
   setJson: (
     parser: ParserType,
-    markup: string,
     json: BitWrapperJson[] | undefined,
     jsonError: Error | undefined,
     durationSec?: number,
   ) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
-
-    slice.markup = markup;
 
     if (jsonError) {
       slice.jsonError = jsonError;
@@ -148,16 +168,14 @@ const bitmarkState = proxy<BitmarkState>({
     slice.jsonUpdates += 1;
   },
 
+  // @awa-impl: PLAN-008-Step1 (setMarkup sets only the markup side — no cross-write)
   setMarkup: (
     parser: ParserType,
-    json: string,
     markup: string | undefined,
     markupError: Error | undefined,
     durationSec?: number,
   ) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
-
-    slice.jsonAsString = json;
 
     if (markupError) {
       slice.markupError = markupError;
@@ -212,6 +230,37 @@ const bitmarkState = proxy<BitmarkState>({
     slice.markupUpdates += 1;
   },
 
+  // @awa-impl: PLAN-007-Step1 (setTableHtml setter)
+  // html and error are independent: html is always stored when provided (so the
+  // editable editor is never clobbered), while error is set/cleared separately.
+  // On error with html undefined (e.g. bitmark -> HTML failed), the last good
+  // html is preserved.
+  setTableHtml: (html: string | undefined, htmlError: Error | undefined, durationSec?: number) => {
+    const slice = bitmarkState.tableHtml as Writable<TableHtmlSlice>;
+
+    if (html !== undefined) {
+      slice.html = html;
+    }
+
+    if (htmlError) {
+      slice.htmlError = htmlError;
+      try {
+        slice.htmlErrorAsString = JSON.stringify(
+          htmlError,
+          Object.getOwnPropertyNames(htmlError),
+          2,
+        );
+      } catch (_e) {
+        slice.htmlErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.htmlError = undefined;
+      slice.htmlErrorAsString = undefined;
+    }
+    slice.htmlDurationSec = durationSec;
+    slice.htmlUpdates += 1;
+  },
+
   setActiveMarkupTab: (tab: ParserType) => {
     (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
   },
@@ -220,34 +269,19 @@ const bitmarkState = proxy<BitmarkState>({
     (bitmarkState as Writable<BitmarkState>).activeJsonTab = tab;
   },
 
-  syncMarkupInput: (markup: string) => {
-    const jsSlice = bitmarkState.js as Writable<ParserSlice>;
-    const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
-    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
-    jsSlice.markup = markup;
-    jsSlice.markupError = undefined;
-    jsSlice.markupErrorAsString = undefined;
-    wasmSlice.markup = markup;
-    wasmSlice.markupError = undefined;
-    wasmSlice.markupErrorAsString = undefined;
-    wasmFullSlice.markup = markup;
-    wasmFullSlice.markupError = undefined;
-    wasmFullSlice.markupErrorAsString = undefined;
+  // @awa-impl: PLAN-008-Step1 (edited tab keeps the user input verbatim — no copy to others)
+  setEditedMarkup: (parser: ParserType, markup: string) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    slice.markup = markup;
+    slice.markupError = undefined;
+    slice.markupErrorAsString = undefined;
   },
 
-  syncJsonInput: (json: string) => {
-    const jsSlice = bitmarkState.js as Writable<ParserSlice>;
-    const wasmSlice = bitmarkState.wasm as Writable<ParserSlice>;
-    const wasmFullSlice = bitmarkState.wasmFull as Writable<ParserSlice>;
-    jsSlice.jsonAsString = json;
-    jsSlice.jsonError = undefined;
-    jsSlice.jsonErrorAsString = undefined;
-    wasmSlice.jsonAsString = json;
-    wasmSlice.jsonError = undefined;
-    wasmSlice.jsonErrorAsString = undefined;
-    wasmFullSlice.jsonAsString = json;
-    wasmFullSlice.jsonError = undefined;
-    wasmFullSlice.jsonErrorAsString = undefined;
+  setEditedJson: (parser: ParserType, json: string) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    slice.jsonAsString = json;
+    slice.jsonError = undefined;
+    slice.jsonErrorAsString = undefined;
   },
 });
 

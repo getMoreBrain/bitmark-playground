@@ -38,13 +38,10 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
   const allLoadError = jsLoadError && wasmLoadError;
 
+  // @awa-impl: PLAN-008-Step3 (edited tab = active markup tab)
   const onInput = useCallback(
     async (markup: string) => {
-      await markupToJson(markup, {
-        jsonOptions: {
-          enableWarnings: true,
-        },
-      });
+      await markupToJson(bitmarkState.activeMarkupTab, markup);
     },
     [markupToJson],
   );
