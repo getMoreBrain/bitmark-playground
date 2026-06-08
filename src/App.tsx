@@ -184,22 +184,20 @@ function App() {
               backgroundColor: 'background',
             }}
           >
-            {uiSnap.showDiffLex ? (
-              <ResizableLayout
-                top={editorPanels}
-                bottom={bottomPanels}
-                bottomHeight={uiSnap.bottomPanelHeight}
-                collapsed={uiSnap.bottomPanelCollapsed}
-                onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
-                onToggleCollapse={() =>
-                  uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
-                }
-              />
-            ) : (
-              <Flex sx={{ flexGrow: 1, minHeight: 0, flexDirection: 'column' }}>
-                {editorPanels}
-              </Flex>
-            )}
+            {/* Always render ResizableLayout so the editor panels keep a stable
+                tree position — toggling the Diff/Lex panels must not remount the
+                editors (which would reset their content). */}
+            <ResizableLayout
+              top={editorPanels}
+              bottom={bottomPanels}
+              showBottom={uiSnap.showDiffLex}
+              bottomHeight={uiSnap.bottomPanelHeight}
+              collapsed={uiSnap.bottomPanelCollapsed}
+              onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
+              onToggleCollapse={() =>
+                uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
+              }
+            />
             <Flex
               sx={{
                 justifyContent: 'space-between',
