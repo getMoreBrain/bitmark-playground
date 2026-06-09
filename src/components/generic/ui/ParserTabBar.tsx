@@ -31,12 +31,17 @@ export interface ParserTabBarProps {
   tableHtmlDuration?: number | undefined;
   /** Match LED status shown at the far right of the WASM Check tab. */
   wasmCheckLed?: WasmCheckLed;
+  /** Show the Text tab (JSON side only). */
+  showText?: boolean;
+  /** Duration for the last WASM-opt-bitmark -> text conversion. */
+  textDuration?: number | undefined;
 }
 
 // @awa-impl: PLAN-002-Step4 (tab bar UI)
 // @awa-impl: PLAN-006-Step3 (optional WASM Check tab)
 // @awa-impl: PLAN-007-Step4 (optional Table (HTML) tab)
 // @awa-impl: PLAN-009-Step2 (WASM Check match LED)
+// @awa-impl: PLAN-011-Step4 (optional Text tab)
 const ParserTabBar = (props: ParserTabBarProps) => {
   const {
     label,
@@ -50,6 +55,8 @@ const ParserTabBar = (props: ParserTabBarProps) => {
     showTableHtml = false,
     tableHtmlDuration,
     wasmCheckLed,
+    showText = false,
+    textDuration,
   } = props;
 
   const formatDuration = (duration: number | undefined): string => {
@@ -162,6 +169,16 @@ const ParserTabBar = (props: ParserTabBarProps) => {
           sx={{ ...tabSx(activeTab === 'tableHtml'), ml: '2px' }}
         >
           Table (HTML){formatDuration(tableHtmlDuration)}
+        </Text>
+      ) : null}
+      {showText ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'text'}
+          onClick={() => onTabChange('text')}
+          sx={{ ...tabSx(activeTab === 'text'), ml: '2px' }}
+        >
+          Text{formatDuration(textDuration)}
         </Text>
       ) : null}
     </Flex>

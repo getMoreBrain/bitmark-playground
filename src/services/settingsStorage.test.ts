@@ -136,6 +136,34 @@ describe('settingsStorage', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'tableHtml' })).toBeNull();
     });
 
+    // @awa-test: PLAN-011-Step7 (v4 settings migrate to current version)
+    it('migrates v4 settings to current version', () => {
+      const v4Settings = {
+        v: 4,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'tableHtml',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      const result = migrateSettings(v4Settings);
+      expect(result).toEqual({ ...v4Settings, v: CURRENT_VERSION });
+    });
+
+    // @awa-test: PLAN-011-Step7 ('text' accepted as activeJsonTab at v5)
+    it('accepts text as valid activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'text' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'text',
+      });
+    });
+
+    // @awa-test: PLAN-011-Step7 ('text' rejected as activeMarkupTab / OutputTab)
+    it('rejects text as activeMarkupTab and leftOutputTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'text' })).toBeNull();
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'text' })).toBeNull();
+    });
+
     it('returns null for invalid activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'invalid' })).toBeNull();
     });

@@ -14,15 +14,23 @@ export interface PersistedSettings {
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 4;
+export const CURRENT_VERSION = 5;
 
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
-const VALID_JSON_TABS: readonly string[] = ['js', 'wasm', 'wasmFull', 'wasmCheck', 'tableHtml'];
+const VALID_JSON_TABS: readonly string[] = [
+  'js',
+  'wasm',
+  'wasmFull',
+  'wasmCheck',
+  'tableHtml',
+  'text',
+];
 const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer'];
 
 // @awa-impl: PLAN-004-Step1 (migrateSettings)
 // @awa-impl: PLAN-006-Step7 (v2 → v3 migration)
 // @awa-impl: PLAN-007-Step7 (v3 → v4 migration)
+// @awa-impl: PLAN-011-Step7 (v4 → v5 migration)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -43,8 +51,14 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v3 → v4: 'tableHtml' added as valid JSON tab, existing values still valid
   if (obj.v === 3) {
+    obj.v = 4;
+    // Fall through
+  }
+
+  // Migrate v4 → v5: 'text' added as valid JSON tab, existing values still valid
+  if (obj.v === 4) {
     obj.v = CURRENT_VERSION;
-    // Fall through to v4 validation
+    // Fall through to v5 validation
   }
 
   if (obj.v === CURRENT_VERSION) {

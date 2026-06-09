@@ -45,6 +45,7 @@ describe('BitmarkJsonTextBox', () => {
     bitmarkState.setActiveJsonTab('js');
     bitmarkState.setWasmCheck('', undefined, undefined);
     bitmarkState.setTableHtml('', undefined, undefined);
+    bitmarkState.setText('', undefined, undefined);
   });
 
   afterEach(() => {
@@ -76,5 +77,16 @@ describe('BitmarkJsonTextBox', () => {
     const editor = screen.getByTestId('monaco-editor');
     expect(editor).toHaveAttribute('language', 'html');
     expect(editor).toHaveAttribute('data-default-value', '<table><tr><td>x</td></tr></table>');
+  });
+
+  // @awa-test: PLAN-011-Step5 (BitmarkJsonTextBox swaps to TextPanel for text tab)
+  it('renders the TextPanel (language=plaintext) when activeJsonTab is text', () => {
+    bitmarkState.setText('Hello plain text', undefined, undefined);
+    bitmarkState.setActiveJsonTab('text');
+
+    render(<BitmarkJsonTextBox />, { wrapper });
+    const editor = screen.getByTestId('monaco-editor');
+    expect(editor).toHaveAttribute('language', 'plaintext');
+    expect(editor).toHaveAttribute('data-default-value', 'Hello plain text');
   });
 });

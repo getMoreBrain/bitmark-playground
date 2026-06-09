@@ -1,6 +1,7 @@
 // @awa-component: PLAN-002-BitmarkJsonTextBox
 // @awa-component: PLAN-006-BitmarkJsonTextBox
 // @awa-component: PLAN-007-BitmarkJsonTextBox
+// @awa-component: PLAN-011-BitmarkJsonTextBox
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
@@ -10,6 +11,7 @@ import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { TableHtmlPanel } from './TableHtmlPanel';
+import { TextPanel } from './TextPanel';
 import { WasmCheckPanel } from './WasmCheckPanel';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -37,7 +39,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const onInput = useCallback(
     async (json: string) => {
       const tab = bitmarkState.activeJsonTab;
-      if (tab === 'wasmCheck' || tab === 'tableHtml') return;
+      if (tab === 'wasmCheck' || tab === 'tableHtml' || tab === 'text') return;
       await jsonToMarkup(tab, json);
     },
     [jsonToMarkup],
@@ -59,6 +61,16 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
       <TableHtmlPanel
         html={bitmarkStateSnap.tableHtml.html}
         errorAsString={bitmarkStateSnap.tableHtml.htmlErrorAsString}
+      />
+    );
+  }
+
+  // @awa-impl: PLAN-011-Step5 (render TextPanel when text tab is active)
+  if (activeTab === 'text') {
+    return (
+      <TextPanel
+        text={bitmarkStateSnap.text.text}
+        errorAsString={bitmarkStateSnap.text.textErrorAsString}
       />
     );
   }

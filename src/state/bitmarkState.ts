@@ -1,5 +1,6 @@
 // @awa-component: PLAN-002-BitmarkState
 // @awa-component: PLAN-008-BitmarkState
+// @awa-component: PLAN-011-BitmarkState
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
@@ -8,7 +9,7 @@ import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm' | 'wasmFull';
 /** Tab id for the JSON parser tab bar — adds the round-trip and HTML-table views. */
-export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml';
+export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml' | 'text';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -42,12 +43,22 @@ export interface TableHtmlSlice {
   readonly htmlUpdates: number;
 }
 
+// @awa-component: PLAN-011-TextSlice
+export interface TextSlice {
+  readonly text: string;
+  readonly textError: Error | undefined;
+  readonly textErrorAsString: string | undefined;
+  readonly textDurationSec: number | undefined;
+  readonly textUpdates: number;
+}
+
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
   readonly wasmFull: ParserSlice;
   readonly wasmCheck: WasmCheckSlice;
   readonly tableHtml: TableHtmlSlice;
+  readonly text: TextSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
   setJson(
@@ -69,6 +80,7 @@ export interface BitmarkState {
     durationSec?: number,
   ): void;
   setTableHtml(html: string | undefined, htmlError: Error | undefined, durationSec?: number): void;
+  setText(text: string | undefined, textError: Error | undefined, durationSec?: number): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: JsonTabType): void;
   /** Set the edited tab's markup verbatim (raw user input; clears markup error). */
@@ -110,6 +122,15 @@ const createTableHtmlSlice = (): TableHtmlSlice => ({
   htmlUpdates: 0,
 });
 
+// @awa-component: PLAN-011-TextSlice
+const createTextSlice = (): TextSlice => ({
+  text: '',
+  textError: undefined,
+  textErrorAsString: undefined,
+  textDurationSec: undefined,
+  textUpdates: 0,
+});
+
 // @awa-impl: PLAN-002-Step9 (tab query param)
 // @awa-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
 const getTabFromUrl = (): ParserType | null => {
@@ -130,6 +151,7 @@ const bitmarkState = proxy<BitmarkState>({
   wasmFull: createParserSlice(),
   wasmCheck: createWasmCheckSlice(),
   tableHtml: createTableHtmlSlice(),
+  text: createTextSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
@@ -259,6 +281,30 @@ const bitmarkState = proxy<BitmarkState>({
     }
     slice.htmlDurationSec = durationSec;
     slice.htmlUpdates += 1;
+  },
+
+  // @awa-impl: PLAN-011-Step1 (setText setter; read-only WASM-opt-bitmark -> text view)
+  setText: (text: string | undefined, textError: Error | undefined, durationSec?: number) => {
+    const slice = bitmarkState.text as Writable<TextSlice>;
+
+    if (textError) {
+      slice.textError = textError;
+      try {
+        slice.textErrorAsString = JSON.stringify(
+          textError,
+          Object.getOwnPropertyNames(textError),
+          2,
+        );
+      } catch (_e) {
+        slice.textErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.text = text ?? '';
+      slice.textError = undefined;
+      slice.textErrorAsString = undefined;
+    }
+    slice.textDurationSec = durationSec;
+    slice.textUpdates += 1;
   },
 
   setActiveMarkupTab: (tab: ParserType) => {

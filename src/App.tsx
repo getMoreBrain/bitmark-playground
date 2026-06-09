@@ -17,6 +17,7 @@ import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
+import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
@@ -70,7 +71,9 @@ function App() {
             wasmFullDuration={snap.wasmFull.markupDurationSec}
             activeTab={snap.activeMarkupTab}
             onTabChange={(tab) => {
-              if (tab !== 'wasmCheck' && tab !== 'tableHtml') bitmarkState.setActiveMarkupTab(tab);
+              if (tab !== 'wasmCheck' && tab !== 'tableHtml' && tab !== 'text') {
+                bitmarkState.setActiveMarkupTab(tab);
+              }
             }}
           />
         </Flex>
@@ -118,6 +121,8 @@ function App() {
             wasmCheckLed={wasmCheckLed}
             showTableHtml
             tableHtmlDuration={snap.tableHtml.htmlDurationSec}
+            showText
+            textDuration={snap.text.textDurationSec}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -176,6 +181,7 @@ function App() {
         <BitmarkParserProvider>
           <WasmCheckRunner />
           <TableHtmlRunner />
+          <TextRunner />
           <Flex
             sx={{
               flexDirection: 'column',

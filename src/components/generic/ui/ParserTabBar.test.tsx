@@ -93,4 +93,27 @@ describe('ParserTabBar', () => {
     render(<ParserTabBar {...baseProps} wasmCheckLed="match" />, { wrapper });
     expect(screen.queryByLabelText(/wasm-check-led/)).not.toBeInTheDocument();
   });
+
+  // @awa-test: PLAN-011-Step4 (Text tab opt-in)
+  it('does not render the Text tab by default', () => {
+    render(<ParserTabBar {...baseProps} />, { wrapper });
+    expect(screen.queryByText(/^Text/)).not.toBeInTheDocument();
+  });
+
+  it('renders the Text tab when showText is true', () => {
+    render(<ParserTabBar {...baseProps} showText />, { wrapper });
+    expect(screen.getByText(/^Text/)).toBeInTheDocument();
+  });
+
+  it('calls onTabChange with "text" when the Text tab is clicked', () => {
+    const onTabChange = vi.fn();
+    render(<ParserTabBar {...baseProps} showText onTabChange={onTabChange} />, { wrapper });
+    fireEvent.click(screen.getByText(/^Text/));
+    expect(onTabChange).toHaveBeenCalledWith('text');
+  });
+
+  it('marks Text tab as selected when activeTab is text', () => {
+    render(<ParserTabBar {...baseProps} showText activeTab="text" />, { wrapper });
+    expect(screen.getByText(/^Text/)).toHaveAttribute('aria-selected', 'true');
+  });
 });
