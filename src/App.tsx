@@ -16,6 +16,7 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { JsRoundTripRunner } from './services/JsRoundTripRunner';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
 import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
@@ -25,7 +26,7 @@ import { theme } from './theme/theme';
 import { parserJsonMatch, WasmCheckLed } from './utils/parserJsonMatch';
 import { reorderJsonStringToReference } from './utils/reorderJsonKeys';
 
-const initialMarkup = '[.article] Hello World!';
+const initialMarkup = '[.article]\nHello World!';
 
 // @awa-impl: PLAN-002-Step5 (tab bar integration)
 // @awa-impl: PLAN-002-Step7 (provider nesting)
@@ -34,11 +35,23 @@ function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
 
-  // @awa-impl: PLAN-009-Step3 (Original vs WASM-opt match LED, recomputed on data change)
+  // @awa-impl: PLAN-012-Step4 (LED reference is the bpg round-trip JSON, not the raw
+  // bpg parse — bpg's own json -> bitmark -> json loses fields markup cannot express,
+  // which the Rust parser can never produce and must not be marked red for)
   const wasmCheckLed = useMemo<WasmCheckLed>(() => {
-    if (snap.js.jsonError || snap.wasm.jsonError) return 'neutral';
-    return parserJsonMatch(snap.js.json, snap.wasm.json);
-  }, [snap.js.json, snap.wasm.json, snap.js.jsonError, snap.wasm.jsonError]);
+    if (snap.js.jsonError || snap.wasm.jsonError || snap.jsRoundTrip.error) return 'neutral';
+    // Reference not yet recomputed for the current Original JSON — not comparable.
+    if (snap.jsRoundTrip.sourceJsonAsString !== snap.js.jsonAsString) return 'neutral';
+    return parserJsonMatch(snap.jsRoundTrip.json, snap.wasm.json);
+  }, [
+    snap.jsRoundTrip.json,
+    snap.jsRoundTrip.sourceJsonAsString,
+    snap.jsRoundTrip.error,
+    snap.js.jsonAsString,
+    snap.js.jsonError,
+    snap.wasm.json,
+    snap.wasm.jsonError,
+  ]);
 
   // @awa-impl: PLAN-010 (reorder WASM JSON keys to match Original before the JSON diff)
   const wasmJsonForDiff = useMemo(
@@ -180,6 +193,7 @@ function App() {
       <BitmarkParserGeneratorProvider>
         <BitmarkParserProvider>
           <WasmCheckRunner />
+          <JsRoundTripRunner />
           <TableHtmlRunner />
           <TextRunner />
           <Flex

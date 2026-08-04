@@ -11,8 +11,9 @@ import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 const PARSERS: readonly ParserType[] = ['js', 'wasm', 'wasmFull'];
 
 // Per-direction JS (bpg) options (constant per direction).
-const JS_MARKUP_TO_JSON_OPTIONS: ConvertOptions = { jsonOptions: { enableWarnings: true } };
-const JS_JSON_TO_MARKUP_OPTIONS: ConvertOptions = { bitmarkOptions: { prettifyJson: true } };
+// Exported so other bpg consumers (e.g. JsRoundTripRunner) convert identically.
+export const JS_MARKUP_TO_JSON_OPTIONS: ConvertOptions = { jsonOptions: { enableWarnings: true } };
+export const JS_JSON_TO_MARKUP_OPTIONS: ConvertOptions = { bitmarkOptions: { prettifyJson: true } };
 
 interface M2JResult {
   json?: BitWrapperJson[];

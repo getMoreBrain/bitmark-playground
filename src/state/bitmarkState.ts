@@ -34,6 +34,21 @@ export interface WasmCheckSlice {
   readonly markupUpdates: number;
 }
 
+// @awa-component: PLAN-012-JsRoundTripSlice
+/**
+ * The Original (bpg) JSON after a full round trip through bpg
+ * (`json -> bitmark -> json`). Used as the WASM Check LED reference, so the Rust
+ * parser is not penalised for fields bpg itself cannot express in markup.
+ */
+export interface JsRoundTripSlice {
+  readonly json: BitWrapperJson[];
+  /** The `js.jsonAsString` this round trip was computed from (staleness guard). */
+  readonly sourceJsonAsString: string;
+  readonly error: Error | undefined;
+  readonly durationSec: number | undefined;
+  readonly updates: number;
+}
+
 // @awa-component: PLAN-007-TableHtmlSlice
 export interface TableHtmlSlice {
   readonly html: string;
@@ -57,6 +72,7 @@ export interface BitmarkState {
   readonly wasm: ParserSlice;
   readonly wasmFull: ParserSlice;
   readonly wasmCheck: WasmCheckSlice;
+  readonly jsRoundTrip: JsRoundTripSlice;
   readonly tableHtml: TableHtmlSlice;
   readonly text: TextSlice;
   readonly activeMarkupTab: ParserType;
@@ -77,6 +93,12 @@ export interface BitmarkState {
   setWasmCheck(
     markup: string | undefined,
     markupError: Error | undefined,
+    durationSec?: number,
+  ): void;
+  setJsRoundTrip(
+    sourceJsonAsString: string,
+    json: BitWrapperJson[] | undefined,
+    error: Error | undefined,
     durationSec?: number,
   ): void;
   setTableHtml(html: string | undefined, htmlError: Error | undefined, durationSec?: number): void;
@@ -111,6 +133,15 @@ const createWasmCheckSlice = (): WasmCheckSlice => ({
   markupErrorAsString: undefined,
   markupDurationSec: undefined,
   markupUpdates: 0,
+});
+
+// @awa-component: PLAN-012-JsRoundTripSlice
+const createJsRoundTripSlice = (): JsRoundTripSlice => ({
+  json: [],
+  sourceJsonAsString: '',
+  error: undefined,
+  durationSec: undefined,
+  updates: 0,
 });
 
 // @awa-component: PLAN-007-TableHtmlSlice
@@ -150,6 +181,7 @@ const bitmarkState = proxy<BitmarkState>({
   wasm: createParserSlice(),
   wasmFull: createParserSlice(),
   wasmCheck: createWasmCheckSlice(),
+  jsRoundTrip: createJsRoundTripSlice(),
   tableHtml: createTableHtmlSlice(),
   text: createTextSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
@@ -250,6 +282,28 @@ const bitmarkState = proxy<BitmarkState>({
     }
     slice.markupDurationSec = durationSec;
     slice.markupUpdates += 1;
+  },
+
+  // @awa-impl: PLAN-012-Step1 (setJsRoundTrip setter)
+  // `sourceJsonAsString` is always stored, including on error, so consumers can
+  // tell "reference failed for the current JSON" from "reference is stale".
+  setJsRoundTrip: (
+    sourceJsonAsString: string,
+    json: BitWrapperJson[] | undefined,
+    error: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState.jsRoundTrip as Writable<JsRoundTripSlice>;
+
+    slice.sourceJsonAsString = sourceJsonAsString;
+    if (error) {
+      slice.error = error;
+    } else {
+      slice.json = json ?? [];
+      slice.error = undefined;
+    }
+    slice.durationSec = durationSec;
+    slice.updates += 1;
   },
 
   // @awa-impl: PLAN-007-Step1 (setTableHtml setter)
