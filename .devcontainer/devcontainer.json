@@ -8,14 +8,14 @@
     "ghcr.io/devcontainers/features/git:1": {}
   },
   "containerEnv": {
-    "MISE_YES": "1",
-    "CONTAINER_WORKSPACE_FOLDER": "${containerWorkspaceFolder}"
+    "CONTAINER_WORKSPACE_FOLDER": "${containerWorkspaceFolder}",
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
   "mounts": [
     // Keep high-churn build artifacts on a local named volume instead virtiofs workspace share
     // It intermittently returns EACCES on the burst of parallel rename
     "source=bitmark-playground-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=bitmark-playground-claude,target=/home/vscode/.claude,type=volume",
+    "source=bitmark-playground-mise-data,target=/home/vscode/.local/share/mise,type=volume",
     // Claude Code
     "source=bitmark-playground-claude,target=/home/vscode/.claude,type=volume",
     "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/vscode/.claude/CLAUDE.md,type=bind,readonly",
@@ -29,12 +29,7 @@
         "editor.tabSize": 2,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "eslint.validate": [
-          "javascript",
-          "javascriptreact",
-          "typescript",
-          "typescriptreact"
-        ],
+        "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
         "eslint.format.enable": true,
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": "explicit"
