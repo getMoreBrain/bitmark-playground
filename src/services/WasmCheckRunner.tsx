@@ -15,6 +15,9 @@ const useWasmCheckRunner = (): void => {
 
     let lastJson: string | null = null;
     let cancelled = false;
+    // Monotonic run id: a slower earlier convert must not overwrite a later one.
+    let runId = 0;
+    let latestRunId = 0;
 
     const run = async (json: string) => {
       if (json === '') {
@@ -22,11 +25,15 @@ const useWasmCheckRunner = (): void => {
         return;
       }
 
+      const thisRun = ++runId;
+
       let markup: unknown;
       let markupError: Error | undefined;
 
-      const startMark = `wasmCheck-j2m-start-${Date.now()}`;
-      const endMark = `wasmCheck-j2m-end-${Date.now()}`;
+      // Run id (not Date.now()) keys the marks — two runs starting in the same
+      // millisecond would otherwise share names and mismeasure.
+      const startMark = `wasmCheck-j2m-start-${thisRun}`;
+      const endMark = `wasmCheck-j2m-end-${thisRun}`;
       performance.mark(startMark);
 
       try {
@@ -44,9 +51,11 @@ const useWasmCheckRunner = (): void => {
 
       performance.mark(endMark);
       const convertTimeSecs =
-        performance.measure('wasmCheck-jsonToMarkup', startMark, endMark).duration / 1000;
+        performance.measure(`wasmCheck-jsonToMarkup-${thisRun}`, startMark, endMark).duration /
+        1000;
 
-      if (cancelled) return;
+      if (cancelled || thisRun < latestRunId) return;
+      latestRunId = thisRun;
 
       bitmarkState.setWasmCheck(markup as string | undefined, markupError, convertTimeSecs);
     };

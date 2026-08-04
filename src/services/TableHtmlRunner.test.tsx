@@ -98,6 +98,30 @@ describe('useTableHtmlRunner', () => {
     expect(convertHtmlTable).not.toHaveBeenCalled();
   });
 
+  // @awa-test: PLAN-007-Step2 (out-of-order completion guard)
+  it('does not let a slower earlier conversion overwrite a later one', async () => {
+    const resolvers: Array<(v: unknown) => void> = [];
+    // runConvertHtmlTable awaits the result, so returning a Promise holds each call open.
+    const convertHtmlTable = vi.fn(() => new Promise((resolve) => resolvers.push(resolve)));
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
+
+    bitmarkState.setEditedMarkup('js', BITMARK_TABLE);
+    await waitFor(() => expect(resolvers).toHaveLength(1));
+
+    bitmarkState.setEditedMarkup('js', `${BITMARK_TABLE}\n| more |`);
+    await waitFor(() => expect(resolvers).toHaveLength(2));
+
+    // Newer run lands first, then the older one completes.
+    resolvers[1]('<table><tr><td>newer</td></tr></table>');
+    await waitFor(() => {
+      expect(bitmarkState.tableHtml.html).toBe('<table><tr><td>newer</td></tr></table>');
+    });
+
+    resolvers[0]('<table><tr><td>older</td></tr></table>');
+    await new Promise((r) => setTimeout(r, 10));
+    expect(bitmarkState.tableHtml.html).toBe('<table><tr><td>newer</td></tr></table>');
+  });
+
   it('does not convert when the parser is not loaded', async () => {
     const convertHtmlTable = vi.fn().mockReturnValue(HTML_FRAGMENT);
     const wrapper = ({ children }: { children: React.ReactNode }) => (

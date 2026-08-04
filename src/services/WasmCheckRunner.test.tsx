@@ -79,6 +79,29 @@ describe('useWasmCheckRunner', () => {
     });
   });
 
+  // @awa-test: PLAN-006-Step2 (out-of-order completion guard)
+  it('does not let a slower earlier convert overwrite a later one', async () => {
+    const resolvers: Array<(v: unknown) => void> = [];
+    const convert = vi.fn(() => new Promise((resolve) => resolvers.push(resolve)));
+    renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert as never) });
+
+    bitmarkState.setEditedJson('wasm', '{"x":1}');
+    await waitFor(() => expect(resolvers).toHaveLength(1));
+
+    bitmarkState.setEditedJson('wasm', '{"x":2}');
+    await waitFor(() => expect(resolvers).toHaveLength(2));
+
+    // Newer run lands first, then the older one completes.
+    resolvers[1]('newer markup');
+    await waitFor(() => {
+      expect(bitmarkState.wasmCheck.markup).toBe('newer markup');
+    });
+
+    resolvers[0]('older markup');
+    await new Promise((r) => setTimeout(r, 10));
+    expect(bitmarkState.wasmCheck.markup).toBe('newer markup');
+  });
+
   it('does not call convert when parser is not loaded', async () => {
     const convert = vi.fn().mockResolvedValue(ROUND_TRIPPED_MARKUP);
     const wrapper = ({ children }: { children: React.ReactNode }) => (

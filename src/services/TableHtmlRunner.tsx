@@ -37,6 +37,14 @@ const noteOriginalMarkup = (markup: string): void => {
   lastOriginalMarkup = markup;
 };
 
+/**
+ * Monotonic counter for `performance.mark` names. `Date.now()` is not unique
+ * enough — two conversions starting in the same millisecond would share mark
+ * names, and `performance.measure` resolves a name to its most recent mark,
+ * producing a wrong (or negative) duration.
+ */
+let markSeq = 0;
+
 const supportsHtmlTable = (parser: BitmarkParserGenerator): boolean =>
   typeof (parser as { convertHtmlTable?: unknown }).convertHtmlTable === 'function';
 
@@ -90,8 +98,9 @@ const convertHtmlToBitmark = async (
   parser: BitmarkParserGenerator,
   html: string,
 ): Promise<{ markup: string; durationSec: number }> => {
-  const startMark = `tableHtml-h2b-start-${Date.now()}`;
-  const endMark = `tableHtml-h2b-end-${Date.now()}`;
+  const seq = ++markSeq;
+  const startMark = `tableHtml-h2b-start-${seq}`;
+  const endMark = `tableHtml-h2b-end-${seq}`;
   performance.mark(startMark);
 
   let markup = '';
@@ -101,7 +110,7 @@ const convertHtmlToBitmark = async (
 
   performance.mark(endMark);
   const durationSec =
-    performance.measure('tableHtml-htmlToBitmark', startMark, endMark).duration / 1000;
+    performance.measure(`tableHtml-htmlToBitmark-${seq}`, startMark, endMark).duration / 1000;
 
   noteOriginalMarkup(markup);
   return { markup, durationSec };
@@ -115,6 +124,9 @@ const useTableHtmlRunner = (): void => {
     if (!loadSuccess || !bitmarkParserGenerator) return;
 
     let cancelled = false;
+    // Monotonic run id: a slower earlier conversion must not overwrite a later one.
+    let runId = 0;
+    let latestRunId = 0;
 
     const run = async (markup: string) => {
       if (markup === '') {
@@ -122,11 +134,14 @@ const useTableHtmlRunner = (): void => {
         return;
       }
 
+      const thisRun = ++runId;
+
       let html: string | undefined;
       let htmlError: Error | undefined;
 
-      const startMark = `tableHtml-b2h-start-${Date.now()}`;
-      const endMark = `tableHtml-b2h-end-${Date.now()}`;
+      const seq = ++markSeq;
+      const startMark = `tableHtml-b2h-start-${seq}`;
+      const endMark = `tableHtml-b2h-end-${seq}`;
       performance.mark(startMark);
 
       try {
@@ -137,9 +152,10 @@ const useTableHtmlRunner = (): void => {
 
       performance.mark(endMark);
       const durationSec =
-        performance.measure('tableHtml-bitmarkToHtml', startMark, endMark).duration / 1000;
+        performance.measure(`tableHtml-bitmarkToHtml-${seq}`, startMark, endMark).duration / 1000;
 
-      if (cancelled) return;
+      if (cancelled || thisRun < latestRunId) return;
+      latestRunId = thisRun;
 
       bitmarkState.setTableHtml(html, htmlError, durationSec);
     };
