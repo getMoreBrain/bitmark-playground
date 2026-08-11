@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 
 import { bitmarkState, ParserType } from '../state/bitmarkState';
 import { StringUtils } from '../utils/StringUtils';
-import { useBitmarkParser } from './BitmarkParser';
+import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
 const PARSERS: readonly ParserType[] = ['js', 'wasm', 'wasmFull'];
@@ -44,7 +44,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
   } = useBitmarkParserGenerator();
   const {
     lex: wasmLex,
-    parse: wasmParse,
+    bitmarkToObjects: wasmBitmarkToObjects,
     convert: wasmConvert,
     loadSuccess: wasmLoadSuccess,
     loadError: wasmLoadError,
@@ -66,9 +66,10 @@ const useBitmarkConverter = (): BitmarkConverter => {
             | BitWrapperJson[]
             | undefined;
         } else {
-          if (!wasmParse) return null;
+          if (!wasmBitmarkToObjects) return null;
           const mode = parser === 'wasm' ? 'optimized' : 'full';
-          json = JSON.parse(wasmParse(markup, { mode })) as BitWrapperJson[];
+          // Typed API: returns entries as objects and throws on failure.
+          json = wasmBitmarkToObjects(markup, { mode }) as unknown as BitWrapperJson[];
         }
       } catch (e) {
         error = e as Error;
@@ -79,7 +80,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
         performance.measure(`${parser}-markupToJson`, startMark, endMark).duration / 1000;
       return { json, error, durationSec };
     },
-    [bitmarkParserGenerator, wasmParse],
+    [bitmarkParserGenerator, wasmBitmarkToObjects],
   );
 
   // json -> markup for a single parser. Returns null when that parser is unavailable.
@@ -100,7 +101,9 @@ const useBitmarkConverter = (): BitmarkConverter => {
         } else {
           if (!wasmConvert) return null;
           const mode = parser === 'wasm' ? 'optimized' : 'full';
-          markup = wasmConvert(json, { inputFormat: 'json', outputFormat: 'bitmark', mode });
+          markup = throwIfParserError(
+            wasmConvert(json, { inputFormat: 'json', outputFormat: 'bitmark', mode }),
+          );
         }
       } catch (e) {
         error = e as Error;

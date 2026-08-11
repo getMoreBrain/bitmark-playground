@@ -13,7 +13,7 @@ const makeWrapper = (convert: (input: string, options?: unknown) => string) => {
     loadSuccess: true,
     loadError: false,
     lex: undefined,
-    parse: undefined,
+    bitmarkToObjects: undefined,
     convert,
     version: 'test',
   } as unknown as ContextValue;
@@ -63,6 +63,21 @@ describe('useTextRunner', () => {
     });
   });
 
+  it('stores an error when the conversion returns an `error:` string', async () => {
+    const convert = vi
+      .fn()
+      .mockReturnValue('error: InvalidJson at offset 0: unexpected end of input');
+    renderHook(() => useTextRunner(), { wrapper: makeWrapper(convert) });
+
+    bitmarkState.setEditedMarkup('wasm', 'bad');
+
+    await waitFor(() => {
+      expect(bitmarkState.text.textError?.message).toContain('InvalidJson');
+    });
+    // The error message must never be shown as the converted text.
+    expect(bitmarkState.text.text).not.toContain('InvalidJson');
+  });
+
   it('clears text when wasm.markup becomes empty', async () => {
     const convert = vi.fn().mockReturnValue('t');
     renderHook(() => useTextRunner(), { wrapper: makeWrapper(convert) });
@@ -86,7 +101,7 @@ describe('useTextRunner', () => {
             loadSuccess: false,
             loadError: false,
             lex: undefined,
-            parse: undefined,
+            bitmarkToObjects: undefined,
             convert: undefined,
             version: '',
           } as unknown as ContextValue

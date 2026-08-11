@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
 import { bitmarkState } from '../state/bitmarkState';
-import { useBitmarkParser } from './BitmarkParser';
+import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 
 // @awa-impl: PLAN-011-Step2 (WASM optimized bitmark -> plain text)
 const useTextRunner = (): void => {
@@ -28,7 +28,9 @@ const useTextRunner = (): void => {
       performance.mark(startMark);
 
       try {
-        text = wasmConvert(markup, { inputFormat: 'bitmark', outputFormat: 'text' });
+        text = throwIfParserError(
+          wasmConvert(markup, { inputFormat: 'bitmark', outputFormat: 'text' }),
+        );
       } catch (e) {
         textError = e as Error;
       }

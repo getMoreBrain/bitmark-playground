@@ -1,6 +1,10 @@
 // @awa-component: PLAN-002-BitmarkParser
 
-import type { convert as convertFn, lex as lexFn, parse as parseFn } from '@gmb/bitmark-parser';
+import type {
+  bitmarkToObjects as bitmarkToObjectsFn,
+  convert as convertFn,
+  lex as lexFn,
+} from '@gmb/bitmark-parser';
 import {
   createContext,
   ReactElement,
@@ -19,10 +23,27 @@ const BITMARK_PARSER_CDN_URL =
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
 
+// The string-based API (`convert`, `lex`) reports failures by returning an
+// `error: …`-prefixed string rather than throwing.
+const PARSER_ERROR_PREFIX = 'error:';
+
+/**
+ * Return `out` unchanged, or throw when it is a parser error string.
+ *
+ * Call this on every `convert` / `lex` result that is piped onward, otherwise
+ * an error message is treated as document content and re-parsed downstream.
+ */
+const throwIfParserError = (out: string): string => {
+  if (out.startsWith(PARSER_ERROR_PREFIX)) {
+    throw new Error(out.slice(PARSER_ERROR_PREFIX.length).trim());
+  }
+  return out;
+};
+
 interface BitmarkParserModule {
   init: (wasmUrl?: string) => Promise<void>;
   lex: typeof lexFn;
-  parse: typeof parseFn;
+  bitmarkToObjects: typeof bitmarkToObjectsFn;
   convert: typeof convertFn;
   version: () => string;
 }
@@ -35,7 +56,7 @@ interface IBitmarkParserContext {
   loadSuccess: boolean;
   loadError: boolean;
   lex: typeof lexFn | undefined;
-  parse: typeof parseFn | undefined;
+  bitmarkToObjects: typeof bitmarkToObjectsFn | undefined;
   convert: typeof convertFn | undefined;
   version: string;
 }
@@ -44,7 +65,7 @@ const defaultState: IBitmarkParserContext = {
   loadSuccess: false,
   loadError: false,
   lex: undefined,
-  parse: undefined,
+  bitmarkToObjects: undefined,
   convert: undefined,
   version: '',
 };
@@ -81,7 +102,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           loadSuccess: true,
           loadError: false,
           lex: module.lex,
-          parse: module.parse,
+          bitmarkToObjects: module.bitmarkToObjects,
           convert: module.convert,
           version: resolvedVersion,
         });
@@ -91,7 +112,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           loadSuccess: false,
           loadError: true,
           lex: undefined,
-          parse: undefined,
+          bitmarkToObjects: undefined,
           convert: undefined,
           version: '',
         });
@@ -104,4 +125,4 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
   return <BitmarkParserContext.Provider value={state}>{children}</BitmarkParserContext.Provider>;
 };
 
-export { BitmarkParserContext, BitmarkParserProvider, useBitmarkParser };
+export { BitmarkParserContext, BitmarkParserProvider, throwIfParserError, useBitmarkParser };

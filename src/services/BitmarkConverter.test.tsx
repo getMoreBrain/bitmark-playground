@@ -24,12 +24,14 @@ const fakeWasm = {
   loadError: false,
   version: 'test',
   lex: () => 'lexout',
-  parse: (markup: string, opts?: { mode?: string }) => {
+  bitmarkToObjects: (markup: string, opts?: { mode?: string }) => {
     if (markup === 'BAD') throw new Error('wasm parse bad');
-    return JSON.stringify([{ kind: 'wasm', mode: opts?.mode, src: markup }]);
+    return [{ kind: 'wasm', mode: opts?.mode, src: markup }];
   },
   convert: (json: string, opts?: { mode?: string }) => {
     if (json === 'BAD') throw new Error('wasm convert bad');
+    // The string API reports failures by returning an `error: …` string.
+    if (json === 'ERRSTR') return 'error: InvalidJson at offset 0: unexpected end of input';
     return `wasm<<${opts?.mode}:${json}>>`;
   },
 };
@@ -38,7 +40,11 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <BitmarkParserGeneratorContext.Provider
     value={{ loadSuccess: true, loadError: false, bitmarkParserGenerator: fakeBpg }}
   >
-    <BitmarkParserContext.Provider value={fakeWasm}>{children}</BitmarkParserContext.Provider>
+    <BitmarkParserContext.Provider
+      value={fakeWasm as unknown as Parameters<typeof BitmarkParserContext.Provider>[0]['value']}
+    >
+      {children}
+    </BitmarkParserContext.Provider>
   </BitmarkParserGeneratorContext.Provider>
 );
 
@@ -120,5 +126,24 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     expect(bitmarkState.js.markupError).toBeDefined();
     // Same-side non-edited JSON tab keeps its last good value (no copy, no clear).
     expect(bitmarkState.wasm.jsonAsString).toBe(goodWasmJson);
+  });
+
+  it('treats an `error:` string returned by wasm convert as an error, not as markup', async () => {
+    const { result } = renderHook(() => useBitmarkConverter(), { wrapper });
+
+    // Seed a good round-trip so there is a last-good markup to preserve.
+    await act(async () => {
+      await result.current.jsonToMarkup('js', 'GOOD');
+    });
+    expect(bitmarkState.wasm.markup).toBe('wasm<<optimized:GOOD>>');
+
+    // wasm convert now returns `error: …` instead of throwing.
+    await act(async () => {
+      await result.current.jsonToMarkup('js', 'ERRSTR');
+    });
+
+    expect(bitmarkState.wasm.markupError?.message).toContain('InvalidJson');
+    // The error message must never be stored as markup.
+    expect(bitmarkState.wasm.markup).not.toContain('InvalidJson');
   });
 });

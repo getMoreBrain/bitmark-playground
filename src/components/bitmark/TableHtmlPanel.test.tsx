@@ -23,7 +23,7 @@ const fakeParserGenerator = {
 const fakeWasmParser = {
   loadSuccess: true,
   loadError: false,
-  parse: () => '',
+  bitmarkToObjects: () => [],
   convert: () => '',
   lex: () => '',
   version: 'test',
