@@ -116,4 +116,57 @@ describe('ParserTabBar', () => {
     render(<ParserTabBar {...baseProps} showText activeTab="text" />, { wrapper });
     expect(screen.getByText(/^Text/)).toHaveAttribute('aria-selected', 'true');
   });
+
+  // @awa-test: PLAN-013-Step4 (ParserTabBar XML (NISO-IEC) tab opt-in)
+  it('does not render the XML (NISO-IEC) tab by default', () => {
+    render(<ParserTabBar {...baseProps} />, { wrapper });
+    expect(screen.queryByText(/XML \(NISO-IEC\)/)).not.toBeInTheDocument();
+  });
+
+  it('renders the XML (NISO-IEC) tab when showXmlNiso is true', () => {
+    render(<ParserTabBar {...baseProps} showXmlNiso />, { wrapper });
+    expect(screen.getByText(/XML \(NISO-IEC\)/)).toBeInTheDocument();
+  });
+
+  it('calls onTabChange with "xmlNiso" when the XML tab is clicked', () => {
+    const onTabChange = vi.fn();
+    render(<ParserTabBar {...baseProps} showXmlNiso onTabChange={onTabChange} />, { wrapper });
+    fireEvent.click(screen.getByText(/XML \(NISO-IEC\)/));
+    expect(onTabChange).toHaveBeenCalledWith('xmlNiso');
+  });
+
+  it('marks the XML tab as selected when activeTab is xmlNiso', () => {
+    render(<ParserTabBar {...baseProps} showXmlNiso activeTab="xmlNiso" />, { wrapper });
+    expect(screen.getByText(/XML \(NISO-IEC\)$/)).toHaveAttribute('aria-selected', 'true');
+  });
+
+  // @awa-test: PLAN-013-Step4 (ParserTabBar XML (NISO-IEC-ES) tab opt-in)
+  it('does not render the XML (NISO-IEC-ES) tab by default', () => {
+    render(<ParserTabBar {...baseProps} />, { wrapper });
+    expect(screen.queryByText(/XML \(NISO-IEC-ES\)/)).not.toBeInTheDocument();
+  });
+
+  it('renders the XML (NISO-IEC-ES) tab when showXmlNisoEs is true', () => {
+    render(<ParserTabBar {...baseProps} showXmlNisoEs />, { wrapper });
+    expect(screen.getByText(/XML \(NISO-IEC-ES\)/)).toBeInTheDocument();
+  });
+
+  it('calls onTabChange with "xmlNisoEs" when the ES XML tab is clicked', () => {
+    const onTabChange = vi.fn();
+    render(<ParserTabBar {...baseProps} showXmlNisoEs onTabChange={onTabChange} />, { wrapper });
+    fireEvent.click(screen.getByText(/XML \(NISO-IEC-ES\)/));
+    expect(onTabChange).toHaveBeenCalledWith('xmlNisoEs');
+  });
+
+  it('marks the ES XML tab as selected when activeTab is xmlNisoEs', () => {
+    render(<ParserTabBar {...baseProps} showXmlNisoEs activeTab="xmlNisoEs" />, { wrapper });
+    expect(screen.getByText(/XML \(NISO-IEC-ES\)/)).toHaveAttribute('aria-selected', 'true');
+  });
+
+  // @awa-test: PLAN-013-Step4 (both XML tabs render side by side)
+  it('renders both XML tabs when both are enabled', () => {
+    render(<ParserTabBar {...baseProps} showXmlNiso showXmlNisoEs />, { wrapper });
+    expect(screen.getByText(/XML \(NISO-IEC\)$/)).toBeInTheDocument();
+    expect(screen.getByText(/XML \(NISO-IEC-ES\)/)).toBeInTheDocument();
+  });
 });

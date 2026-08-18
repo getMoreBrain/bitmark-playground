@@ -20,6 +20,7 @@ import { JsRoundTripRunner } from './services/JsRoundTripRunner';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
 import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
+import { XmlRunner } from './services/XmlRunner';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
 import { theme } from './theme/theme';
@@ -84,7 +85,13 @@ function App() {
             wasmFullDuration={snap.wasmFull.markupDurationSec}
             activeTab={snap.activeMarkupTab}
             onTabChange={(tab) => {
-              if (tab !== 'wasmCheck' && tab !== 'tableHtml' && tab !== 'text') {
+              if (
+                tab !== 'wasmCheck' &&
+                tab !== 'tableHtml' &&
+                tab !== 'text' &&
+                tab !== 'xmlNiso' &&
+                tab !== 'xmlNisoEs'
+              ) {
                 bitmarkState.setActiveMarkupTab(tab);
               }
             }}
@@ -136,6 +143,10 @@ function App() {
             tableHtmlDuration={snap.tableHtml.htmlDurationSec}
             showText
             textDuration={snap.text.textDurationSec}
+            showXmlNiso
+            xmlNisoDuration={snap.xmlNiso.xmlDurationSec}
+            showXmlNisoEs
+            xmlNisoEsDuration={snap.xmlNisoEs.xmlDurationSec}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -196,6 +207,8 @@ function App() {
           <JsRoundTripRunner />
           <TableHtmlRunner />
           <TextRunner />
+          <XmlRunner variant="xmlNiso" />
+          <XmlRunner variant="xmlNisoEs" />
           <Flex
             sx={{
               flexDirection: 'column',

@@ -2,6 +2,7 @@
 // @awa-component: PLAN-006-ParserTabBar
 // @awa-component: PLAN-007-ParserTabBar
 // @awa-component: PLAN-009-ParserTabBar
+// @awa-component: PLAN-013-ParserTabBar
 /** @jsxImportSource theme-ui */
 import { Box, Flex, Text } from 'theme-ui';
 
@@ -35,6 +36,14 @@ export interface ParserTabBarProps {
   showText?: boolean;
   /** Duration for the last WASM-opt-bitmark -> text conversion. */
   textDuration?: number | undefined;
+  /** Show the XML (NISO-IEC) tab (JSON side only). */
+  showXmlNiso?: boolean;
+  /** Duration for the last NISO-STS XML conversion. */
+  xmlNisoDuration?: number | undefined;
+  /** Show the XML (NISO-IEC-ES) tab (JSON side only). */
+  showXmlNisoEs?: boolean;
+  /** Duration for the last NISO-STS-ES XML conversion. */
+  xmlNisoEsDuration?: number | undefined;
 }
 
 // @awa-impl: PLAN-002-Step4 (tab bar UI)
@@ -42,6 +51,7 @@ export interface ParserTabBarProps {
 // @awa-impl: PLAN-007-Step4 (optional Table (HTML) tab)
 // @awa-impl: PLAN-009-Step2 (WASM Check match LED)
 // @awa-impl: PLAN-011-Step4 (optional Text tab)
+// @awa-impl: PLAN-013-Step4 (optional XML (NISO-IEC) tab)
 const ParserTabBar = (props: ParserTabBarProps) => {
   const {
     label,
@@ -57,6 +67,10 @@ const ParserTabBar = (props: ParserTabBarProps) => {
     wasmCheckLed,
     showText = false,
     textDuration,
+    showXmlNiso = false,
+    xmlNisoDuration,
+    showXmlNisoEs = false,
+    xmlNisoEsDuration,
   } = props;
 
   const formatDuration = (duration: number | undefined): string => {
@@ -179,6 +193,26 @@ const ParserTabBar = (props: ParserTabBarProps) => {
           sx={{ ...tabSx(activeTab === 'text'), ml: '2px' }}
         >
           Text{formatDuration(textDuration)}
+        </Text>
+      ) : null}
+      {showXmlNiso ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'xmlNiso'}
+          onClick={() => onTabChange('xmlNiso')}
+          sx={{ ...tabSx(activeTab === 'xmlNiso'), ml: '2px' }}
+        >
+          XML (NISO-IEC){formatDuration(xmlNisoDuration)}
+        </Text>
+      ) : null}
+      {showXmlNisoEs ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'xmlNisoEs'}
+          onClick={() => onTabChange('xmlNisoEs')}
+          sx={{ ...tabSx(activeTab === 'xmlNisoEs'), ml: '2px' }}
+        >
+          XML (NISO-IEC-ES){formatDuration(xmlNisoEsDuration)}
         </Text>
       ) : null}
     </Flex>

@@ -55,6 +55,10 @@ export default defineConfig({
         __dirname,
         'src/test/__mocks__/monaco-basic-language.ts',
       ),
+      'monaco-editor/esm/vs/basic-languages/xml/xml.contribution': path.resolve(
+        __dirname,
+        'src/test/__mocks__/monaco-basic-language.ts',
+      ),
       'monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/monaco-editor.ts'),
       'react-monaco-editor': path.resolve(__dirname, 'src/test/__mocks__/react-monaco-editor.tsx'),
     },

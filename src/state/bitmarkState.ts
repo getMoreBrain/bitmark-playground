@@ -8,8 +8,13 @@ import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm' | 'wasmFull';
-/** Tab id for the JSON parser tab bar — adds the round-trip and HTML-table views. */
-export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml' | 'text';
+/** Tab id for the JSON parser tab bar — adds the round-trip, HTML-table, text and XML views. */
+export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml' | 'text' | XmlVariant;
+/**
+ * XML mapping variants. Each is its own JSON-side tab and its own state slice;
+ * they differ only by the config mapping id passed to the parser's `convert`.
+ */
+export type XmlVariant = 'xmlNiso' | 'xmlNisoEs';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -67,6 +72,15 @@ export interface TextSlice {
   readonly textUpdates: number;
 }
 
+// @awa-component: PLAN-013-XmlSlice
+export interface XmlSlice {
+  readonly xml: string;
+  readonly xmlError: Error | undefined;
+  readonly xmlErrorAsString: string | undefined;
+  readonly xmlDurationSec: number | undefined;
+  readonly xmlUpdates: number;
+}
+
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
@@ -75,6 +89,8 @@ export interface BitmarkState {
   readonly jsRoundTrip: JsRoundTripSlice;
   readonly tableHtml: TableHtmlSlice;
   readonly text: TextSlice;
+  readonly xmlNiso: XmlSlice;
+  readonly xmlNisoEs: XmlSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
   setJson(
@@ -103,12 +119,26 @@ export interface BitmarkState {
   ): void;
   setTableHtml(html: string | undefined, htmlError: Error | undefined, durationSec?: number): void;
   setText(text: string | undefined, textError: Error | undefined, durationSec?: number): void;
+  setXml(
+    variant: XmlVariant,
+    xml: string | undefined,
+    xmlError: Error | undefined,
+    durationSec?: number,
+  ): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: JsonTabType): void;
   /** Set the edited tab's markup verbatim (raw user input; clears markup error). */
   setEditedMarkup(parser: ParserType, markup: string): void;
   /** Set the edited tab's JSON verbatim (raw user input; clears JSON error). */
   setEditedJson(parser: ParserType, json: string): void;
+  /**
+   * Set an XML tab's document verbatim (raw user input).
+   *
+   * Unlike `setXml`, this does NOT touch the duration: the user typed this XML,
+   * the app did not generate it, so the tab's generation time is left as-is
+   * (mirrors `setEditedMarkup` / `setEditedJson`).
+   */
+  setEditedXml(variant: XmlVariant, xml: string, xmlError: Error | undefined): void;
 }
 
 const createParserSlice = (): ParserSlice => ({
@@ -153,6 +183,15 @@ const createTableHtmlSlice = (): TableHtmlSlice => ({
   htmlUpdates: 0,
 });
 
+// @awa-component: PLAN-013-XmlSlice
+const createXmlSlice = (): XmlSlice => ({
+  xml: '',
+  xmlError: undefined,
+  xmlErrorAsString: undefined,
+  xmlDurationSec: undefined,
+  xmlUpdates: 0,
+});
+
 // @awa-component: PLAN-011-TextSlice
 const createTextSlice = (): TextSlice => ({
   text: '',
@@ -184,6 +223,8 @@ const bitmarkState = proxy<BitmarkState>({
   jsRoundTrip: createJsRoundTripSlice(),
   tableHtml: createTableHtmlSlice(),
   text: createTextSlice(),
+  xmlNiso: createXmlSlice(),
+  xmlNisoEs: createXmlSlice(),
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
@@ -361,6 +402,38 @@ const bitmarkState = proxy<BitmarkState>({
     slice.textUpdates += 1;
   },
 
+  // @awa-impl: PLAN-013-Step1 (setXml setter, per XML mapping variant)
+  // xml and error are independent: xml is always stored when provided (so the
+  // editable editor is never clobbered), while error is set/cleared separately.
+  // On error with xml undefined (e.g. bitmark -> XML failed), the last good
+  // xml is preserved. Mirrors setTableHtml.
+  setXml: (
+    variant: XmlVariant,
+    xml: string | undefined,
+    xmlError: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState[variant] as Writable<XmlSlice>;
+
+    if (xml !== undefined) {
+      slice.xml = xml;
+    }
+
+    if (xmlError) {
+      slice.xmlError = xmlError;
+      try {
+        slice.xmlErrorAsString = JSON.stringify(xmlError, Object.getOwnPropertyNames(xmlError), 2);
+      } catch (_e) {
+        slice.xmlErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.xmlError = undefined;
+      slice.xmlErrorAsString = undefined;
+    }
+    slice.xmlDurationSec = durationSec;
+    slice.xmlUpdates += 1;
+  },
+
   setActiveMarkupTab: (tab: ParserType) => {
     (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
   },
@@ -382,6 +455,25 @@ const bitmarkState = proxy<BitmarkState>({
     slice.jsonAsString = json;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
+  },
+
+  // @awa-impl: PLAN-013-Step1 (setEditedXml; user input, duration untouched)
+  setEditedXml: (variant: XmlVariant, xml: string, xmlError: Error | undefined) => {
+    const slice = bitmarkState[variant] as Writable<XmlSlice>;
+    slice.xml = xml;
+
+    if (xmlError) {
+      slice.xmlError = xmlError;
+      try {
+        slice.xmlErrorAsString = JSON.stringify(xmlError, Object.getOwnPropertyNames(xmlError), 2);
+      } catch (_e) {
+        slice.xmlErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.xmlError = undefined;
+      slice.xmlErrorAsString = undefined;
+    }
+    slice.xmlUpdates += 1;
   },
 });
 

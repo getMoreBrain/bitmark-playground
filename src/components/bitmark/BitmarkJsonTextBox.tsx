@@ -2,6 +2,7 @@
 // @awa-component: PLAN-006-BitmarkJsonTextBox
 // @awa-component: PLAN-007-BitmarkJsonTextBox
 // @awa-component: PLAN-011-BitmarkJsonTextBox
+// @awa-component: PLAN-013-BitmarkJsonTextBox
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
@@ -13,6 +14,7 @@ import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/Monac
 import { TableHtmlPanel } from './TableHtmlPanel';
 import { TextPanel } from './TextPanel';
 import { WasmCheckPanel } from './WasmCheckPanel';
+import { XmlPanel } from './XmlPanel';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   //
@@ -39,7 +41,15 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const onInput = useCallback(
     async (json: string) => {
       const tab = bitmarkState.activeJsonTab;
-      if (tab === 'wasmCheck' || tab === 'tableHtml' || tab === 'text') return;
+      if (
+        tab === 'wasmCheck' ||
+        tab === 'tableHtml' ||
+        tab === 'text' ||
+        tab === 'xmlNiso' ||
+        tab === 'xmlNisoEs'
+      ) {
+        return;
+      }
       await jsonToMarkup(tab, json);
     },
     [jsonToMarkup],
@@ -72,6 +82,14 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
         text={bitmarkStateSnap.text.text}
         errorAsString={bitmarkStateSnap.text.textErrorAsString}
       />
+    );
+  }
+
+  // @awa-impl: PLAN-013-Step5 (render XmlPanel when an XML tab is active)
+  if (activeTab === 'xmlNiso' || activeTab === 'xmlNisoEs') {
+    const xmlSlice = bitmarkStateSnap[activeTab];
+    return (
+      <XmlPanel variant={activeTab} xml={xmlSlice.xml} errorAsString={xmlSlice.xmlErrorAsString} />
     );
   }
 

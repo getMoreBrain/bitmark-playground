@@ -89,4 +89,18 @@ describe('BitmarkJsonTextBox', () => {
     expect(editor).toHaveAttribute('language', 'plaintext');
     expect(editor).toHaveAttribute('data-default-value', 'Hello plain text');
   });
+
+  // @awa-test: PLAN-013-Step5 (BitmarkJsonTextBox swaps to XmlPanel for each XML tab)
+  it.each(['xmlNiso', 'xmlNisoEs'] as const)(
+    'renders the XmlPanel (language=xml) when activeJsonTab is %s',
+    (variant) => {
+      bitmarkState.setXml(variant, `<bit type="${variant}" />`, undefined, undefined);
+      bitmarkState.setActiveJsonTab(variant);
+
+      render(<BitmarkJsonTextBox />, { wrapper });
+      const editor = screen.getByTestId('monaco-editor');
+      expect(editor).toHaveAttribute('language', 'xml');
+      expect(editor).toHaveAttribute('data-default-value', `<bit type="${variant}" />`);
+    },
+  );
 });

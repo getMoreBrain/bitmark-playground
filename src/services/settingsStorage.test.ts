@@ -164,6 +164,62 @@ describe('settingsStorage', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'text' })).toBeNull();
     });
 
+    // @awa-test: PLAN-013-Step7 ('xmlNiso' accepted as activeJsonTab at v6)
+    it('accepts xmlNiso as valid activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'xmlNiso' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'xmlNiso',
+      });
+    });
+
+    // @awa-test: PLAN-013-Step7 ('xmlNiso' rejected as activeMarkupTab / OutputTab)
+    it('rejects xmlNiso as activeMarkupTab and leftOutputTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'xmlNiso' })).toBeNull();
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'xmlNiso' })).toBeNull();
+    });
+
+    // @awa-test: PLAN-013-Step7 (v5 settings migrate to current version)
+    it('migrates v5 settings to current version', () => {
+      const v5Settings = {
+        v: 5,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'text',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      const result = migrateSettings(v5Settings);
+      expect(result).toEqual({ ...v5Settings, v: CURRENT_VERSION });
+    });
+
+    // @awa-test: PLAN-013-Step7 ('xmlNisoEs' accepted as activeJsonTab at v7)
+    it('accepts xmlNisoEs as valid activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'xmlNisoEs' })).toEqual({
+        ...validSettings,
+        activeJsonTab: 'xmlNisoEs',
+      });
+    });
+
+    // @awa-test: PLAN-013-Step7 ('xmlNisoEs' rejected as activeMarkupTab / OutputTab)
+    it('rejects xmlNisoEs as activeMarkupTab and leftOutputTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'xmlNisoEs' })).toBeNull();
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'xmlNisoEs' })).toBeNull();
+    });
+
+    // @awa-test: PLAN-013-Step7 (v6 settings migrate to current version)
+    it('migrates v6 settings to current version', () => {
+      const v6Settings = {
+        v: 6,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'xmlNiso',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      const result = migrateSettings(v6Settings);
+      expect(result).toEqual({ ...v6Settings, v: CURRENT_VERSION });
+    });
+
     it('returns null for invalid activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'invalid' })).toBeNull();
     });
