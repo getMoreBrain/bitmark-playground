@@ -4,7 +4,7 @@ import { proxy } from 'valtio';
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
-export type OutputTab = 'diff' | 'lexer';
+export type OutputTab = 'diff' | 'lexer' | 'mappings';
 
 export interface UiState {
   /** Whether bottom output panels are visible */

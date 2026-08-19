@@ -103,4 +103,41 @@ describe('OutputPanel', () => {
     fireEvent.click(screen.getByText('Lexer'));
     expect(onTabChange).toHaveBeenCalledWith('lexer');
   });
+
+  // @awa-test: PLAN-014-Step5 (Mappings tab is opt-in, bottom-left panel only)
+  it('does not render the Mappings tab by default', () => {
+    render(<OutputPanel label="JSON" activeTab="diff" onTabChange={() => {}} />, { wrapper });
+    expect(screen.queryByText('Mappings')).not.toBeInTheDocument();
+  });
+
+  it('renders the Mappings tab when showMappings is true', () => {
+    render(<OutputPanel label="bitmark" activeTab="diff" onTabChange={() => {}} showMappings />, {
+      wrapper,
+    });
+    expect(screen.getByText('Mappings')).toBeInTheDocument();
+  });
+
+  it('calls onTabChange with "mappings" when the Mappings tab is clicked', () => {
+    const onTabChange = vi.fn();
+    render(
+      <OutputPanel label="bitmark" activeTab="diff" onTabChange={onTabChange} showMappings />,
+      { wrapper },
+    );
+    fireEvent.click(screen.getByText('Mappings'));
+    expect(onTabChange).toHaveBeenCalledWith('mappings');
+  });
+
+  it('shows the mapping report when the Mappings tab is active', () => {
+    render(
+      <OutputPanel
+        label="bitmark"
+        activeTab="mappings"
+        onTabChange={() => {}}
+        showMappings
+        mappingsOutput="MAPPING REPORT  input: bitmark → json"
+      />,
+      { wrapper },
+    );
+    expect(screen.getByText(/MAPPING REPORT/)).toBeInTheDocument();
+  });
 });

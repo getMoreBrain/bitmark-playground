@@ -12,6 +12,9 @@ const OUTPUT_TABS = [
   { id: 'lexer', label: 'Lexer' },
 ];
 
+// @awa-impl: PLAN-014-Step5 (optional Mappings tab — bottom-left panel only)
+const OUTPUT_TABS_WITH_MAPPINGS = [...OUTPUT_TABS, { id: 'mappings', label: 'Mappings' }];
+
 export interface OutputPanelProps {
   label: string;
   activeTab: OutputTabType;
@@ -24,6 +27,10 @@ export interface OutputPanelProps {
   language?: string;
   /** Lexer output text to display in the Lexer tab */
   lexerOutput?: string;
+  /** Show the Mappings tab (bottom-left panel only). */
+  showMappings?: boolean;
+  /** Mapping report text to display in the Mappings tab. */
+  mappingsOutput?: string;
 }
 
 // @awa-impl: PLAN-003-Step5 (output panel)
@@ -36,12 +43,14 @@ const OutputPanel = ({
   modified,
   language,
   lexerOutput,
+  showMappings = false,
+  mappingsOutput,
 }: OutputPanelProps) => {
   return (
     <Flex sx={{ flexDirection: 'column', flexGrow: 1, width: '50%', minHeight: 0 }}>
       <OutputTabBar
         label={label}
-        tabs={OUTPUT_TABS}
+        tabs={showMappings ? OUTPUT_TABS_WITH_MAPPINGS : OUTPUT_TABS}
         activeTab={activeTab}
         onTabChange={(id) => onTabChange(id as OutputTabType)}
       />
@@ -74,6 +83,23 @@ const OutputPanel = ({
             }}
           >
             {lexerOutput}
+          </pre>
+        ) : null}
+        {activeTab === 'mappings' && showMappings ? (
+          <pre
+            sx={{
+              margin: 0,
+              padding: 2,
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              color: 'text',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              overflow: 'auto',
+              flexGrow: 1,
+            }}
+          >
+            {mappingsOutput}
           </pre>
         ) : null}
       </Flex>

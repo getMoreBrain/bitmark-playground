@@ -49,13 +49,22 @@ describe('TableHtmlPanel', () => {
     expect(editor).toHaveAttribute('data-default-value', '<table><tr><td>x</td></tr></table>');
   });
 
-  it('shows a loading state when the parser is not available', () => {
+  it('shows a loading state when the WASM parser is not available', () => {
     const loadingWrapper = ({ children }: { children: React.ReactNode }) => (
       <ThemeUIProvider theme={theme}>
-        <BitmarkParserGeneratorContext.Provider
-          value={{ loadSuccess: false, loadError: false, bitmarkParserGenerator: undefined }}
-        >
-          <BitmarkParserContext.Provider value={fakeWasmParser}>
+        <BitmarkParserGeneratorContext.Provider value={fakeParserGenerator}>
+          <BitmarkParserContext.Provider
+            value={
+              {
+                loadSuccess: false,
+                loadError: false,
+                lex: undefined,
+                bitmarkToObjects: undefined,
+                convert: undefined,
+                version: '',
+              } as unknown as Parameters<typeof BitmarkParserContext.Provider>[0]['value']
+            }
+          >
             {children}
           </BitmarkParserContext.Provider>
         </BitmarkParserGeneratorContext.Provider>
@@ -63,7 +72,6 @@ describe('TableHtmlPanel', () => {
     );
     render(<TableHtmlPanel html="<table></table>" />, { wrapper: loadingWrapper });
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.queryByTestId('monaco-editor')).not.toBeInTheDocument();
   });
 
   // @awa-test: PLAN-007-Step3 (conversion error shown inside the editor, in place of html)

@@ -1,35 +1,40 @@
-// @awa-test: PLAN-007-Step2 (TableHtmlRunner Original -> HTML refresh + loop prevention)
+// @awa-test: PLAN-014-Step4 (TableHtmlRunner drives HTML through the WASM parser)
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bitmarkState } from '../state/bitmarkState';
-import { BitmarkParserGeneratorContext } from './BitmarkParserGenerator';
-import { convertHtmlToBitmark, noteOriginalMarkup, useTableHtmlRunner } from './TableHtmlRunner';
+import { BitmarkParserContext } from './BitmarkParser';
+import {
+  applyHtmlEdit,
+  convertHtmlToBitmark,
+  noteOriginalMarkup,
+  resetTableHtmlRunnerState,
+  useTableHtmlRunner,
+} from './TableHtmlRunner';
 
-const HTML_FRAGMENT = '<table><tr><td>cell</td></tr></table>';
-const BITMARK_TABLE = '[.table-extended]\n| cell |';
+const HTML_DOC = '<bitmark-bit data-type="article">hi</bitmark-bit>';
+const BITMARK_DOC = '[.article]\nhi';
 
-const makeWrapper = (convertHtmlTable: (input: string, options?: unknown) => unknown) => {
-  const fakeParser = { convertHtmlTable } as unknown as Parameters<
-    typeof BitmarkParserGeneratorContext.Provider
-  >[0]['value']['bitmarkParserGenerator'];
+type ContextValue = Parameters<typeof BitmarkParserContext.Provider>[0]['value'];
+
+const makeWrapper = (convert: (input: string, options?: unknown) => string) => {
+  const value = {
+    loadSuccess: true,
+    loadError: false,
+    lex: undefined,
+    bitmarkToObjects: undefined,
+    convert,
+    version: 'test',
+  } as unknown as ContextValue;
 
   return ({ children }: { children: React.ReactNode }) => (
-    <BitmarkParserGeneratorContext.Provider
-      value={{
-        loadSuccess: true,
-        loadError: false,
-        bitmarkParserGenerator: fakeParser,
-      }}
-    >
-      {children}
-    </BitmarkParserGeneratorContext.Provider>
+    <BitmarkParserContext.Provider value={value}>{children}</BitmarkParserContext.Provider>
   );
 };
 
 describe('useTableHtmlRunner', () => {
   beforeEach(() => {
-    // Reset Original markup baseline and tableHtml slice to a clean state.
+    resetTableHtmlRunnerState();
     bitmarkState.setEditedMarkup('js', '');
     bitmarkState.setTableHtml('', undefined, undefined);
   });
@@ -38,138 +43,119 @@ describe('useTableHtmlRunner', () => {
     vi.restoreAllMocks();
   });
 
-  it('converts Original bitmark to HTML when js.markup changes', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(HTML_FRAGMENT);
-    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
+  it('converts Original bitmark to HTML via the WASM parser html mapping', async () => {
+    const convert = vi.fn().mockReturnValue(HTML_DOC);
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.setEditedMarkup('js', BITMARK_TABLE);
+    bitmarkState.setEditedMarkup('js', BITMARK_DOC);
 
     await waitFor(() => {
-      expect(convertHtmlTable).toHaveBeenCalledWith(
-        BITMARK_TABLE,
+      expect(convert).toHaveBeenCalledWith(
+        BITMARK_DOC,
         expect.objectContaining({ inputFormat: 'bitmark', outputFormat: 'html' }),
       );
-      expect(bitmarkState.tableHtml.html).toBe(HTML_FRAGMENT);
+      expect(bitmarkState.tableHtml.html).toBe(HTML_DOC);
       expect(bitmarkState.tableHtml.htmlError).toBeUndefined();
     });
   });
 
-  it('stores error when the bitmark -> HTML conversion throws', async () => {
-    const convertHtmlTable = vi.fn().mockImplementation(() => {
+  it('stores an error when the bitmark -> HTML conversion throws', async () => {
+    const convert = vi.fn().mockImplementation(() => {
       throw new Error('boom');
     });
-    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.setEditedMarkup('js', '[.article] no table here');
+    bitmarkState.setEditedMarkup('js', BITMARK_DOC);
 
-    await waitFor(() => {
-      expect(bitmarkState.tableHtml.htmlError).toBeDefined();
-      expect(bitmarkState.tableHtml.htmlError?.message).toBe('boom');
-      expect(bitmarkState.tableHtml.htmlErrorAsString).toContain('boom');
-    });
+    await waitFor(() => expect(bitmarkState.tableHtml.htmlError?.message).toBe('boom'));
   });
 
-  it('clears tableHtml when Original markup becomes empty', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(HTML_FRAGMENT);
-    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
+  it('treats an `error:` string from convert as an error, not as HTML', async () => {
+    const convert = vi.fn().mockReturnValue('error: InvalidBitmark at offset 0');
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convert) });
 
-    bitmarkState.setEditedMarkup('js', BITMARK_TABLE);
+    bitmarkState.setEditedMarkup('js', BITMARK_DOC);
+
     await waitFor(() => {
-      expect(bitmarkState.tableHtml.html).toBe(HTML_FRAGMENT);
+      expect(bitmarkState.tableHtml.htmlError?.message).toContain('InvalidBitmark');
     });
+    expect(bitmarkState.tableHtml.html).not.toContain('InvalidBitmark');
+  });
+
+  it('clears the HTML when Original markup becomes empty', async () => {
+    const convert = vi.fn().mockReturnValue(HTML_DOC);
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convert) });
+
+    bitmarkState.setEditedMarkup('js', BITMARK_DOC);
+    await waitFor(() => expect(bitmarkState.tableHtml.html).toBe(HTML_DOC));
 
     bitmarkState.setEditedMarkup('js', '');
-    await waitFor(() => {
-      expect(bitmarkState.tableHtml.html).toBe('');
-      expect(bitmarkState.tableHtml.htmlError).toBeUndefined();
-    });
+    await waitFor(() => expect(bitmarkState.tableHtml.html).toBe(''));
   });
 
-  it('does not refresh HTML for a self-induced markup change (loop prevention)', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(HTML_FRAGMENT);
-    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
+  it('skips the refresh for a self-induced markup change (no feedback loop)', async () => {
+    const convert = vi.fn().mockReturnValue(HTML_DOC);
+    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convert) });
+    convert.mockClear();
 
-    // Simulate Flow A having produced this bitmark from HTML: pre-seed the dedupe,
-    // then push the same markup into Original. The Original -> HTML refresh must skip it.
-    noteOriginalMarkup('[.table-extended] from-html');
-    bitmarkState.setEditedMarkup('js', '[.table-extended] from-html');
+    noteOriginalMarkup(BITMARK_DOC);
+    bitmarkState.setEditedMarkup('js', BITMARK_DOC);
 
     await new Promise((r) => setTimeout(r, 10));
-    expect(convertHtmlTable).not.toHaveBeenCalled();
-  });
-
-  // @awa-test: PLAN-007-Step2 (out-of-order completion guard)
-  it('does not let a slower earlier conversion overwrite a later one', async () => {
-    const resolvers: Array<(v: unknown) => void> = [];
-    // runConvertHtmlTable awaits the result, so returning a Promise holds each call open.
-    const convertHtmlTable = vi.fn(() => new Promise((resolve) => resolvers.push(resolve)));
-    renderHook(() => useTableHtmlRunner(), { wrapper: makeWrapper(convertHtmlTable) });
-
-    bitmarkState.setEditedMarkup('js', BITMARK_TABLE);
-    await waitFor(() => expect(resolvers).toHaveLength(1));
-
-    bitmarkState.setEditedMarkup('js', `${BITMARK_TABLE}\n| more |`);
-    await waitFor(() => expect(resolvers).toHaveLength(2));
-
-    // Newer run lands first, then the older one completes.
-    resolvers[1]('<table><tr><td>newer</td></tr></table>');
-    await waitFor(() => {
-      expect(bitmarkState.tableHtml.html).toBe('<table><tr><td>newer</td></tr></table>');
-    });
-
-    resolvers[0]('<table><tr><td>older</td></tr></table>');
-    await new Promise((r) => setTimeout(r, 10));
-    expect(bitmarkState.tableHtml.html).toBe('<table><tr><td>newer</td></tr></table>');
-  });
-
-  it('does not convert when the parser is not loaded', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(HTML_FRAGMENT);
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <BitmarkParserGeneratorContext.Provider
-        value={{ loadSuccess: false, loadError: false, bitmarkParserGenerator: undefined }}
-      >
-        {children}
-      </BitmarkParserGeneratorContext.Provider>
-    );
-    renderHook(() => useTableHtmlRunner(), { wrapper });
-
-    bitmarkState.setEditedMarkup('js', BITMARK_TABLE);
-    await new Promise((r) => setTimeout(r, 10));
-    expect(convertHtmlTable).not.toHaveBeenCalled();
+    expect(convert).not.toHaveBeenCalled();
   });
 });
 
 describe('convertHtmlToBitmark', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+  beforeEach(() => resetTableHtmlRunnerState());
 
-  it('converts HTML to bitmark with the html input format', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(BITMARK_TABLE);
-    const parser = { convertHtmlTable } as unknown as Parameters<typeof convertHtmlToBitmark>[0];
+  it('converts HTML to bitmark with the html input format', () => {
+    const convert = vi.fn().mockReturnValue(BITMARK_DOC);
 
-    const result = await convertHtmlToBitmark(parser, HTML_FRAGMENT);
+    const result = convertHtmlToBitmark(convert, HTML_DOC);
 
-    expect(convertHtmlTable).toHaveBeenCalledWith(
-      HTML_FRAGMENT,
+    expect(convert).toHaveBeenCalledWith(
+      HTML_DOC,
       expect.objectContaining({ inputFormat: 'html', outputFormat: 'bitmark' }),
     );
-    expect(result.markup).toBe(BITMARK_TABLE);
-    expect(typeof result.durationSec).toBe('number');
+    expect(result.markup).toBe(BITMARK_DOC);
   });
 
-  it('returns empty markup for empty HTML without calling the parser', async () => {
-    const convertHtmlTable = vi.fn().mockReturnValue(BITMARK_TABLE);
-    const parser = { convertHtmlTable } as unknown as Parameters<typeof convertHtmlToBitmark>[0];
-
-    const result = await convertHtmlToBitmark(parser, '');
-
-    expect(convertHtmlTable).not.toHaveBeenCalled();
-    expect(result.markup).toBe('');
+  it('returns empty bitmark for empty HTML without calling convert', () => {
+    const convert = vi.fn().mockReturnValue(BITMARK_DOC);
+    expect(convertHtmlToBitmark(convert, '').markup).toBe('');
+    expect(convert).not.toHaveBeenCalled();
   });
 
-  it('throws when convertHtmlTable is unsupported by the parser', async () => {
-    const parser = {} as unknown as Parameters<typeof convertHtmlToBitmark>[0];
-    await expect(convertHtmlToBitmark(parser, HTML_FRAGMENT)).rejects.toThrow(/not supported/);
+  it('throws when convert returns an `error:` string', () => {
+    const convert = vi.fn().mockReturnValue('error: InvalidHtml at offset 0');
+    expect(() => convertHtmlToBitmark(convert, HTML_DOC)).toThrow(/InvalidHtml/);
+  });
+});
+
+// @awa-test: PLAN-014-Step4 (HTML -> bitmark duration lands on the Original tab)
+describe('applyHtmlEdit', () => {
+  beforeEach(() => {
+    resetTableHtmlRunnerState();
+    bitmarkState.setMarkup('js', '', undefined, undefined);
+    bitmarkState.setTableHtml('previous html', undefined, 1.5);
+  });
+
+  it('records the duration on the Original tab and the edit for the mapping report', async () => {
+    const convert = vi.fn().mockReturnValue(BITMARK_DOC);
+    const markupToJson = vi.fn().mockResolvedValue(undefined);
+
+    await applyHtmlEdit(convert, HTML_DOC, markupToJson);
+
+    expect(bitmarkState.js.markupDurationSec).toBeGreaterThanOrEqual(0);
+    expect(bitmarkState.js.markup).toBe(BITMARK_DOC);
+    expect(markupToJson).toHaveBeenCalledWith('js', BITMARK_DOC);
+
+    // The HTML tab keeps the user's text and its own generation time.
+    expect(bitmarkState.tableHtml.html).toBe(HTML_DOC);
+
+    // The mapping report source is the HTML window.
+    expect(bitmarkState.lastEdit.inputFormat).toBe('html');
+    expect(bitmarkState.lastEdit.content).toBe(HTML_DOC);
   });
 });

@@ -16,6 +16,12 @@ const XML_MAPPING: Record<XmlVariant, string> = {
   xmlNisoEs: 'xml-niso-iec-es',
 };
 
+/** Display names, matching the tab bar. */
+const XML_LABEL: Record<XmlVariant, string> = {
+  xmlNiso: 'XML (NISO-IEC)',
+  xmlNisoEs: 'XML (NISO-IEC-ES)',
+};
+
 /**
  * The published `OutputFormat` type is narrower than the runtime: it lists only
  * `bitmark | json | text`, while `convert` also accepts any config mapping id
@@ -141,6 +147,9 @@ const applyXmlEdit = async (
   // clobbered while focused. The duration is deliberately not recorded here.
   bitmarkState.setEditedXml(variant, nextXml, xmlError);
 
+  // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
+  bitmarkState.setLastEdit(XML_MAPPING[variant], nextXml, XML_LABEL[variant]);
+
   if (xmlError) return;
 
   // Set before `markupToJson`, whose `setEditedMarkup` stores the edited tab's
@@ -224,6 +233,7 @@ export {
   noteWasmMarkup,
   resetXmlRunnerState,
   useXmlRunner,
+  XML_LABEL,
   XML_MAPPING,
   XmlRunner,
 };

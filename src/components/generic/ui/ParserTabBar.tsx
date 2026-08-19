@@ -26,7 +26,7 @@ export interface ParserTabBarProps {
   showWasmCheck?: boolean;
   /** Duration for the WASM Check round-trip (JS parser). */
   wasmCheckDuration?: number | undefined;
-  /** Show the Table (HTML) tab (JSON side only). */
+  /** Show the HTML tab (JSON side only). */
   showTableHtml?: boolean;
   /** Duration for the last HTML-table conversion. */
   tableHtmlDuration?: number | undefined;
@@ -48,7 +48,7 @@ export interface ParserTabBarProps {
 
 // @awa-impl: PLAN-002-Step4 (tab bar UI)
 // @awa-impl: PLAN-006-Step3 (optional WASM Check tab)
-// @awa-impl: PLAN-007-Step4 (optional Table (HTML) tab)
+// @awa-impl: PLAN-007-Step4 (optional HTML tab)
 // @awa-impl: PLAN-009-Step2 (WASM Check match LED)
 // @awa-impl: PLAN-011-Step4 (optional Text tab)
 // @awa-impl: PLAN-013-Step4 (optional XML (NISO-IEC) tab)
@@ -175,16 +175,6 @@ const ParserTabBar = (props: ParserTabBarProps) => {
           ) : null}
         </Text>
       ) : null}
-      {showTableHtml ? (
-        <Text
-          role="tab"
-          aria-selected={activeTab === 'tableHtml'}
-          onClick={() => onTabChange('tableHtml')}
-          sx={{ ...tabSx(activeTab === 'tableHtml'), ml: '2px' }}
-        >
-          Table (HTML){formatDuration(tableHtmlDuration)}
-        </Text>
-      ) : null}
       {showText ? (
         <Text
           role="tab"
@@ -193,6 +183,16 @@ const ParserTabBar = (props: ParserTabBarProps) => {
           sx={{ ...tabSx(activeTab === 'text'), ml: '2px' }}
         >
           Text{formatDuration(textDuration)}
+        </Text>
+      ) : null}
+      {showTableHtml ? (
+        <Text
+          role="tab"
+          aria-selected={activeTab === 'tableHtml'}
+          onClick={() => onTabChange('tableHtml')}
+          sx={{ ...tabSx(activeTab === 'tableHtml'), ml: '2px' }}
+        >
+          HTML{formatDuration(tableHtmlDuration)}
         </Text>
       ) : null}
       {showXmlNiso ? (

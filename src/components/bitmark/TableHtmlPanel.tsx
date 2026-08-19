@@ -10,9 +10,8 @@ import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
-import { useBitmarkParserGenerator } from '../../services/BitmarkParserGenerator';
-import { convertHtmlToBitmark } from '../../services/TableHtmlRunner';
-import { bitmarkState } from '../../state/bitmarkState';
+import { useBitmarkParser } from '../../services/BitmarkParser';
+import { applyHtmlEdit } from '../../services/TableHtmlRunner';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -28,40 +27,18 @@ export interface TableHtmlPanelProps {
 
 // @awa-impl: PLAN-007-Step3 (editable HTML editor; HTML -> bitmark on input)
 const TableHtmlPanel = ({ html, errorAsString }: TableHtmlPanelProps) => {
-  const { bitmarkParserGenerator } = useBitmarkParserGenerator();
+  const { convert: wasmConvert } = useBitmarkParser();
   const { markupToJson } = useBitmarkConverter();
 
   const onInput = useCallback(
     async (nextHtml: string) => {
-      if (!bitmarkParserGenerator) return;
-
-      let markup = '';
-      let htmlError: Error | undefined;
-      let durationSec: number | undefined;
-
-      try {
-        const result = await convertHtmlToBitmark(bitmarkParserGenerator, nextHtml);
-        markup = result.markup;
-        durationSec = result.durationSec;
-      } catch (e) {
-        htmlError = e as Error;
-      }
-
-      // Record the HTML the user is editing (so the editor is never clobbered
-      // while focused) plus the conversion duration / error.
-      bitmarkState.setTableHtml(nextHtml, htmlError, durationSec);
-
-      if (htmlError) return;
-
-      // Push the converted bitmark into Original ('js') and run it through the
-      // parser(s). `convertHtmlToBitmark` already pre-seeded the Original -> HTML
-      // dedupe, so this write does not bounce back and overwrite the HTML being edited.
-      await markupToJson('js', markup);
+      if (!wasmConvert) return;
+      await applyHtmlEdit(wasmConvert, nextHtml, markupToJson);
     },
-    [bitmarkParserGenerator, markupToJson],
+    [wasmConvert, markupToJson],
   );
 
-  if (!bitmarkParserGenerator) {
+  if (!wasmConvert) {
     return (
       <Flex
         sx={{

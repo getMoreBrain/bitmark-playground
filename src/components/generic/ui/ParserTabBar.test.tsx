@@ -44,28 +44,36 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/^Original/)).toHaveAttribute('aria-selected', 'false');
   });
 
-  // @awa-test: PLAN-007-Step4 (Table (HTML) tab opt-in)
-  it('does not render the Table (HTML) tab by default', () => {
+  // @awa-test: PLAN-007-Step4 (HTML tab opt-in)
+  it('does not render the HTML tab by default', () => {
     render(<ParserTabBar {...baseProps} />, { wrapper });
-    expect(screen.queryByText(/Table \(HTML\)/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^HTML/)).not.toBeInTheDocument();
   });
 
-  it('renders the Table (HTML) tab when showTableHtml is true', () => {
+  it('renders the HTML tab when showTableHtml is true', () => {
     render(<ParserTabBar {...baseProps} showTableHtml />, { wrapper });
-    expect(screen.getByText(/Table \(HTML\)/)).toBeInTheDocument();
+    expect(screen.getByText(/^HTML/)).toBeInTheDocument();
   });
 
-  it('calls onTabChange with "tableHtml" when the Table (HTML) tab is clicked', () => {
+  it('calls onTabChange with "tableHtml" when the HTML tab is clicked', () => {
     const onTabChange = vi.fn();
     render(<ParserTabBar {...baseProps} showTableHtml onTabChange={onTabChange} />, { wrapper });
-    fireEvent.click(screen.getByText(/Table \(HTML\)/));
+    fireEvent.click(screen.getByText(/^HTML/));
     expect(onTabChange).toHaveBeenCalledWith('tableHtml');
   });
 
-  it('marks Table (HTML) tab as selected when activeTab is tableHtml', () => {
+  it('marks the HTML tab as selected when activeTab is tableHtml', () => {
     render(<ParserTabBar {...baseProps} showTableHtml activeTab="tableHtml" />, { wrapper });
-    expect(screen.getByText(/Table \(HTML\)/)).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText(/^HTML/)).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText(/^Original/)).toHaveAttribute('aria-selected', 'false');
+  });
+
+  // @awa-test: PLAN-014-Step7 (HTML sits after Text on the JSON bar)
+  it('renders the HTML tab after the Text tab', () => {
+    render(<ParserTabBar {...baseProps} showText showTableHtml showXmlNiso />, { wrapper });
+    const labels = screen.getAllByRole('tab').map((el) => el.textContent);
+    expect(labels.indexOf('HTML')).toBeGreaterThan(labels.indexOf('Text'));
+    expect(labels.indexOf('HTML')).toBeLessThan(labels.indexOf('XML (NISO-IEC)'));
   });
 
   // @awa-test: PLAN-009-Step2 (WASM Check match LED)

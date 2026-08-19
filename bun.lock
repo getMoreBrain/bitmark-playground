@@ -25,7 +25,7 @@
         "@eslint/js": "^9.28.0",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@gmb/bitmark-parser": "^6.6.0",
+        "@gmb/bitmark-parser": "^6.7.0",
         "@gmb/bitmark-parser-generator": "^5.26.0",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -212,19 +212,19 @@
 
     "@exodus/bytes": ["@exodus/bytes@1.14.1", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ=="],
 
-    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@6.6.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "6.6.0", "@gmb/bitmark-parser-darwin-x64": "6.6.0", "@gmb/bitmark-parser-linux-arm64": "6.6.0", "@gmb/bitmark-parser-linux-x64": "6.6.0", "@gmb/bitmark-parser-win32-x64": "6.6.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-6OWoC4YEMYzy+bNjQ/fmszxQ79G5A8qEX/0mwJsCTnvkz4dMDvLtHk8HdPu0h4DaOh/v6mO/OYMu6055Osi5rw=="],
+    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@6.7.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "6.7.0", "@gmb/bitmark-parser-darwin-x64": "6.7.0", "@gmb/bitmark-parser-linux-arm64": "6.7.0", "@gmb/bitmark-parser-linux-x64": "6.7.0", "@gmb/bitmark-parser-win32-x64": "6.7.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-dwELqc+i2B23/CDbcqkdisG3ulcwB0JEsld7CAn/4/HRrJMx6a3PK+QYrhGzKyY/QX8JO6mUhte4K51nR/pUTg=="],
 
-    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@6.6.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-9FDWNDZ014+LO9kjj8yuWR5Tk6AyJT5CuCcYL6pxSn8zoEtJg1Z1EN8lTJZZ44roL3B4pkqxG75SetZjAcyi+Q=="],
+    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@6.7.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-Mc3yS0a7C+c6RzdQ5+R2ubjwhokl5dCu5ZBMlOmd5j4lPccpNSSs6cQdK+rbBQYvolPFpEad3V9mXyesChQJDg=="],
 
-    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@6.6.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-XL4GyTrauUgWGhovdZQdJbFqZuVqxyBwZOSa5PkNzz6e6KNCsr1VIob1xqWs7e1MulSgGMjNRIkrubrvpZxsCQ=="],
+    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@6.7.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-1Ushspp59Tdb7QooLRPt/icErToOI31COthJ2w/eato5YohaM3zLF2WahDjxpf8QPu8XoLbo266nyQWpla1RlQ=="],
 
     "@gmb/bitmark-parser-generator": ["@gmb/bitmark-parser-generator@5.26.0", "", { "dependencies": { "@ncoderz/superenum": "^1.0.0", "@types/fs-extra": "^11.0.4", "commander": "^14.0.3", "fs-extra": "^11.3.4" }, "bin": { "bitmark-parser": "bin/run" } }, "sha512-i1Mii1Di56LzK9R3T3qbljZU6iAt/etXdZtuaqcd2pAvAd+yCPrA7DF28OWlsg8O95espUQyVOox1g7Gs6t4ng=="],
 
-    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@6.6.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-qf9UyWoghVzZWvGlVVOmeE3N6U/4/PRVBtD+/3sSePP0o7KHCrUcLMGf16N/P6Go0szeBZGwZVMLS53B6MJ9Ww=="],
+    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@6.7.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-8RxU286rODwv55L99jAekOkNpopvZuXgRgZxg1geFtGo/wW/CzM+WBlfn0eZh1CFlvX7nhArWr/blbuy5nwdDw=="],
 
-    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@6.6.0", "", { "os": "linux", "cpu": "x64" }, "sha512-s/wh7c2L0SoDhhx//hVvW0+5irwXVUTWxAWVmIdk0bK0j8unqrtd502a3PXvfUGQcS7KtTSXTtYSH+LjaRXGKQ=="],
+    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@6.7.0", "", { "os": "linux", "cpu": "x64" }, "sha512-9CMAzfFp8HEq0YcFIVGjSVVALbksJIN2d66B7j2z+aNusvwY8qZXnv/Fn/gwqhMzkZKOX2pUBdLD0EB6XpbjsA=="],
 
-    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@6.6.0", "", { "os": "win32", "cpu": "x64" }, "sha512-wXEGw3hlAnqzDnUXRN6PgYHg99AFUff2xYlibhj5fnXtpTc9Id94WbZRvpH0j7SM6CC8brV8mw5cKY9/aqhx9g=="],
+    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@6.7.0", "", { "os": "win32", "cpu": "x64" }, "sha512-aMkGFaUIAyB0sZQGq8yy1dF95QyJ6wxSe38+QYvjkIwmdlIIhOp8qICi8GhKO8YqkiHVHefcion2Gk9e0XbfyA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

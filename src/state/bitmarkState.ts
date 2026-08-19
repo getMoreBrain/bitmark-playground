@@ -8,6 +8,13 @@ import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
 export type ParserType = 'js' | 'wasm' | 'wasmFull';
+
+/** Display names for the parser tabs, matching the tab bar. */
+export const TAB_LABEL: Record<ParserType, string> = {
+  js: 'Original',
+  wasm: 'WASM',
+  wasmFull: 'WASM (full)',
+};
 /** Tab id for the JSON parser tab bar — adds the round-trip, HTML-table, text and XML views. */
 export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml' | 'text' | XmlVariant;
 /**
@@ -81,6 +88,33 @@ export interface XmlSlice {
   readonly xmlUpdates: number;
 }
 
+// @awa-component: PLAN-014-LastEditSlice
+/**
+ * The window the user last edited — the input to the mapping report.
+ *
+ * Recorded at the UI entry points (the editors' `onInput`), NOT inside the
+ * converter: the converter is also driven programmatically by the XML/HTML
+ * panels, which would otherwise masquerade as bitmark edits.
+ */
+export interface LastEditSlice {
+  /** Parser `inputFormat` id for that window ('' before the first edit). */
+  readonly inputFormat: string;
+  /** That window's content at the time of the edit. */
+  readonly content: string;
+  /** Human label for the window, shown above the report. */
+  readonly label: string;
+  readonly updates: number;
+}
+
+// @awa-component: PLAN-014-MappingsSlice
+export interface MappingsSlice {
+  readonly report: string;
+  readonly reportError: Error | undefined;
+  readonly reportErrorAsString: string | undefined;
+  readonly reportDurationSec: number | undefined;
+  readonly reportUpdates: number;
+}
+
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
@@ -91,6 +125,8 @@ export interface BitmarkState {
   readonly text: TextSlice;
   readonly xmlNiso: XmlSlice;
   readonly xmlNisoEs: XmlSlice;
+  readonly lastEdit: LastEditSlice;
+  readonly mappings: MappingsSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
   setJson(
@@ -139,6 +175,13 @@ export interface BitmarkState {
    * (mirrors `setEditedMarkup` / `setEditedJson`).
    */
   setEditedXml(variant: XmlVariant, xml: string, xmlError: Error | undefined): void;
+  /** Record the window the user just edited (drives the mapping report). */
+  setLastEdit(inputFormat: string, content: string, label: string): void;
+  setMappings(
+    report: string | undefined,
+    reportError: Error | undefined,
+    durationSec?: number,
+  ): void;
 }
 
 const createParserSlice = (): ParserSlice => ({
@@ -225,6 +268,14 @@ const bitmarkState = proxy<BitmarkState>({
   text: createTextSlice(),
   xmlNiso: createXmlSlice(),
   xmlNisoEs: createXmlSlice(),
+  lastEdit: { inputFormat: '', content: '', label: '', updates: 0 },
+  mappings: {
+    report: '',
+    reportError: undefined,
+    reportErrorAsString: undefined,
+    reportDurationSec: undefined,
+    reportUpdates: 0,
+  },
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
@@ -455,6 +506,43 @@ const bitmarkState = proxy<BitmarkState>({
     slice.jsonAsString = json;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
+  },
+
+  // @awa-impl: PLAN-014-Step1 (record the last edited window)
+  setLastEdit: (inputFormat: string, content: string, label: string) => {
+    const slice = bitmarkState.lastEdit as Writable<LastEditSlice>;
+    slice.inputFormat = inputFormat;
+    slice.content = content;
+    slice.label = label;
+    slice.updates += 1;
+  },
+
+  // @awa-impl: PLAN-014-Step1 (setMappings setter)
+  setMappings: (
+    report: string | undefined,
+    reportError: Error | undefined,
+    durationSec?: number,
+  ) => {
+    const slice = bitmarkState.mappings as Writable<MappingsSlice>;
+
+    if (reportError) {
+      slice.reportError = reportError;
+      try {
+        slice.reportErrorAsString = JSON.stringify(
+          reportError,
+          Object.getOwnPropertyNames(reportError),
+          2,
+        );
+      } catch (_e) {
+        slice.reportErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.report = report ?? '';
+      slice.reportError = undefined;
+      slice.reportErrorAsString = undefined;
+    }
+    slice.reportDurationSec = durationSec;
+    slice.reportUpdates += 1;
   },
 
   // @awa-impl: PLAN-013-Step1 (setEditedXml; user input, duration untouched)

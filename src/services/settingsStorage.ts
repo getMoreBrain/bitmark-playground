@@ -14,7 +14,7 @@ export interface PersistedSettings {
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 7;
+export const CURRENT_VERSION = 8;
 
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
 const VALID_JSON_TABS: readonly string[] = [
@@ -27,13 +27,14 @@ const VALID_JSON_TABS: readonly string[] = [
   'xmlNiso',
   'xmlNisoEs',
 ];
-const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer'];
+const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer', 'mappings'];
 
 // @awa-impl: PLAN-004-Step1 (migrateSettings)
 // @awa-impl: PLAN-006-Step7 (v2 → v3 migration)
 // @awa-impl: PLAN-007-Step7 (v3 → v4 migration)
 // @awa-impl: PLAN-011-Step7 (v4 → v5 migration)
 // @awa-impl: PLAN-013-Step7 (v5 → v6 migration)
+// @awa-impl: PLAN-014-Step5 (v7 → v8 migration)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -72,8 +73,14 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v6 → v7: 'xmlNisoEs' added as valid JSON tab, existing values still valid
   if (obj.v === 6) {
+    obj.v = 7;
+    // Fall through
+  }
+
+  // Migrate v7 → v8: 'mappings' added as valid output tab, existing values still valid
+  if (obj.v === 7) {
     obj.v = CURRENT_VERSION;
-    // Fall through to v7 validation
+    // Fall through to v8 validation
   }
 
   if (obj.v === CURRENT_VERSION) {

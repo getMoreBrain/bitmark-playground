@@ -9,7 +9,7 @@ import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
-import { bitmarkState } from '../../state/bitmarkState';
+import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { TableHtmlPanel } from './TableHtmlPanel';
 import { TextPanel } from './TextPanel';
@@ -50,6 +50,8 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
       ) {
         return;
       }
+      // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
+      bitmarkState.setLastEdit('json', json, `${TAB_LABEL[tab]} JSON`);
       await jsonToMarkup(tab, json);
     },
     [jsonToMarkup],

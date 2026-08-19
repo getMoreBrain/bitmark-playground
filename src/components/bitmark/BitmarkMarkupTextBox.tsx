@@ -12,7 +12,7 @@ import { Language } from '../../monaco-tree-sitter/language';
 import { MonacoTreeSitter } from '../../monaco-tree-sitter/monaco-tree-sitter';
 import { Grammar } from '../../monaco-tree-sitter/types/grammer';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
-import { bitmarkState } from '../../state/bitmarkState';
+import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -41,7 +41,10 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   // @awa-impl: PLAN-008-Step3 (edited tab = active markup tab)
   const onInput = useCallback(
     async (markup: string) => {
-      await markupToJson(bitmarkState.activeMarkupTab, markup);
+      const tab = bitmarkState.activeMarkupTab;
+      // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
+      bitmarkState.setLastEdit('bitmark', markup, `${TAB_LABEL[tab]} bitmark`);
+      await markupToJson(tab, markup);
     },
     [markupToJson],
   );

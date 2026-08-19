@@ -17,6 +17,7 @@ import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
+import { MappingsRunner } from './services/MappingsRunner';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
 import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
@@ -186,6 +187,8 @@ function App() {
         modified={snap.wasm.markup}
         language="bitmark"
         lexerOutput={snap.wasm.lexerOutput}
+        showMappings
+        mappingsOutput={snap.mappings.reportErrorAsString ?? snap.mappings.report}
       />
       <OutputPanel
         label="JSON"
@@ -207,6 +210,7 @@ function App() {
           <JsRoundTripRunner />
           <TableHtmlRunner />
           <TextRunner />
+          <MappingsRunner />
           <XmlRunner variant="xmlNiso" />
           <XmlRunner variant="xmlNisoEs" />
           <Flex

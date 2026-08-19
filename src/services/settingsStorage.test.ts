@@ -220,6 +220,33 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v6Settings, v: CURRENT_VERSION });
     });
 
+    // @awa-test: PLAN-014-Step5 ('mappings' accepted as an output tab at v8)
+    it('accepts mappings as a valid output tab', () => {
+      expect(migrateSettings({ ...validSettings, leftOutputTab: 'mappings' })).toEqual({
+        ...validSettings,
+        leftOutputTab: 'mappings',
+      });
+    });
+
+    // @awa-test: PLAN-014-Step5 ('mappings' rejected as a parser/JSON tab)
+    it('rejects mappings as activeMarkupTab and activeJsonTab', () => {
+      expect(migrateSettings({ ...validSettings, activeMarkupTab: 'mappings' })).toBeNull();
+      expect(migrateSettings({ ...validSettings, activeJsonTab: 'mappings' })).toBeNull();
+    });
+
+    // @awa-test: PLAN-014-Step5 (v7 settings migrate to current version)
+    it('migrates v7 settings to current version', () => {
+      const v7Settings = {
+        v: 7,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'xmlNisoEs',
+        showDiffLex: true,
+        leftOutputTab: 'diff',
+        rightOutputTab: 'lexer',
+      };
+      expect(migrateSettings(v7Settings)).toEqual({ ...v7Settings, v: CURRENT_VERSION });
+    });
+
     it('returns null for invalid activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'invalid' })).toBeNull();
     });
