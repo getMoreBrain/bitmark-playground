@@ -106,6 +106,19 @@ export interface LastEditSlice {
   readonly updates: number;
 }
 
+// @awa-component: PLAN-015-InfoSlice
+/**
+ * Concatenated `info({ infoType: 'bit', bit })` output for each distinct bit
+ * name in the current WASM (new parser) JSON. Shown read-only in the Info tab.
+ */
+export interface InfoSlice {
+  readonly output: string;
+  readonly outputError: Error | undefined;
+  readonly outputErrorAsString: string | undefined;
+  readonly outputDurationSec: number | undefined;
+  readonly outputUpdates: number;
+}
+
 // @awa-component: PLAN-014-MappingsSlice
 export interface MappingsSlice {
   readonly report: string;
@@ -126,6 +139,7 @@ export interface BitmarkState {
   readonly xmlNiso: XmlSlice;
   readonly xmlNisoEs: XmlSlice;
   readonly lastEdit: LastEditSlice;
+  readonly info: InfoSlice;
   readonly mappings: MappingsSlice;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
@@ -182,6 +196,7 @@ export interface BitmarkState {
     reportError: Error | undefined,
     durationSec?: number,
   ): void;
+  setInfo(output: string | undefined, outputError: Error | undefined, durationSec?: number): void;
 }
 
 const createParserSlice = (): ParserSlice => ({
@@ -269,6 +284,13 @@ const bitmarkState = proxy<BitmarkState>({
   xmlNiso: createXmlSlice(),
   xmlNisoEs: createXmlSlice(),
   lastEdit: { inputFormat: '', content: '', label: '', updates: 0 },
+  info: {
+    output: '',
+    outputError: undefined,
+    outputErrorAsString: undefined,
+    outputDurationSec: undefined,
+    outputUpdates: 0,
+  },
   mappings: {
     report: '',
     reportError: undefined,
@@ -543,6 +565,30 @@ const bitmarkState = proxy<BitmarkState>({
     }
     slice.reportDurationSec = durationSec;
     slice.reportUpdates += 1;
+  },
+
+  // @awa-impl: PLAN-015-Step1 (setInfo setter)
+  setInfo: (output: string | undefined, outputError: Error | undefined, durationSec?: number) => {
+    const slice = bitmarkState.info as Writable<InfoSlice>;
+
+    if (outputError) {
+      slice.outputError = outputError;
+      try {
+        slice.outputErrorAsString = JSON.stringify(
+          outputError,
+          Object.getOwnPropertyNames(outputError),
+          2,
+        );
+      } catch (_e) {
+        slice.outputErrorAsString = 'Unknown';
+      }
+    } else {
+      slice.output = output ?? '';
+      slice.outputError = undefined;
+      slice.outputErrorAsString = undefined;
+    }
+    slice.outputDurationSec = durationSec;
+    slice.outputUpdates += 1;
   },
 
   // @awa-impl: PLAN-013-Step1 (setEditedXml; user input, duration untouched)

@@ -16,6 +16,7 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { InfoRunner } from './services/InfoRunner';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
 import { MappingsRunner } from './services/MappingsRunner';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
@@ -187,6 +188,8 @@ function App() {
         modified={snap.wasm.markup}
         language="bitmark"
         lexerOutput={snap.wasm.lexerOutput}
+        showInfo
+        infoOutput={snap.info.outputErrorAsString ?? snap.info.output}
         showMappings
         mappingsOutput={snap.mappings.reportErrorAsString ?? snap.mappings.report}
       />
@@ -211,6 +214,7 @@ function App() {
           <TableHtmlRunner />
           <TextRunner />
           <MappingsRunner />
+          <InfoRunner />
           <XmlRunner variant="xmlNiso" />
           <XmlRunner variant="xmlNisoEs" />
           <Flex

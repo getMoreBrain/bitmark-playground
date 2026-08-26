@@ -127,6 +127,52 @@ describe('OutputPanel', () => {
     expect(onTabChange).toHaveBeenCalledWith('mappings');
   });
 
+  // @awa-test: PLAN-015-Step4 (Info tab is opt-in, bottom-left panel only)
+  it('does not render the Info tab by default', () => {
+    render(<OutputPanel label="JSON" activeTab="diff" onTabChange={() => {}} />, { wrapper });
+    expect(screen.queryByText('Info')).not.toBeInTheDocument();
+  });
+
+  it('renders the Info tab when showInfo is true', () => {
+    render(<OutputPanel label="bitmark" activeTab="diff" onTabChange={() => {}} showInfo />, {
+      wrapper,
+    });
+    expect(screen.getByText('Info')).toBeInTheDocument();
+  });
+
+  // @awa-test: PLAN-015-Step4 (Info sits between Lexer and Mappings)
+  it('renders the Info tab immediately left of Mappings', () => {
+    render(
+      <OutputPanel label="bitmark" activeTab="diff" onTabChange={() => {}} showInfo showMappings />,
+      { wrapper },
+    );
+    const labels = screen.getAllByRole('tab').map((el) => el.textContent);
+    expect(labels).toEqual(['Diff', 'Lexer', 'Info', 'Mappings']);
+  });
+
+  it('calls onTabChange with "info" when the Info tab is clicked', () => {
+    const onTabChange = vi.fn();
+    render(<OutputPanel label="bitmark" activeTab="diff" onTabChange={onTabChange} showInfo />, {
+      wrapper,
+    });
+    fireEvent.click(screen.getByText('Info'));
+    expect(onTabChange).toHaveBeenCalledWith('info');
+  });
+
+  it('shows the info output when the Info tab is active', () => {
+    render(
+      <OutputPanel
+        label="bitmark"
+        activeTab="info"
+        onTabChange={() => {}}
+        showInfo
+        infoOutput="BIT INFO: article"
+      />,
+      { wrapper },
+    );
+    expect(screen.getByText(/BIT INFO/)).toBeInTheDocument();
+  });
+
   it('shows the mapping report when the Mappings tab is active', () => {
     render(
       <OutputPanel

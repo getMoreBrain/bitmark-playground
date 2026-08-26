@@ -3,6 +3,7 @@
 import type {
   bitmarkToObjects as bitmarkToObjectsFn,
   convert as convertFn,
+  info as infoFn,
   lex as lexFn,
 } from '@gmb/bitmark-parser';
 import {
@@ -45,6 +46,7 @@ interface BitmarkParserModule {
   lex: typeof lexFn;
   bitmarkToObjects: typeof bitmarkToObjectsFn;
   convert: typeof convertFn;
+  info: typeof infoFn;
   version: () => string;
 }
 
@@ -58,6 +60,7 @@ interface IBitmarkParserContext {
   lex: typeof lexFn | undefined;
   bitmarkToObjects: typeof bitmarkToObjectsFn | undefined;
   convert: typeof convertFn | undefined;
+  info: typeof infoFn | undefined;
   version: string;
 }
 
@@ -67,6 +70,7 @@ const defaultState: IBitmarkParserContext = {
   lex: undefined,
   bitmarkToObjects: undefined,
   convert: undefined,
+  info: undefined,
   version: '',
 };
 
@@ -104,6 +108,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           lex: module.lex,
           bitmarkToObjects: module.bitmarkToObjects,
           convert: module.convert,
+          info: module.info,
           version: resolvedVersion,
         });
       } catch (e) {
@@ -114,6 +119,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           lex: undefined,
           bitmarkToObjects: undefined,
           convert: undefined,
+          info: undefined,
           version: '',
         });
       }
