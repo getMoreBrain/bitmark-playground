@@ -28,6 +28,9 @@ const fakeWasmParser = {
   convert: () => '',
   info: () => '',
   semanticTokens: undefined,
+  diagnostics: undefined,
+  complete: undefined,
+  hover: undefined,
   version: 'test',
 };
 

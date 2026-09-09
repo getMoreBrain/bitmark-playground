@@ -5,6 +5,7 @@ import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
+import { attachBitmarkDiagnostics } from '../../monaco-bitmark/bitmarkDiagnostics';
 import {
   attachBitmarkHighlighter,
   BITMARK_LANGUAGE_ID,
@@ -30,6 +31,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } =
     useBitmarkConverter();
   const highlighterRef = useRef<IDisposable>();
+  const diagnosticsRef = useRef<IDisposable>();
 
   const activeTab = bitmarkStateSnap.activeMarkupTab;
   const activeSlice = bitmarkStateSnap[activeTab];
@@ -50,13 +52,17 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   );
 
   // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
+  // @awa-impl: PLAN-017-Step3 (and marked from parser diagnostics)
   const editorDidMount = useCallback<EditorDidMount>((editor) => {
     highlighterRef.current = attachBitmarkHighlighter(editor);
+    diagnosticsRef.current = attachBitmarkDiagnostics(editor);
   }, []);
 
   const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
     highlighterRef.current?.dispose();
     highlighterRef.current = undefined;
+    diagnosticsRef.current?.dispose();
+    diagnosticsRef.current = undefined;
   }, []);
 
   // Do initial conversion with the initial markup

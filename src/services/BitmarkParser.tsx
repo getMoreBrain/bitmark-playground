@@ -18,9 +18,32 @@ import {
 } from 'react';
 
 import { log } from '../logging/log';
+import type {
+  CompleteSource,
+  DiagnosticsSource,
+  HoverSource,
+} from '../monaco-bitmark/bitmarkEditorTypes';
+import { registerBitmarkJsonSchema } from '../monaco-bitmark/bitmarkJsonSchema';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
+
+/**
+ * Where the dev server serves this checkout's own parser build from — the
+ * sibling `packages/bitmark-parser/dist/browser` of the repo this playground
+ * is a submodule of (see `vite.config.ts`). Selected with `?engine=local`,
+ * so an UNRELEASED parser can be driven from the playground before it ships;
+ * `main` always loads the published one.
+ */
+const LOCAL_ENGINE_URL = 'local-engine/bitmark-parser.min.js';
+
+/** The engine URL for this page load: `?engine=local`, else the CDN at `?v2=`. */
+export const engineUrl = (search: string, base: string, cacheBuster: number): string => {
+  const params = new URLSearchParams(search);
+  if (params.get('engine') === 'local') return `${base}${LOCAL_ENGINE_URL}?_=${cacheBuster}`;
+  const version = params.get('v2') ?? 'latest';
+  return `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${cacheBuster}`;
+};
 
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
@@ -49,6 +72,12 @@ interface BitmarkParserModule {
   info: typeof infoFn;
   semanticTokens: typeof semanticTokensFn;
   version: () => string;
+  // The editor services (parser PLAN-196). Optional: a parser older than the
+  // release that carries them simply has no such export, and the playground
+  // then runs without markers, completion or hover.
+  diagnostics?: DiagnosticsSource;
+  complete?: CompleteSource;
+  hover?: HoverSource;
 }
 
 interface BitmarkParserProviderProps {
@@ -62,6 +91,9 @@ interface IBitmarkParserContext {
   convert: typeof convertFn | undefined;
   info: typeof infoFn | undefined;
   semanticTokens: typeof semanticTokensFn | undefined;
+  diagnostics: DiagnosticsSource | undefined;
+  complete: CompleteSource | undefined;
+  hover: HoverSource | undefined;
   version: string;
 }
 
@@ -72,6 +104,9 @@ const defaultState: IBitmarkParserContext = {
   convert: undefined,
   info: undefined,
   semanticTokens: undefined,
+  diagnostics: undefined,
+  complete: undefined,
+  hover: undefined,
   version: '',
 };
 
@@ -88,9 +123,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
     if (loadedRef.current) return;
     loadedRef.current = true;
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const version = searchParams.get('v2') ?? 'latest';
-    const moduleUrl = `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${_cacheBuster}`;
+    const moduleUrl = engineUrl(window.location.search, import.meta.env.BASE_URL, _cacheBuster);
 
     const load = async () => {
       try {
@@ -105,6 +138,11 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // Get version from the library itself
         const resolvedVersion = module.version();
 
+        // @awa-impl: PLAN-017-Step5 (the JSON pane validates against the
+        // schema the SAME parser version publishes). Independent of the
+        // engine: a failure leaves JSON syntax checking as it was.
+        void registerBitmarkJsonSchema(moduleUrl);
+
         setState({
           loadSuccess: true,
           loadError: false,
@@ -112,6 +150,9 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           convert: module.convert,
           info: module.info,
           semanticTokens: module.semanticTokens,
+          diagnostics: module.diagnostics,
+          complete: module.complete,
+          hover: module.hover,
           version: resolvedVersion,
         });
       } catch (e) {
@@ -123,6 +164,9 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           convert: undefined,
           info: undefined,
           semanticTokens: undefined,
+          diagnostics: undefined,
+          complete: undefined,
+          hover: undefined,
           version: '',
         });
       }

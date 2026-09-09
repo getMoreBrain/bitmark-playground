@@ -16,6 +16,7 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { EditorServicesRunner } from './services/EditorServicesRunner';
 import { InfoRunner } from './services/InfoRunner';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
 import { MappingsRunner } from './services/MappingsRunner';
@@ -219,6 +220,7 @@ function App() {
           <XmlRunner variant="xmlNiso" />
           <XmlRunner variant="xmlNisoEs" />
           <SemanticTokensRunner />
+          <EditorServicesRunner />
           <Flex
             sx={{
               flexDirection: 'column',
