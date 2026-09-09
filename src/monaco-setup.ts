@@ -5,7 +5,7 @@
  * and features) with selective imports to dramatically reduce bundle size.
  *
  * Only the JSON language service is registered since the app uses:
- * - Tree-sitter for bitmark syntax highlighting
+ * - The WASM bitmark parser's semantic tokens (applied as decorations) for bitmark highlighting
  * - JSON mode for the JSON editor panel
  */
 
@@ -19,6 +19,8 @@ import 'monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 
+import { registerBitmarkLanguage } from './monaco-bitmark/bitmarkLanguage';
+
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string) {
     if (label === 'json') {
@@ -27,3 +29,6 @@ self.MonacoEnvironment = {
     return new editorWorker();
   },
 };
+
+// @awa-impl: PLAN-016-Step5 (bitmark language + token stylesheet registered before any editor mounts)
+registerBitmarkLanguage();

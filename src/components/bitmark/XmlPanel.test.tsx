@@ -27,8 +27,8 @@ const fakeWasmParser = {
   loadError: false,
   bitmarkToObjects: () => [],
   convert: () => '',
-  lex: () => '',
   info: () => '',
+  semanticTokens: undefined,
   version: 'test',
 };
 
@@ -68,7 +68,6 @@ describe.each(VARIANTS)('XmlPanel(%s)', (variant) => {
               {
                 loadSuccess: false,
                 loadError: false,
-                lex: undefined,
                 bitmarkToObjects: undefined,
                 convert: undefined,
                 version: '',

@@ -18,7 +18,6 @@ const makeWrapper = (info: (options?: unknown) => string) => {
   const value = {
     loadSuccess: true,
     loadError: false,
-    lex: undefined,
     bitmarkToObjects: undefined,
     convert: undefined,
     info,

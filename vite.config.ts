@@ -37,8 +37,6 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: false,
   },
-  // Handle .wasm files as assets
-  assetsInclude: ['**/*.wasm'],
   test: {
     globals: true,
     environment: 'jsdom',

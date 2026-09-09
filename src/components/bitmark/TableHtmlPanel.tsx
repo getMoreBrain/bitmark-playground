@@ -9,6 +9,7 @@ import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
+import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { applyHtmlEdit } from '../../services/TableHtmlRunner';
@@ -60,7 +61,7 @@ const TableHtmlPanel = ({ html, errorAsString }: TableHtmlPanelProps) => {
 
   return (
     <MonacoTextArea
-      theme="vs-dark"
+      theme={MONACO_THEME}
       language="html"
       value={value}
       options={DEFAULT_MONACO_OPTIONS}

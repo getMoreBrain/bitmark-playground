@@ -4,7 +4,8 @@ import type {
   bitmarkToObjects as bitmarkToObjectsFn,
   convert as convertFn,
   info as infoFn,
-  lex as lexFn,
+  init as initFn,
+  semanticTokens as semanticTokensFn,
 } from '@gmb/bitmark-parser';
 import {
   createContext,
@@ -24,14 +25,14 @@ const BITMARK_PARSER_CDN_URL =
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
 
-// The string-based API (`convert`, `lex`) reports failures by returning an
+// The string-based API (`convert`, `info`) reports failures by returning an
 // `error: …`-prefixed string rather than throwing.
 const PARSER_ERROR_PREFIX = 'error:';
 
 /**
  * Return `out` unchanged, or throw when it is a parser error string.
  *
- * Call this on every `convert` / `lex` result that is piped onward, otherwise
+ * Call this on every `convert` / `info` result that is piped onward, otherwise
  * an error message is treated as document content and re-parsed downstream.
  */
 const throwIfParserError = (out: string): string => {
@@ -42,11 +43,11 @@ const throwIfParserError = (out: string): string => {
 };
 
 interface BitmarkParserModule {
-  init: (wasmUrl?: string) => Promise<void>;
-  lex: typeof lexFn;
+  init: typeof initFn;
   bitmarkToObjects: typeof bitmarkToObjectsFn;
   convert: typeof convertFn;
   info: typeof infoFn;
+  semanticTokens: typeof semanticTokensFn;
   version: () => string;
 }
 
@@ -57,20 +58,20 @@ interface BitmarkParserProviderProps {
 interface IBitmarkParserContext {
   loadSuccess: boolean;
   loadError: boolean;
-  lex: typeof lexFn | undefined;
   bitmarkToObjects: typeof bitmarkToObjectsFn | undefined;
   convert: typeof convertFn | undefined;
   info: typeof infoFn | undefined;
+  semanticTokens: typeof semanticTokensFn | undefined;
   version: string;
 }
 
 const defaultState: IBitmarkParserContext = {
   loadSuccess: false,
   loadError: false,
-  lex: undefined,
   bitmarkToObjects: undefined,
   convert: undefined,
   info: undefined,
+  semanticTokens: undefined,
   version: '',
 };
 
@@ -96,7 +97,9 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // Load ES module via dynamic import
         const module = (await import(/* @vite-ignore */ moduleUrl)) as BitmarkParserModule;
 
-        // Initialize WASM
+        // Initialize WASM. The browser entry defaults to the `browser-full`
+        // variant (7.x), which has the same conversion capabilities as the
+        // single pre-7 browser build.
         await module.init();
 
         // Get version from the library itself
@@ -105,10 +108,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         setState({
           loadSuccess: true,
           loadError: false,
-          lex: module.lex,
           bitmarkToObjects: module.bitmarkToObjects,
           convert: module.convert,
           info: module.info,
+          semanticTokens: module.semanticTokens,
           version: resolvedVersion,
         });
       } catch (e) {
@@ -116,10 +119,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         setState({
           loadSuccess: false,
           loadError: true,
-          lex: undefined,
           bitmarkToObjects: undefined,
           convert: undefined,
           info: undefined,
+          semanticTokens: undefined,
           version: '',
         });
       }

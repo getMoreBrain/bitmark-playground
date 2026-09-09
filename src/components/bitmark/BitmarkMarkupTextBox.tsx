@@ -1,16 +1,15 @@
 // @awa-component: PLAN-002-BitmarkMarkupTextBox
-import { editor } from 'monaco-editor';
-import * as MonacoModule from 'monaco-editor';
-import { useCallback, useEffect } from 'react';
-import { EditorDidMount } from 'react-monaco-editor';
+import { editor, IDisposable } from 'monaco-editor';
+import { useCallback, useEffect, useRef } from 'react';
+import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
-import { Parser } from 'web-tree-sitter';
 
-import treeSitterBitmarkGrammar from '../../monaco-tree-sitter/grammars/bitmark.json';
-import { Language } from '../../monaco-tree-sitter/language';
-import { MonacoTreeSitter } from '../../monaco-tree-sitter/monaco-tree-sitter';
-import { Grammar } from '../../monaco-tree-sitter/types/grammer';
+import {
+  attachBitmarkHighlighter,
+  BITMARK_LANGUAGE_ID,
+  MONACO_THEME,
+} from '../../monaco-bitmark/bitmarkLanguage';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
@@ -30,6 +29,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const bitmarkStateSnap = useSnapshot(bitmarkState);
   const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } =
     useBitmarkConverter();
+  const highlighterRef = useRef<IDisposable>();
 
   const activeTab = bitmarkStateSnap.activeMarkupTab;
   const activeSlice = bitmarkStateSnap[activeTab];
@@ -49,14 +49,14 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     [markupToJson],
   );
 
-  const editorDidMount = useCallback<EditorDidMount>((editor, _monaco) => {
-    const language = new Language(treeSitterBitmarkGrammar as Grammar);
+  // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
+  const editorDidMount = useCallback<EditorDidMount>((editor) => {
+    highlighterRef.current = attachBitmarkHighlighter(editor);
+  }, []);
 
-    // Apply the language to the editor
-    const languageWasmPath = new URL(`../../tree-sitter-bitmark.wasm`, import.meta.url).toString();
-    void language.init(languageWasmPath, Parser).then(() => {
-      new MonacoTreeSitter(MonacoModule, editor, language);
-    });
+  const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
+    highlighterRef.current?.dispose();
+    highlighterRef.current = undefined;
   }, []);
 
   // Do initial conversion with the initial markup
@@ -75,12 +75,13 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     return (
       <MonacoTextArea
         {...restProps}
-        theme="vs-dark"
-        language={'bitmark'}
+        theme={MONACO_THEME}
+        language={BITMARK_LANGUAGE_ID}
         value={value}
         options={opts}
         onInput={onInput}
         editorDidMount={editorDidMount}
+        editorWillUnmount={editorWillUnmount}
       />
     );
   } else {

@@ -3,12 +3,8 @@ import './index.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Parser } from 'web-tree-sitter';
-import treeSitterWasmUrl from 'web-tree-sitter/tree-sitter.wasm?url';
 
 import { App } from './App';
-import { Theme, ThemeConfig } from './monaco-tree-sitter/theme';
-import treeSitterTheme from './monaco-tree-sitter/themes/tomorrow.json';
 import { initSettingsPersistence } from './services/settingsPersistence';
 
 // Suppress harmless Monaco diff editor errors caused by React StrictMode
@@ -21,15 +17,7 @@ console.error = (...args: unknown[]) => {
   origConsoleError.apply(console, args);
 };
 
-async function start(): Promise<void> {
-  // Load the monaco-tree-sitter theme
-  Theme.load(treeSitterTheme as ThemeConfig, 'tomorrow');
-
-  // Init tree-sitter-web
-  await Parser.init({
-    locateFile: () => treeSitterWasmUrl,
-  });
-
+function start(): void {
   // @awa-impl: PLAN-004-Step3 (wire persistence)
   initSettingsPersistence();
 
@@ -41,4 +29,4 @@ async function start(): Promise<void> {
   );
 }
 
-void start();
+start();

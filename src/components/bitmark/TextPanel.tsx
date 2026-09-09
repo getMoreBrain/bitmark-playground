@@ -2,6 +2,7 @@
 /** @jsxImportSource theme-ui */
 import { editor } from 'monaco-editor';
 
+import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 
 const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -24,7 +25,7 @@ const TextPanel = ({ text, errorAsString }: TextPanelProps) => {
 
   return (
     <MonacoTextArea
-      theme="vs-dark"
+      theme={MONACO_THEME}
       language="plaintext"
       value={value}
       options={READ_ONLY_OPTIONS}

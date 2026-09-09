@@ -26,8 +26,8 @@ const fakeWasmParser = {
   loadError: false,
   bitmarkToObjects: () => [],
   convert: () => '',
-  lex: () => '',
   info: () => '',
+  semanticTokens: undefined,
   version: 'test',
 };
 

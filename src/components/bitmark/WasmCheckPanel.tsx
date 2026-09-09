@@ -1,15 +1,14 @@
 // @awa-component: PLAN-006-WasmCheckPanel
 /** @jsxImportSource theme-ui */
-import { editor } from 'monaco-editor';
-import * as MonacoModule from 'monaco-editor';
-import { useCallback } from 'react';
-import { EditorDidMount } from 'react-monaco-editor';
-import { Parser } from 'web-tree-sitter';
+import { editor, IDisposable } from 'monaco-editor';
+import { useCallback, useRef } from 'react';
+import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 
-import treeSitterBitmarkGrammar from '../../monaco-tree-sitter/grammars/bitmark.json';
-import { Language } from '../../monaco-tree-sitter/language';
-import { MonacoTreeSitter } from '../../monaco-tree-sitter/monaco-tree-sitter';
-import { Grammar } from '../../monaco-tree-sitter/types/grammer';
+import {
+  attachBitmarkHighlighter,
+  BITMARK_LANGUAGE_ID,
+  MONACO_THEME,
+} from '../../monaco-bitmark/bitmarkLanguage';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 
 const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -30,23 +29,28 @@ export interface WasmCheckPanelProps {
 
 // @awa-impl: PLAN-006-Step5 (read-only round-trip bitmark view)
 const WasmCheckPanel = ({ markup, errorAsString }: WasmCheckPanelProps) => {
-  const editorDidMount = useCallback<EditorDidMount>((editor, _monaco) => {
-    const language = new Language(treeSitterBitmarkGrammar as Grammar);
-    const languageWasmPath = new URL(`../../tree-sitter-bitmark.wasm`, import.meta.url).toString();
-    void language.init(languageWasmPath, Parser).then(() => {
-      new MonacoTreeSitter(MonacoModule, editor, language);
-    });
+  const highlighterRef = useRef<IDisposable>();
+
+  // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
+  const editorDidMount = useCallback<EditorDidMount>((editor) => {
+    highlighterRef.current = attachBitmarkHighlighter(editor);
+  }, []);
+
+  const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
+    highlighterRef.current?.dispose();
+    highlighterRef.current = undefined;
   }, []);
 
   const value = errorAsString ?? markup;
 
   return (
     <MonacoTextArea
-      theme="vs-dark"
-      language="bitmark"
+      theme={MONACO_THEME}
+      language={BITMARK_LANGUAGE_ID}
       value={value}
       options={READ_ONLY_OPTIONS}
       editorDidMount={editorDidMount}
+      editorWillUnmount={editorWillUnmount}
     />
   );
 };

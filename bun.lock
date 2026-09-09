@@ -19,13 +19,12 @@
         "theme-ui": "^0.16.1",
         "typescript": "^5.2.2",
         "valtio": "^1.11.3",
-        "web-tree-sitter": "^0.25.3",
       },
       "devDependencies": {
         "@eslint/js": "^9.28.0",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@gmb/bitmark-parser": "^6.9.0",
+        "@gmb/bitmark-parser": "^7.0.0",
         "@gmb/bitmark-parser-generator": "^5.26.0",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -40,7 +39,6 @@
         "only-allow": "^1.2.1",
         "prettier": "^3.8.1",
         "rollup-plugin-visualizer": "^6.0.5",
-        "tree-sitter-cpp": "^0.23.4",
         "typescript-eslint": "^8.54.0",
         "vite": "^6.3.5",
         "vitest": "^4.0.18",
@@ -212,19 +210,19 @@
 
     "@exodus/bytes": ["@exodus/bytes@1.14.1", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ=="],
 
-    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@6.9.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "6.9.0", "@gmb/bitmark-parser-darwin-x64": "6.9.0", "@gmb/bitmark-parser-linux-arm64": "6.9.0", "@gmb/bitmark-parser-linux-x64": "6.9.0", "@gmb/bitmark-parser-win32-x64": "6.9.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-/69OElvk83AtYRHyyxsAdkHYysDFd7I5VqbUzPmvzVCvmbeIx7D8xCzUEpQKH4vfecuJT9tGq/Hdi6AgjG9XEg=="],
+    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@7.0.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "7.0.0", "@gmb/bitmark-parser-darwin-x64": "7.0.0", "@gmb/bitmark-parser-linux-arm64": "7.0.0", "@gmb/bitmark-parser-linux-x64": "7.0.0", "@gmb/bitmark-parser-win32-x64": "7.0.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-5wFGYUY5JoXLPeJlMa69Bqs0GSt++FlhTReSYjXtryBrhJZnmEdB7O5QlJ/4vsylwImUDX9/MzGIAHFIpwIdOg=="],
 
-    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@6.9.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/q/8vByIUSriNXf7mQXN9G2yfjkrDgp/ml5ldZf0wyzp65L+3oYDEdbqaKOYdgiBtdTUjh9PiuCB+nVzHDsirw=="],
+    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@7.0.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-WACYq43bC+f+6CAwcO8qi6DgiWyZAqS4Q5cj5BBefRUsjQjGeggwq96/Dk+J+wyQjYLpK2QxXqzAbX6qyczHmQ=="],
 
-    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@6.9.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-gj2VYAfFeZI5f3UatSfefavzIs8J7pkn4v9qvepiV1zT3gBQEFEYN7eLm3yUP2cuWj6RvDXG5w8r6DVSOIOwQQ=="],
+    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@7.0.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-2vbZZymhwBaQknKRMVjtX2uxx51V/Zx8M6gv025mk7C0aGCbV0+Ec4C6bKsk7NgtQ/dzToBw0OBOnm/yqG7IVA=="],
 
     "@gmb/bitmark-parser-generator": ["@gmb/bitmark-parser-generator@5.26.0", "", { "dependencies": { "@ncoderz/superenum": "^1.0.0", "@types/fs-extra": "^11.0.4", "commander": "^14.0.3", "fs-extra": "^11.3.4" }, "bin": { "bitmark-parser": "bin/run" } }, "sha512-i1Mii1Di56LzK9R3T3qbljZU6iAt/etXdZtuaqcd2pAvAd+yCPrA7DF28OWlsg8O95espUQyVOox1g7Gs6t4ng=="],
 
-    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@6.9.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-/kCWpXVcCvc/YaPrsS0foeK76mR/qxPVQ20+wNP61vj4xttpKHHnAmlvyTm7/5AM79nREuxfB1IFdg7X5uJO2g=="],
+    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@7.0.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-2trbJRghqVDlqkTMFeKINIkX0fMdrlsIsNfom+wwGKGMYoLm4yho3tJIiowg2ttSNXlMDxgtfMraQAD3FN4sHg=="],
 
-    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@6.9.0", "", { "os": "linux", "cpu": "x64" }, "sha512-OJA4PqLN4WIIOPXt69jq6kftfrICYrNFYwjLuUP8erAFxHd0N2Qv+hfBf2lxyUWnAiOv+nBKaHxlddX3IG1EYg=="],
+    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@7.0.0", "", { "os": "linux", "cpu": "x64" }, "sha512-JeAe9nVrCghtm6wSxHU7+QUh8BrEoBz9p4gIPUIBLswo8/y/JXIolroktCkOU+QpeDAAw4AsrmG93c6kNP12aQ=="],
 
-    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@6.9.0", "", { "os": "win32", "cpu": "x64" }, "sha512-Hnbbo5PFpIQQknu2eq0wk8LuJDP2grlyo7FgHoXLFiPpGVoiexLv/4qs0IVFKfKkBErsFxDRy/E4f2nRY40Rtw=="],
+    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@7.0.0", "", { "os": "win32", "cpu": "x64" }, "sha512-Ot+Cme4updmwFTk3ckZZWiiSdaIFNMmT3xxY5eQgndWxyDq+AOoZV+fsZ3VQ4SMiWY1EV3AEafz/h4gCHMl0Eg=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
@@ -788,10 +786,6 @@
 
     "natural-compare": ["natural-compare@1.4.0", "", {}, "sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw=="],
 
-    "node-addon-api": ["node-addon-api@8.5.0", "", {}, "sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A=="],
-
-    "node-gyp-build": ["node-gyp-build@4.8.4", "", { "bin": { "node-gyp-build": "bin.js", "node-gyp-build-optional": "optional.js", "node-gyp-build-test": "build-test.js" } }, "sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ=="],
-
     "node-releases": ["node-releases@2.0.27", "", {}, "sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA=="],
 
     "object-assign": ["object-assign@4.1.1", "", {}, "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg=="],
@@ -924,10 +918,6 @@
 
     "tr46": ["tr46@6.0.0", "", { "dependencies": { "punycode": "^2.3.1" } }, "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw=="],
 
-    "tree-sitter-c": ["tree-sitter-c@0.23.6", "", { "dependencies": { "node-addon-api": "^8.3.0", "node-gyp-build": "^4.8.4" }, "peerDependencies": { "tree-sitter": "^0.22.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-0dxXKznVyUA0s6PjNolJNs2yF87O5aL538A/eR6njA5oqX3C3vH4vnx3QdOKwuUdpKEcFdHuiDpRKLLCA/tjvQ=="],
-
-    "tree-sitter-cpp": ["tree-sitter-cpp@0.23.4", "", { "dependencies": { "node-addon-api": "^8.2.1", "node-gyp-build": "^4.8.2", "tree-sitter-c": "^0.23.1" }, "peerDependencies": { "tree-sitter": "^0.21.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-qR5qUDyhZ5jJ6V8/umiBxokRbe89bCGmcq/dk94wI4kN86qfdV8k0GHIUEKaqWgcu42wKal5E97LKpLeVW8sKw=="],
-
     "ts-api-utils": ["ts-api-utils@2.4.0", "", { "peerDependencies": { "typescript": ">=4.8.4" } }, "sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA=="],
 
     "type-check": ["type-check@0.4.0", "", { "dependencies": { "prelude-ls": "^1.2.1" } }, "sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew=="],
@@ -963,8 +953,6 @@
     "vitest": ["vitest@4.0.18", "", { "dependencies": { "@vitest/expect": "4.0.18", "@vitest/mocker": "4.0.18", "@vitest/pretty-format": "4.0.18", "@vitest/runner": "4.0.18", "@vitest/snapshot": "4.0.18", "@vitest/spy": "4.0.18", "@vitest/utils": "4.0.18", "es-module-lexer": "^1.7.0", "expect-type": "^1.2.2", "magic-string": "^0.30.21", "obug": "^2.1.1", "pathe": "^2.0.3", "picomatch": "^4.0.3", "std-env": "^3.10.0", "tinybench": "^2.9.0", "tinyexec": "^1.0.2", "tinyglobby": "^0.2.15", "tinyrainbow": "^3.0.3", "vite": "^6.0.0 || ^7.0.0", "why-is-node-running": "^2.3.0" }, "peerDependencies": { "@edge-runtime/vm": "*", "@opentelemetry/api": "^1.9.0", "@types/node": "^20.0.0 || ^22.0.0 || >=24.0.0", "@vitest/browser-playwright": "4.0.18", "@vitest/browser-preview": "4.0.18", "@vitest/browser-webdriverio": "4.0.18", "@vitest/ui": "4.0.18", "happy-dom": "*", "jsdom": "*" }, "optionalPeers": ["@edge-runtime/vm", "@opentelemetry/api", "@types/node", "@vitest/browser-playwright", "@vitest/browser-preview", "@vitest/browser-webdriverio", "@vitest/ui", "happy-dom", "jsdom"], "bin": { "vitest": "vitest.mjs" } }, "sha512-hOQuK7h0FGKgBAas7v0mSAsnvrIgAvWmRFjmzpJ7SwFHH3g1k2u37JtYwOwmEKhK6ZO3v9ggDBBm0La1LCK4uQ=="],
 
     "w3c-xmlserializer": ["w3c-xmlserializer@5.0.0", "", { "dependencies": { "xml-name-validator": "^5.0.0" } }, "sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA=="],
-
-    "web-tree-sitter": ["web-tree-sitter@0.25.10", "", { "peerDependencies": { "@types/emscripten": "^1.40.0" }, "optionalPeers": ["@types/emscripten"] }, "sha512-Y09sF44/13XvgVKgO2cNDw5rGk6s26MgoZPXLESvMXeefBf7i6/73eFurre0IsTW6E14Y0ArIzhUMmjoc7xyzA=="],
 
     "webidl-conversions": ["webidl-conversions@8.0.1", "", {}, "sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ=="],
 

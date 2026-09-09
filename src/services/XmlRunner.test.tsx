@@ -24,7 +24,6 @@ const makeWrapper = (convert: (input: string, options?: unknown) => string) => {
   const value = {
     loadSuccess: true,
     loadError: false,
-    lex: undefined,
     bitmarkToObjects: undefined,
     convert,
     version: 'test',
@@ -125,7 +124,6 @@ describe.each(VARIANTS)('useXmlRunner(%s)', (variant) => {
           {
             loadSuccess: false,
             loadError: false,
-            lex: undefined,
             bitmarkToObjects: undefined,
             convert: undefined,
             version: '',

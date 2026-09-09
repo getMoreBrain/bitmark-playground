@@ -9,6 +9,7 @@ import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
+import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { applyXmlEdit } from '../../services/XmlRunner';
@@ -74,7 +75,7 @@ const XmlPanel = ({ variant, xml, errorAsString }: XmlPanelProps) => {
 
   return (
     <MonacoTextArea
-      theme="vs-dark"
+      theme={MONACO_THEME}
       language="xml"
       value={value}
       options={DEFAULT_MONACO_OPTIONS}

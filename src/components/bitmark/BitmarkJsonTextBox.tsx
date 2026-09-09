@@ -8,6 +8,7 @@ import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
+import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
@@ -107,7 +108,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     return (
       <MonacoTextArea
         {...restProps}
-        theme="vs-dark"
+        theme={MONACO_THEME}
         language="json"
         value={value}
         options={opts}

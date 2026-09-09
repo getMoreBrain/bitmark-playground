@@ -21,6 +21,7 @@ export const editor = {
 export const languages = {
   register: () => {},
   registerCompletionItemProvider: () => ({ dispose: () => {} }),
+  registerDocumentSemanticTokensProvider: () => ({ dispose: () => {} }),
   setMonarchTokensProvider: () => ({ dispose: () => {} }),
   setLanguageConfiguration: () => ({ dispose: () => {} }),
 };

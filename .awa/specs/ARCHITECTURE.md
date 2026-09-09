@@ -7,7 +7,7 @@ bitmark Playground is a web-based tool that enables real-time bidirectional conv
 ## System Overview
 
 - UI Layer — React SPA with side-by-side editor panels
-- Editor Layer — Monaco Editor with tree-sitter syntax highlighting
+- Editor Layer — Monaco Editor with bitmark highlighting from the WASM parser's semantic tokens
 - Parser Layer — Pluggable bitmark parsers loaded dynamically from CDN
 - State Layer — Reactive state management via Valtio
 - Build Layer — Bun-based build tooling with react-app-rewired
@@ -16,8 +16,7 @@ bitmark Playground is a web-based tool that enables real-time bidirectional conv
 
 - `React 18` — UI framework
 - `TypeScript 5` — Type-safe development
-- `Monaco Editor 0` — Code editor component
-- `web-tree-sitter 0` — Syntax highlighting via tree-sitter grammars
+- `Monaco Editor 0` — Code editor component (semantic tokens feature for bitmark highlighting)
 - `Valtio 1` — Proxy-based reactive state management
 - `Theme UI 0` — Themeable component styling
 - `react-app-rewired 2` — CRA configuration overrides without ejecting
@@ -37,7 +36,7 @@ flowchart LR
 
     subgraph Editor["Editor Layer"]
         Monaco[Monaco Editor]
-        TreeSitter[Tree-Sitter Highlighter]
+        SemTokens[Bitmark Semantic Tokens Provider]
     end
 
     subgraph Parser["Parser Layer"]
@@ -52,7 +51,8 @@ flowchart LR
 
     MarkupEditor --> Monaco
     JsonEditor --> Monaco
-    Monaco --> TreeSitter
+    Monaco --> SemTokens
+    SemTokens --> BP
     MarkupEditor -- "markup → json" --> BitmarkState
     JsonEditor -- "json → markup" --> BitmarkState
     BitmarkState --> BPG
@@ -75,9 +75,7 @@ src/components/generic/           # Reusable generic UI components and utilities
 src/services/                     # Parser loading, conversion, and application info services
 src/state/                        # Valtio-based reactive state
 src/theme/                        # Theme UI theme configuration
-src/monaco-tree-sitter/           # Tree-sitter integration for Monaco syntax highlighting
-src/monaco-tree-sitter/grammars/  # Tree-sitter grammar definitions (JSON)
-src/monaco-tree-sitter/themes/    # Tree-sitter theme definitions (JSON)
+src/monaco-bitmark/               # Bitmark language, theme and semantic tokens provider for Monaco
 src/logging/                      # Console logging wrapper
 src/utils/                        # Shared utility functions
 src/generated/                    # Auto-generated build metadata
@@ -106,19 +104,20 @@ CONSTRAINTS
 
 ### Editor Layer
 
-Monaco Editor instances with tree-sitter-based syntax highlighting for bitmark markup.
+Monaco Editor instances with bitmark highlighting driven by the WASM parser's semantic tokens (LSP shape).
 
 RESPONSIBILITIES
 
 - Provide code editing with Monaco Editor
-- Apply tree-sitter grammar highlighting for bitmark language
+- Register the `bitmark` language and its token stylesheet, and apply the parser's `semanticTokens` to each bitmark editor as inline decorations (debounced on content change)
 - Auto-resize editors to fit container via ResizeObserver
 - Suppress re-renders when editor has focus (uncontrolled input pattern)
 
 CONSTRAINTS
 
 - Only JSON language mode uses built-in Monaco highlighting
-- Bitmark language highlighting requires tree-sitter WASM initialization
+- Bitmark highlighting is available only once the WASM parser has loaded; attached editors re-highlight at that point
+- Bitmark editors apply tokens as decorations directly rather than through Monaco's semantic tokens feature, whose 300 ms minimum request delay makes typing feel laggy
 - Monaco webpack plugin must be configured via config-overrides.js
 
 ### Parser Layer
@@ -218,7 +217,7 @@ sequenceDiagram
 - State mutations MUST go through Valtio proxy setter methods
 - UI components MUST read state via `useSnapshot`, never directly from proxy
 - Monaco editor components MUST suppress re-renders when focused (uncontrolled pattern)
-- Tree-sitter WASM MUST be initialized before applying syntax highlighting
+- Bitmark highlighting MUST come from the WASM parser's semantic tokens, never from a separate grammar
 - Webpack overrides MUST use react-app-rewired, not CRA ejection
 - Build info MUST be auto-generated from package.json before each build/start
 
@@ -238,3 +237,4 @@ Core markup-to-JSON and JSON-to-markup conversion is functional. Deployed to Git
 ## Change Log
 
 - 1.0.0 (2026-02-17): Initial architecture
+- 1.1.0 (2026-09-09): Tree-sitter highlighting replaced by the WASM parser's semantic tokens (PLAN-016)

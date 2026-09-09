@@ -23,12 +23,18 @@ const fakeWasm = {
   loadSuccess: true,
   loadError: false,
   version: 'test',
-  lex: () => 'lexout',
   bitmarkToObjects: (markup: string, opts?: { mode?: string }) => {
     if (markup === 'BAD') throw new Error('wasm parse bad');
     return [{ kind: 'wasm', mode: opts?.mode, src: markup }];
   },
-  convert: (json: string, opts?: { mode?: string }) => {
+  convert: (json: string, opts?: { mode?: string; outputFormat?: string }) => {
+    // 7.x lexer: `outputFormat: 'lex'` returns the token stream as a JSON array.
+    if (opts?.outputFormat === 'lex') {
+      if (json === 'LEXERR') return 'error: lexer exploded';
+      return JSON.stringify([
+        { kind: 'Text(Body, false)', span: { start: 0, end: json.length }, text: json },
+      ]);
+    }
     if (json === 'BAD') throw new Error('wasm convert bad');
     // The string API reports failures by returning an `error: …` string.
     if (json === 'ERRSTR') return 'error: InvalidJson at offset 0: unexpected end of input';
@@ -145,5 +151,29 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     expect(bitmarkState.wasm.markupError?.message).toContain('InvalidJson');
     // The error message must never be stored as markup.
     expect(bitmarkState.wasm.markup).not.toContain('InvalidJson');
+  });
+
+  it('lexes the WASM optimized markup via convert: token lines on the bitmark side, token JSON on the JSON side', async () => {
+    const { result } = renderHook(() => useBitmarkConverter(), { wrapper });
+
+    await act(async () => {
+      await result.current.markupToJson('wasm', 'M');
+    });
+
+    expect(bitmarkState.wasm.lexerOutput).toBe('Text(Body, false) Span { start: 0, end: 1 } "M"');
+    expect(JSON.parse(bitmarkState.wasmFull.lexerOutput)).toEqual([
+      { kind: 'Text(Body, false)', span: { start: 0, end: 1 }, text: 'M' },
+    ]);
+  });
+
+  it('reports an `error:` string from the lexer as a lexer error on both sides', async () => {
+    const { result } = renderHook(() => useBitmarkConverter(), { wrapper });
+
+    await act(async () => {
+      await result.current.markupToJson('wasm', 'LEXERR');
+    });
+
+    expect(bitmarkState.wasm.lexerOutput).toMatch(/^Lexer error: .*lexer exploded/);
+    expect(bitmarkState.wasmFull.lexerOutput).toMatch(/^Lexer error: .*lexer exploded/);
   });
 });

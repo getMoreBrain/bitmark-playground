@@ -1,5 +1,6 @@
 // @awa-component: PLAN-002-BitmarkConverter
 // @awa-component: PLAN-008-BitmarkConverter
+import type { LexToken } from '@gmb/bitmark-parser';
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
 import { useCallback } from 'react';
 
@@ -14,6 +15,19 @@ const PARSERS: readonly ParserType[] = ['js', 'wasm', 'wasmFull'];
 // Exported so other bpg consumers (e.g. JsRoundTripRunner) convert identically.
 export const JS_MARKUP_TO_JSON_OPTIONS: ConvertOptions = { jsonOptions: { enableWarnings: true } };
 export const JS_JSON_TO_MARKUP_OPTIONS: ConvertOptions = { bitmarkOptions: { prettifyJson: true } };
+
+// WASM lexer (7.x): the former `lex()` export is now the `lex` output format of
+// `convert`, which returns the token stream as a JSON array of `LexToken`.
+const WASM_LEX_OPTIONS = { inputFormat: 'bitmark', outputFormat: 'lex', pretty: true } as const;
+
+/** Render lexer tokens one per line, mirroring the pre-7 `lex()` text dump. */
+const formatLexTokens = (tokens: LexToken[]): string =>
+  tokens
+    .map(
+      (t) =>
+        `${t.kind} Span { start: ${t.span.start}, end: ${t.span.end} } ${JSON.stringify(t.text)}`,
+    )
+    .join('\n');
 
 interface M2JResult {
   json?: BitWrapperJson[];
@@ -43,7 +57,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
     loadError: jsLoadError,
   } = useBitmarkParserGenerator();
   const {
-    lex: wasmLex,
     bitmarkToObjects: wasmBitmarkToObjects,
     convert: wasmConvert,
     loadSuccess: wasmLoadSuccess,
@@ -117,21 +130,22 @@ const useBitmarkConverter = (): BitmarkConverter => {
     [bitmarkParserGenerator, wasmConvert],
   );
 
-  // Lex the WASM optimized tab's markup into both lexer outputs (lex + lex-json).
+  // Lex the WASM optimized tab's markup into both lexer outputs:
+  // bitmark side = one token per line, JSON side = the token JSON.
   const lexWasmOptimized = useCallback(() => {
-    if (!wasmLex) return;
+    if (!wasmConvert) return;
     const markup = bitmarkState.wasm.markup;
     try {
-      bitmarkState.setLexerOutput('wasm', wasmLex(markup));
+      const tokensJson = throwIfParserError(wasmConvert(markup, WASM_LEX_OPTIONS));
+      const tokens = JSON.parse(tokensJson) as LexToken[];
+      bitmarkState.setLexerOutput('wasm', formatLexTokens(tokens));
+      bitmarkState.setLexerOutput('wasmFull', tokensJson);
     } catch (e) {
-      bitmarkState.setLexerOutput('wasm', `Lexer error: ${String(e)}`);
+      const message = `Lexer error: ${String(e)}`;
+      bitmarkState.setLexerOutput('wasm', message);
+      bitmarkState.setLexerOutput('wasmFull', message);
     }
-    try {
-      bitmarkState.setLexerOutput('wasmFull', wasmLex(markup, { stage: 'lex-json' }));
-    } catch (e) {
-      bitmarkState.setLexerOutput('wasmFull', `Lexer error: ${String(e)}`);
-    }
-  }, [wasmLex]);
+  }, [wasmConvert]);
 
   // @awa-impl: PLAN-008-Step2 (markupToJson: forward calc + per-tab round-trip back-fill)
   const markupToJson = useCallback(

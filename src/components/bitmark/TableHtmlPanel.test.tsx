@@ -25,8 +25,8 @@ const fakeWasmParser = {
   loadError: false,
   bitmarkToObjects: () => [],
   convert: () => '',
-  lex: () => '',
   info: () => '',
+  semanticTokens: undefined,
   version: 'test',
 };
 
@@ -59,7 +59,6 @@ describe('TableHtmlPanel', () => {
               {
                 loadSuccess: false,
                 loadError: false,
-                lex: undefined,
                 bitmarkToObjects: undefined,
                 convert: undefined,
                 version: '',
