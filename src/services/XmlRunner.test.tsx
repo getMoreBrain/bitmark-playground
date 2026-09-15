@@ -23,6 +23,7 @@ type ContextValue = Parameters<typeof BitmarkParserContext.Provider>[0]['value']
 const makeWrapper = (convert: (input: string, options?: unknown) => string) => {
   const value = {
     loadSuccess: true,
+    markupReady: true,
     loadError: false,
     bitmarkToObjects: undefined,
     convert,

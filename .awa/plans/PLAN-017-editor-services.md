@@ -1,6 +1,6 @@
 # PLAN-017: Editor Services — Diagnostics, Completion and Hover from the WASM Parser
 
-STATUS: in-progress  <!-- Steps 1-8 done; Step 9 (ARCHITECTURE, version, port to main) waits on the parser release -->
+STATUS: in-progress  <!-- Steps 1-8, 9, 10 done; Step 11 (ARCHITECTURE, version, port to main) waits on the parser release -->
 DIRECTION: bottom-up
 TRACEABILITY: Builds on PLAN-016 (highlighting from the parser's semantic tokens). Requires the parser release that carries the editor services (bitmark-parser PLAN-196, contract `API-EDT-editor-services.tsp`); until then, `?engine=local`.
 
@@ -67,7 +67,9 @@ end to end.
 - [x] Step 6 — `?engine=local`: `engineUrl()` in the parser service, and the `localEngine` Vite plugin serving the sibling parser build (and its schema) at `/local-engine`.
 - [x] Step 7 — Tests: markers, kind mapping, the replaced-prefix rule, hover conversion, the schema binding, the runner, `engineUrl`.
 - [x] Step 8 — Verified in a real browser (headless Chromium over the dev server, `?engine=local`, driving the DOM only): squiggles for an unknown property, an unpaired mark and an unknown bit type (1 error / 2 warnings / 1 info); the marker's own hover carrying the message and the parser's code (`bitmark(unknown-property)`); completion inside a `[.cloze]` tag listing that bit's tags with their format and effective count (`@revealSolutions boolean · 0..1`, `@id string · 0..∞`, …); completion in a header listing bit types with their titles (`article Article`, `article-ai AI Article`, …); hover on `[@id:5]` showing format, count, default and JSON key. No console errors. The completion answer itself proves the LOCAL engine served the page — the published 7.0.0 has no `complete` export.
-- [ ] Step 9 — ARCHITECTURE.md, version bump; port onto `main` (which keeps loading the published engine) once the parser release is out.
+- [ ] Step 11 — ARCHITECTURE.md, version bump; port onto `main` (which keeps loading the published engine) once the parser release is out.
+- [x] Step 9 — Lazy documentation (parser PLAN-202): the parser's `complete` no longer ships `documentation`; the provider remembers each suggestion's query and item (`BitmarkSuggestion.bitmark`) and Monaco's `resolveCompletionItem` asks the parser's `resolve` for the one item about to be shown (`resolveMonacoSuggestion`; a parser without `resolve`, a suggestion without its query, or a failure leaves the suggestion as it is). `EditorServicesRunner` installs the fourth source.
+- [x] Step 10 — Completion as an editor uses it (parser PLAN-203): `quickSuggestions` off for the bitmark editor (the list opens on trigger characters and Ctrl+Space); the provider passes Monaco's `triggerCharacter` on (`triggerCharacterOf`) so a `.` typed in prose answers nothing; the engine loads in two stages — `bitmark-json` first so the editor is live sooner, then `full` in the background (`markupReady` gates the markup panels; `info` arrives with it) so bit and tag descriptions show; the theme styles the parser's four inline-mark modifiers (`bold`, `italic`, `highlight`, `light`).
 
 ## Functional Requirements
 

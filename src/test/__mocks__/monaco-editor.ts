@@ -67,6 +67,10 @@ export const languages = {
     Snippet: 27,
   },
   CompletionItemTag: { Deprecated: 1 },
+  /** Monaco's own values (`monaco.languages.CompletionItemInsertTextRule`). */
+  CompletionItemInsertTextRule: { None: 0, KeepWhitespace: 1, InsertAsSnippet: 4 },
+  /** Monaco's own values (`monaco.languages.CompletionTriggerKind`). */
+  CompletionTriggerKind: { Invoke: 0, TriggerCharacter: 1, TriggerForIncompleteCompletions: 2 },
   json: {
     jsonDefaults: {
       setDiagnosticsOptions: (..._args: unknown[]) => {},

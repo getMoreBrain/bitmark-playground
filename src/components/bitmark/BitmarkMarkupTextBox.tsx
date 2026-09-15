@@ -18,6 +18,10 @@ import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/Monac
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   renderWhitespace: 'all',
   insertSpaces: false,
+  // Bitmark is prose with markup in it: the suggestion list opens on the
+  // characters that begin a construct (`[`, `=`, …) and on Ctrl+Space, never
+  // on every letter typed (parser PLAN-203 D1).
+  quickSuggestions: false,
 };
 
 export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledProps {

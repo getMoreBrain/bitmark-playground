@@ -31,6 +31,7 @@ describe('SemanticTokensRunner', () => {
   it('installs the parser semanticTokens once the parser has loaded, and removes it on unmount', () => {
     const { unmount } = renderWith({
       loadSuccess: true,
+      markupReady: true,
       semanticTokens: semanticTokens as unknown as ContextValue['semanticTokens'],
     });
     expect(setBitmarkSemanticTokensSource).toHaveBeenLastCalledWith(semanticTokens);

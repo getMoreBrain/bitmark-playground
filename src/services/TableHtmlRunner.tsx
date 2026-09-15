@@ -133,10 +133,11 @@ const applyHtmlEdit = async (
 
 // @awa-impl: PLAN-007-Step2 (Original bitmark -> HTML refresh)
 const useTableHtmlRunner = (): void => {
-  const { convert: wasmConvert, loadSuccess } = useBitmarkParser();
+  const { convert: wasmConvert, loadSuccess, markupReady } = useBitmarkParser();
 
   useEffect(() => {
-    if (!loadSuccess || !wasmConvert) return;
+    // A markup format needs the `full` engine (stage 2 of the load).
+    if (!loadSuccess || !wasmConvert || !markupReady) return;
 
     const run = (markup: string) => {
       if (markup === '') {
@@ -182,7 +183,7 @@ const useTableHtmlRunner = (): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess]);
+  }, [wasmConvert, loadSuccess, markupReady]);
 };
 
 // Renderless component that drives the Original -> HTML refresh. Mount once

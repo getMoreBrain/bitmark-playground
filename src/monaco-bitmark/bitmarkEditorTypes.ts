@@ -70,6 +70,8 @@ export interface BitmarkCompletionItem {
   preselect?: boolean;
   sortText: string;
   insertText: string;
+  /** `2` when `insertText` is an LSP snippet (parser PLAN-203: the inline mark). */
+  insertTextFormat?: number;
   data?: unknown;
 }
 
@@ -95,8 +97,20 @@ export type DiagnosticsSource = (
 export type CompleteSource = (
   input: string,
   position: EditorPosition,
-  options?: { positionEncoding?: string; includeDeprecated?: boolean },
+  options?: { positionEncoding?: string; includeDeprecated?: boolean; triggerCharacter?: string },
 ) => BitmarkCompletionList;
+
+/**
+ * The parser's `resolve` (parser PLAN-202): `complete` ships no
+ * documentation; this fills it in for the one item the editor is about to
+ * show, given the query it came from and the item as listed.
+ */
+export type ResolveSource = (
+  input: string,
+  position: EditorPosition,
+  item: BitmarkCompletionItem,
+  options?: { positionEncoding?: string; includeDeprecated?: boolean },
+) => BitmarkCompletionItem;
 
 export type HoverSource = (
   input: string,

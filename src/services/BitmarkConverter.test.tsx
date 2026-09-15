@@ -21,6 +21,7 @@ const fakeBpg = {
 
 const fakeWasm = {
   loadSuccess: true,
+  markupReady: true,
   loadError: false,
   version: 'test',
   bitmarkToObjects: (markup: string, opts?: { mode?: string }) => {

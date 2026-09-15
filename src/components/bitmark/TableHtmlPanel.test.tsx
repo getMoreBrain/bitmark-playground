@@ -11,6 +11,7 @@ import { TableHtmlPanel } from './TableHtmlPanel';
 
 const fakeParserGenerator = {
   loadSuccess: true,
+  markupReady: true,
   loadError: false,
   bitmarkParserGenerator: {
     convert: async () => '',
@@ -22,6 +23,7 @@ const fakeParserGenerator = {
 
 const fakeWasmParser = {
   loadSuccess: true,
+  markupReady: true,
   loadError: false,
   bitmarkToObjects: () => [],
   convert: () => '',
@@ -29,6 +31,7 @@ const fakeWasmParser = {
   semanticTokens: undefined,
   diagnostics: undefined,
   complete: undefined,
+  resolve: undefined,
   hover: undefined,
   version: 'test',
 };

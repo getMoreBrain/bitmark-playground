@@ -22,6 +22,7 @@ import type {
   CompleteSource,
   DiagnosticsSource,
   HoverSource,
+  ResolveSource,
 } from '../monaco-bitmark/bitmarkEditorTypes';
 import { registerBitmarkJsonSchema } from '../monaco-bitmark/bitmarkJsonSchema';
 
@@ -77,6 +78,7 @@ interface BitmarkParserModule {
   // then runs without markers, completion or hover.
   diagnostics?: DiagnosticsSource;
   complete?: CompleteSource;
+  resolve?: ResolveSource;
   hover?: HoverSource;
 }
 
@@ -87,12 +89,21 @@ interface BitmarkParserProviderProps {
 interface IBitmarkParserContext {
   loadSuccess: boolean;
   loadError: boolean;
+  /**
+   * The engine loads in two stages (parser PLAN-203 D4): `bitmark-json`
+   * first — the smallest variant, bitmark ↔ JSON and the editor services,
+   * so the editor is live sooner — then `full` in the background, which adds
+   * the markup formats (HTML, XML, the mapping report), `info` as text and
+   * the descriptions. `markupReady` says the second stage has landed.
+   */
+  markupReady: boolean;
   bitmarkToObjects: typeof bitmarkToObjectsFn | undefined;
   convert: typeof convertFn | undefined;
   info: typeof infoFn | undefined;
   semanticTokens: typeof semanticTokensFn | undefined;
   diagnostics: DiagnosticsSource | undefined;
   complete: CompleteSource | undefined;
+  resolve: ResolveSource | undefined;
   hover: HoverSource | undefined;
   version: string;
 }
@@ -100,12 +111,14 @@ interface IBitmarkParserContext {
 const defaultState: IBitmarkParserContext = {
   loadSuccess: false,
   loadError: false,
+  markupReady: false,
   bitmarkToObjects: undefined,
   convert: undefined,
   info: undefined,
   semanticTokens: undefined,
   diagnostics: undefined,
   complete: undefined,
+  resolve: undefined,
   hover: undefined,
   version: '',
 };
@@ -130,10 +143,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // Load ES module via dynamic import
         const module = (await import(/* @vite-ignore */ moduleUrl)) as BitmarkParserModule;
 
-        // Initialize WASM. The browser entry defaults to the `browser-full`
-        // variant (7.x), which has the same conversion capabilities as the
-        // single pre-7 browser build.
-        await module.init();
+        // Stage 1: the smallest variant, so the editor is live as soon as
+        // possible — bitmark ↔ JSON, highlighting, diagnostics, completion
+        // and hover. `info` waits: this variant renders it as JSON only.
+        await module.init({ feature: 'bitmark-json' });
 
         // Get version from the library itself
         const resolvedVersion = module.version();
@@ -143,29 +156,46 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // engine: a failure leaves JSON syntax checking as it was.
         void registerBitmarkJsonSchema(moduleUrl);
 
-        setState({
+        const loaded: IBitmarkParserContext = {
           loadSuccess: true,
           loadError: false,
+          markupReady: false,
           bitmarkToObjects: module.bitmarkToObjects,
           convert: module.convert,
-          info: module.info,
+          info: undefined,
           semanticTokens: module.semanticTokens,
           diagnostics: module.diagnostics,
           complete: module.complete,
+          resolve: module.resolve,
           hover: module.hover,
           version: resolvedVersion,
-        });
+        };
+        setState(loaded);
+
+        // Stage 2: `full` — the markup formats, `info` as text, and the
+        // `info` meta layer (bit and tag descriptions, which completion
+        // documentation and hover show). Loads in the background while
+        // stage 1 keeps serving; the package swaps atomically. A failure
+        // here leaves stage 1 in place.
+        try {
+          await module.init({ feature: 'full' });
+          setState({ ...loaded, markupReady: true, info: module.info });
+        } catch (e) {
+          log.error('BitmarkParserProvider: the full engine failed to load', e);
+        }
       } catch (e) {
         log.error('BitmarkParserProvider: failed to load', e);
         setState({
           loadSuccess: false,
           loadError: true,
+          markupReady: false,
           bitmarkToObjects: undefined,
           convert: undefined,
           info: undefined,
           semanticTokens: undefined,
           diagnostics: undefined,
           complete: undefined,
+          resolve: undefined,
           hover: undefined,
           version: '',
         });

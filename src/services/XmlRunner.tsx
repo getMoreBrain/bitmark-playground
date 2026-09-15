@@ -163,10 +163,11 @@ const applyXmlEdit = async (
 
 // @awa-impl: PLAN-013-Step2 (WASM bitmark -> XML refresh, per variant)
 const useXmlRunner = (variant: XmlVariant): void => {
-  const { convert: wasmConvert, loadSuccess } = useBitmarkParser();
+  const { convert: wasmConvert, loadSuccess, markupReady } = useBitmarkParser();
 
   useEffect(() => {
-    if (!loadSuccess || !wasmConvert) return;
+    // A markup format needs the `full` engine (stage 2 of the load).
+    if (!loadSuccess || !wasmConvert || !markupReady) return;
 
     const run = (markup: string) => {
       if (markup === '') {
@@ -213,7 +214,7 @@ const useXmlRunner = (variant: XmlVariant): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess, variant]);
+  }, [wasmConvert, loadSuccess, variant, markupReady]);
 };
 
 export interface XmlRunnerProps {

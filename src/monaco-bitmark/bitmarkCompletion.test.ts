@@ -1,12 +1,14 @@
 // @awa-test: PLAN-017-Step2 (parser complete -> Monaco suggestions)
 import * as monaco from 'monaco-editor';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   COMPLETION_TRIGGER_CHARACTERS,
   monacoKind,
   replacedPrefixLength,
+  resolveMonacoSuggestion,
   toMonacoSuggestion,
+  triggerCharacterOf,
 } from './bitmarkCompletion';
 import { BitmarkCompletionItem, LspCompletionKind } from './bitmarkEditorTypes';
 
@@ -79,6 +81,18 @@ describe('toMonacoSuggestion', () => {
     expect(toMonacoSuggestion(item(), position, '[@i').tags).toBeUndefined();
   });
 
+  it('inserts a snippet as a snippet, and plain text as plain text', () => {
+    const mark = toMonacoSuggestion(
+      item({ label: '==', insertText: '==${1:text}==|${2:bold}|', insertTextFormat: 2 }),
+      position,
+      '=',
+    );
+    expect(mark.insertTextRules).toBe(
+      monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+    );
+    expect(toMonacoSuggestion(item(), position, '[@i').insertTextRules).toBeUndefined();
+  });
+
   it('inserts what the parser asked for, which can differ from the label', () => {
     // A valued inline attribute: the label is the key, the insert adds the `:`.
     const s = toMonacoSuggestion(
@@ -96,5 +110,53 @@ describe('COMPLETION_TRIGGER_CHARACTERS', () => {
     for (const c of ['[', '.', '@', '&', ':', '|', '=', '-']) {
       expect(COMPLETION_TRIGGER_CHARACTERS).toContain(c);
     }
+  });
+});
+
+describe('resolveMonacoSuggestion', () => {
+  const position = { lineNumber: 2, column: 4 };
+  const query = { input: '[.article]\n[@i', position: { line: 1, character: 3 } };
+  const listed = item({ documentation: undefined });
+
+  it('asks the parser for THIS item at the query it came from, and carries the Markdown', () => {
+    const resolver = vi.fn(() => ({
+      ...listed,
+      documentation: { kind: 'markdown' as const, value: '**`[@id]`**\n\n- format: `string`' },
+    }));
+    const s = toMonacoSuggestion(listed, position, '[@i', query);
+    expect(s.documentation).toBeUndefined();
+    const r = resolveMonacoSuggestion(s, resolver);
+    expect(resolver).toHaveBeenCalledWith(query.input, query.position, listed);
+    expect((r.documentation as { value: string }).value).toContain('- format: `string`');
+    expect(r.label).toBe('@id');
+  });
+
+  it('leaves a suggestion alone without a query, without a parser, or when the parser has nothing', () => {
+    const bare = toMonacoSuggestion(listed, position, '[@i');
+    expect(resolveMonacoSuggestion(bare, vi.fn())).toBe(bare);
+    const s = toMonacoSuggestion(listed, position, '[@i', query);
+    expect(resolveMonacoSuggestion(s, undefined)).toBe(s);
+    expect(resolveMonacoSuggestion(s, () => listed)).toBe(s);
+  });
+
+  it('survives a parser failure', () => {
+    const s = toMonacoSuggestion(listed, position, '[@i', query);
+    const failing = () => {
+      throw new Error('boom');
+    };
+    expect(resolveMonacoSuggestion(s, failing)).toBe(s);
+  });
+});
+
+describe('triggerCharacterOf', () => {
+  it('passes the trigger character on, and nothing for an explicit invocation', () => {
+    const K = monaco.languages.CompletionTriggerKind;
+    expect(triggerCharacterOf({ triggerKind: K.TriggerCharacter, triggerCharacter: '[' })).toBe(
+      '[',
+    );
+    expect(triggerCharacterOf({ triggerKind: K.Invoke })).toBeUndefined();
+    expect(
+      triggerCharacterOf({ triggerKind: K.TriggerForIncompleteCompletions, triggerCharacter: '.' }),
+    ).toBeUndefined();
   });
 });

@@ -17,6 +17,7 @@ const bits = (...types: string[]): BitWrapperJson[] =>
 const makeWrapper = (info: (options?: unknown) => string) => {
   const value = {
     loadSuccess: true,
+    markupReady: true,
     loadError: false,
     bitmarkToObjects: undefined,
     convert: undefined,

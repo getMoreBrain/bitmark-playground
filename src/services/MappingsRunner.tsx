@@ -35,10 +35,11 @@ let markSeq = 0;
 
 // @awa-impl: PLAN-014-Step2 (mapping report for the last edited window)
 const useMappingsRunner = (): void => {
-  const { convert: wasmConvert, loadSuccess } = useBitmarkParser();
+  const { convert: wasmConvert, loadSuccess, markupReady } = useBitmarkParser();
 
   useEffect(() => {
-    if (!loadSuccess || !wasmConvert) return;
+    // A markup format needs the `full` engine (stage 2 of the load).
+    if (!loadSuccess || !wasmConvert || !markupReady) return;
 
     let lastUpdates = -1;
 
@@ -87,7 +88,7 @@ const useMappingsRunner = (): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess]);
+  }, [wasmConvert, loadSuccess, markupReady]);
 };
 
 // Renderless component driving the Mappings report. Mount once inside

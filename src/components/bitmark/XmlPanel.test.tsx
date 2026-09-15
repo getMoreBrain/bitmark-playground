@@ -14,6 +14,7 @@ const XML_DOC = '<bit type="article"><node type="paragraph">hi</node></bit>';
 
 const fakeParserGenerator = {
   loadSuccess: true,
+  markupReady: true,
   loadError: false,
   bitmarkParserGenerator: {
     convert: async () => '',
@@ -24,6 +25,7 @@ const fakeParserGenerator = {
 
 const fakeWasmParser = {
   loadSuccess: true,
+  markupReady: true,
   loadError: false,
   bitmarkToObjects: () => [],
   convert: () => '',
@@ -31,6 +33,7 @@ const fakeWasmParser = {
   semanticTokens: undefined,
   diagnostics: undefined,
   complete: undefined,
+  resolve: undefined,
   hover: undefined,
   version: 'test',
 };

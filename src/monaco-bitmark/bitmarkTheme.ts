@@ -74,11 +74,22 @@ export const TOKEN_STYLES: Record<SemanticTokenType, TokenStyle> = {
   plainText: { color: TEXT },
 };
 
+/**
+ * The style modifiers an inline mark's chain sets on its text (parser
+ * PLAN-203 D3: `==x==\|bold\|` renders as `**x**` does). Named here until the
+ * published parser types carry them.
+ */
+type StyleModifier = 'bold' | 'italic' | 'highlight' | 'light';
+
 /** Modifiers that change a token's look (the tag-class modifiers do not). */
 export const STYLED_MODIFIERS = {
   comment: { color: COMMENT, fontStyle: 'italic' },
   unclosed: { color: MARK, textDecoration: 'underline' },
-} as const satisfies Partial<Record<SemanticTokenModifier, TokenStyle>>;
+  bold: { color: EMPHASIS, fontWeight: 'bold' },
+  italic: { color: EMPHASIS, fontStyle: 'italic' },
+  highlight: { color: HIGHLIGHT },
+  light: { color: LIGHT },
+} as const satisfies Partial<Record<SemanticTokenModifier | StyleModifier, TokenStyle>>;
 
 const TYPE_CLASS_PREFIX = 'bm-tok-';
 const MODIFIER_CLASS_PREFIX = 'bm-mod-';

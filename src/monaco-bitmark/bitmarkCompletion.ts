@@ -2,7 +2,13 @@
 import * as monaco from 'monaco-editor';
 
 import { log } from '../logging/log';
-import { BitmarkCompletionItem, CompleteSource, LspCompletionKind } from './bitmarkEditorTypes';
+import {
+  BitmarkCompletionItem,
+  CompleteSource,
+  EditorPosition,
+  LspCompletionKind,
+  ResolveSource,
+} from './bitmarkEditorTypes';
 import { BITMARK_LANGUAGE_ID } from './bitmarkLanguage';
 
 /**
@@ -53,14 +59,31 @@ export const replacedPrefixLength = (before: string, label: string): number => {
   return 0;
 };
 
+/** The query a suggestion came from — what the parser's `resolve` needs. */
+export interface CompletionQuery {
+  input: string;
+  position: EditorPosition;
+}
+
+/**
+ * A Monaco suggestion that remembers its query and its parser item, so
+ * `resolveCompletionItem` can ask the parser for the documentation of THIS
+ * item. Monaco hands the provider's own object back, extra fields intact.
+ */
+export interface BitmarkSuggestion extends monaco.languages.CompletionItem {
+  bitmark?: { query: CompletionQuery; item: BitmarkCompletionItem };
+}
+
 /** One parser item as a Monaco suggestion, anchored at `position`. */
 export const toMonacoSuggestion = (
   item: BitmarkCompletionItem,
   position: monaco.IPosition,
   lineBeforeCursor: string,
-): monaco.languages.CompletionItem => {
+  query?: CompletionQuery,
+): BitmarkSuggestion => {
   const replaced = replacedPrefixLength(lineBeforeCursor, item.label);
   return {
+    bitmark: query ? { query, item } : undefined,
     label: item.label,
     kind: monacoKind(item.kind),
     detail: item.detail,
@@ -71,6 +94,11 @@ export const toMonacoSuggestion = (
     preselect: item.preselect,
     sortText: item.sortText,
     insertText: item.insertText,
+    // LSP `insertTextFormat` 2 is a snippet (`${1:text}` placeholders).
+    insertTextRules:
+      item.insertTextFormat === 2
+        ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+        : undefined,
     filterText: item.label,
     range: {
       startLineNumber: position.lineNumber,
@@ -82,31 +110,79 @@ export const toMonacoSuggestion = (
 };
 
 let source: CompleteSource | undefined;
+let resolveSource: ResolveSource | undefined;
 
 /** Install (or, with `undefined`, remove) the parser's `complete`. */
 export const setBitmarkCompleteSource = (next: CompleteSource | undefined): void => {
   source = next;
 };
 
+/** Install (or, with `undefined`, remove) the parser's `resolve`. */
+export const setBitmarkResolveSource = (next: ResolveSource | undefined): void => {
+  resolveSource = next;
+};
+
+/**
+ * Fill in a suggestion's documentation from the parser (LSP
+ * `completionItem/resolve`): the list ships none, so the parser renders it
+ * for the one item Monaco is about to show. A suggestion without its query
+ * (an older list), a parser without `resolve`, or a failure leaves the
+ * suggestion as it is.
+ */
+export const resolveMonacoSuggestion = (
+  suggestion: monaco.languages.CompletionItem,
+  resolver: ResolveSource | undefined = resolveSource,
+): monaco.languages.CompletionItem => {
+  const { bitmark } = suggestion as BitmarkSuggestion;
+  if (!resolver || !bitmark) return suggestion;
+  try {
+    const resolved = resolver(bitmark.query.input, bitmark.query.position, bitmark.item);
+    if (!resolved.documentation) return suggestion;
+    return {
+      ...suggestion,
+      documentation: { value: resolved.documentation.value, isTrusted: false },
+    };
+  } catch (e) {
+    log.error('bitmark completion resolve failed', e);
+    return suggestion;
+  }
+};
+
 let registered: monaco.IDisposable | undefined;
+
+/**
+ * The character to tell the parser about (LSP `triggerCharacter`): the one
+ * that opened this query, and nothing when it was invoked explicitly. The
+ * parser answers a trigger that opens nothing where the cursor is — a `.`
+ * or a `-` typed in prose — with an empty list (parser PLAN-203 D1).
+ */
+export const triggerCharacterOf = (
+  context: monaco.languages.CompletionContext,
+): string | undefined =>
+  context.triggerKind === monaco.languages.CompletionTriggerKind.TriggerCharacter
+    ? context.triggerCharacter
+    : undefined;
 
 /**
  * Register the bitmark completion provider (idempotent). It asks the parser
  * what is valid at the cursor and hands the answer to Monaco; the parser
  * returns every candidate for the context and Monaco filters by what was
- * typed.
+ * typed. Documentation is resolved lazily, one item at a time, when Monaco
+ * is about to show it.
  */
 export const registerBitmarkCompletion = (): void => {
   if (registered) return;
   registered = monaco.languages.registerCompletionItemProvider(BITMARK_LANGUAGE_ID, {
     triggerCharacters: COMPLETION_TRIGGER_CHARACTERS,
-    provideCompletionItems: (model, position) => {
+    provideCompletionItems: (model, position, context) => {
       if (!source) return { suggestions: [] };
       try {
-        const list = source(model.getValue(), {
-          line: position.lineNumber - 1,
-          character: position.column - 1,
-        });
+        const query: CompletionQuery = {
+          input: model.getValue(),
+          position: { line: position.lineNumber - 1, character: position.column - 1 },
+        };
+        const triggerCharacter = triggerCharacterOf(context);
+        const list = source(query.input, query.position, { triggerCharacter });
         const lineBeforeCursor = model.getValueInRange({
           startLineNumber: position.lineNumber,
           startColumn: 1,
@@ -115,12 +191,15 @@ export const registerBitmarkCompletion = (): void => {
         });
         return {
           incomplete: list.isIncomplete,
-          suggestions: list.items.map((i) => toMonacoSuggestion(i, position, lineBeforeCursor)),
+          suggestions: list.items.map((i) =>
+            toMonacoSuggestion(i, position, lineBeforeCursor, query),
+          ),
         };
       } catch (e) {
         log.error('bitmark completion failed', e);
         return { suggestions: [] };
       }
     },
+    resolveCompletionItem: (item) => resolveMonacoSuggestion(item),
   });
 };

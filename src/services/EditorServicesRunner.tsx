@@ -1,14 +1,17 @@
 // @awa-component: PLAN-017-EditorServicesRunner
 import { useEffect } from 'react';
 
-import { setBitmarkCompleteSource } from '../monaco-bitmark/bitmarkCompletion';
+import {
+  setBitmarkCompleteSource,
+  setBitmarkResolveSource,
+} from '../monaco-bitmark/bitmarkCompletion';
 import { setBitmarkDiagnosticsSource } from '../monaco-bitmark/bitmarkDiagnostics';
 import { setBitmarkHoverSource } from '../monaco-bitmark/bitmarkHover';
 import { useBitmarkParser } from './BitmarkParser';
 
 // @awa-impl: PLAN-017-Step2 (parser diagnostics / complete / hover -> Monaco)
 const useEditorServicesRunner = (): void => {
-  const { diagnostics, complete, hover, loadSuccess } = useBitmarkParser();
+  const { diagnostics, complete, resolve, hover, loadSuccess } = useBitmarkParser();
 
   useEffect(() => {
     if (!loadSuccess) return;
@@ -17,13 +20,15 @@ const useEditorServicesRunner = (): void => {
     // editor without markers, completion or hover.
     setBitmarkDiagnosticsSource(diagnostics);
     setBitmarkCompleteSource(complete);
+    setBitmarkResolveSource(resolve);
     setBitmarkHoverSource(hover);
     return () => {
       setBitmarkDiagnosticsSource(undefined);
       setBitmarkCompleteSource(undefined);
+      setBitmarkResolveSource(undefined);
       setBitmarkHoverSource(undefined);
     };
-  }, [diagnostics, complete, hover, loadSuccess]);
+  }, [diagnostics, complete, resolve, hover, loadSuccess]);
 };
 
 // Renderless component that feeds the WASM parser's editor services to the
