@@ -260,6 +260,32 @@ describe('applyXmlEdit', () => {
     expect(markupToJson).toHaveBeenCalledWith('wasm', BITMARK_OUT);
   });
 
+  // @awa-test: PLAN-020-Step3 (typed XML: its bits are pinned in its own pane)
+  it('stores where the bits are in the typed XML, from its conversion', async () => {
+    const convert = vi.fn();
+    const convertWithDetails = vi.fn().mockReturnValue({
+      output: BITMARK_OUT,
+      bitSpans: {
+        positionEncoding: 'utf-16',
+        spans: [0].map((inputStart, index) => ({
+          index,
+          inputStart,
+          inputEnd: inputStart + 1,
+          outputStart: 0,
+          outputEnd: 0,
+        })),
+      },
+    });
+    const markupToJson = vi.fn().mockResolvedValue(undefined);
+
+    await applyXmlEdit(convert, 'xmlNiso', XML_IN, markupToJson, convertWithDetails);
+
+    expect(bitmarkState.xmlNiso.xml).toBe(XML_IN);
+    expect(bitmarkState.xmlNiso.xmlBitStarts).toEqual([0]);
+    expect(bitmarkState.wasm.markup).toBe(BITMARK_OUT);
+    expect(convert).not.toHaveBeenCalled();
+  });
+
   it('stores the error and does not touch either duration when conversion fails', async () => {
     const convert = vi.fn().mockReturnValue('error: InvalidXml at offset 0');
     const markupToJson = vi.fn().mockResolvedValue(undefined);

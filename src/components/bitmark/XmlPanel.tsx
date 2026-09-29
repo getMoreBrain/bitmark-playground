@@ -45,7 +45,7 @@ export interface XmlPanelProps {
 
 // @awa-impl: PLAN-013-Step3 (editable XML editor; XML -> WASM bitmark on input)
 const XmlPanel = ({ variant, xml, bitStarts, errorAsString }: XmlPanelProps) => {
-  const { convert: wasmConvert } = useBitmarkParser();
+  const { convert: wasmConvert, convertWithDetails } = useBitmarkParser();
   // @awa-impl: PLAN-018-Step7 (linked to the bitmark editor's scrolling)
   const { onMount, onUnmount } = usePinnedScrollSync(xml, bitStarts);
   const { markupToJson } = useBitmarkConverter();
@@ -53,9 +53,9 @@ const XmlPanel = ({ variant, xml, bitStarts, errorAsString }: XmlPanelProps) => 
   const onInput = useCallback(
     async (nextXml: string) => {
       if (!wasmConvert) return;
-      await applyXmlEdit(wasmConvert, variant, nextXml, markupToJson);
+      await applyXmlEdit(wasmConvert, variant, nextXml, markupToJson, convertWithDetails);
     },
-    [wasmConvert, markupToJson, variant],
+    [wasmConvert, convertWithDetails, markupToJson, variant],
   );
 
   if (!wasmConvert) {

@@ -31,7 +31,7 @@ export interface TableHtmlPanelProps {
 
 // @awa-impl: PLAN-007-Step3 (editable HTML editor; HTML -> bitmark on input)
 const TableHtmlPanel = ({ html, bitStarts, errorAsString }: TableHtmlPanelProps) => {
-  const { convert: wasmConvert } = useBitmarkParser();
+  const { convert: wasmConvert, convertWithDetails } = useBitmarkParser();
   // @awa-impl: PLAN-018-Step7 (linked to the bitmark editor's scrolling)
   const { onMount, onUnmount } = usePinnedScrollSync(html, bitStarts);
   const { markupToJson } = useBitmarkConverter();
@@ -39,9 +39,9 @@ const TableHtmlPanel = ({ html, bitStarts, errorAsString }: TableHtmlPanelProps)
   const onInput = useCallback(
     async (nextHtml: string) => {
       if (!wasmConvert) return;
-      await applyHtmlEdit(wasmConvert, nextHtml, markupToJson);
+      await applyHtmlEdit(wasmConvert, nextHtml, markupToJson, convertWithDetails);
     },
-    [wasmConvert, markupToJson],
+    [wasmConvert, convertWithDetails, markupToJson],
   );
 
   if (!wasmConvert) {

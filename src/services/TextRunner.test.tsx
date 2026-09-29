@@ -56,8 +56,8 @@ describe('useTextRunner', () => {
       bitSpans: {
         positionEncoding: 'utf-16',
         spans: [
-          { index: 0, start: 0, end: 3 },
-          { index: 1, start: 4, end: 7 },
+          { index: 0, inputStart: 0, inputEnd: 3, outputStart: 0, outputEnd: 3 },
+          { index: 1, inputStart: 5, inputEnd: 8, outputStart: 4, outputEnd: 7 },
         ],
       },
     });

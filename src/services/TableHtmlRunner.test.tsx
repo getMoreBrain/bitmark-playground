@@ -158,4 +158,28 @@ describe('applyHtmlEdit', () => {
     expect(bitmarkState.lastEdit.inputFormat).toBe('html');
     expect(bitmarkState.lastEdit.content).toBe(HTML_DOC);
   });
+  // @awa-test: PLAN-020-Step3 (typed HTML: its bits are pinned in its own pane)
+  it('stores where the bits are in the typed HTML, from its conversion', async () => {
+    const convert = vi.fn();
+    const convertWithDetails = vi.fn().mockReturnValue({
+      output: BITMARK_DOC,
+      bitSpans: {
+        positionEncoding: 'utf-16',
+        spans: [0, 12].map((inputStart, index) => ({
+          index,
+          inputStart,
+          inputEnd: inputStart + 1,
+          outputStart: 0,
+          outputEnd: 0,
+        })),
+      },
+    });
+    const markupToJson = vi.fn().mockResolvedValue(undefined);
+
+    await applyHtmlEdit(convert, HTML_DOC, markupToJson, convertWithDetails);
+
+    expect(bitmarkState.tableHtml.html).toBe(HTML_DOC);
+    expect(bitmarkState.tableHtml.htmlBitStarts).toEqual([0, 12]);
+    expect(convert).not.toHaveBeenCalled();
+  });
 });

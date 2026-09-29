@@ -1,11 +1,14 @@
 // @awa-component: PLAN-013-XmlRunner
-import type { convert as convertFn } from '@gmb/bitmark-parser';
+import type {
+  convert as convertFn,
+  convertWithDetails as convertWithDetailsFn,
+} from '@gmb/bitmark-parser';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
 import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState, XmlVariant } from '../state/bitmarkState';
-import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParser } from './BitmarkParser';
 
 /**
  * Config mapping id per XML variant. The variants are otherwise identical —
@@ -89,23 +92,33 @@ let markSeq = 0;
 /**
  * Flow A: convert NISO-STS XML input to bitmark.
  *
- * Returns the bitmark and the conversion duration. Pre-seeds this variant's
- * guard with the produced bitmark so the caller's `markupToJson` does not bounce
- * back and overwrite the XML the user is editing.
+ * Returns the bitmark, the conversion duration and where each bit starts in
+ * the XML (PLAN-020; undefined on an engine without `convertWithDetails`).
+ * Pre-seeds this variant's guard with the produced bitmark so the caller's
+ * `markupToJson` does not bounce back and overwrite the XML the user is
+ * editing.
  */
 const convertXmlToBitmark = (
   convert: typeof convertFn,
   variant: XmlVariant,
   xml: string,
-): { markup: string; durationSec: number } => {
+  convertWithDetails?: typeof convertWithDetailsFn,
+): { markup: string; durationSec: number; inputStarts: number[] | undefined } => {
   const seq = ++markSeq;
   const startMark = `${variant}-x2b-start-${seq}`;
   const endMark = `${variant}-x2b-end-${seq}`;
   performance.mark(startMark);
 
   let markup = '';
+  let inputStarts: number[] | undefined = [];
   if (xml !== '') {
-    markup = throwIfParserError(convert(xml, xmlToBitmarkOpts(variant)));
+    // @awa-impl: PLAN-020-Step3 (the XML's own positions, from its conversion)
+    ({ output: markup, inputStarts } = convertWithBitStarts(
+      convert,
+      convertWithDetails,
+      xml,
+      xmlToBitmarkOpts(variant),
+    ));
   }
 
   performance.mark(endMark);
@@ -113,7 +126,7 @@ const convertXmlToBitmark = (
     performance.measure(`${variant}-xmlToBitmark-${seq}`, startMark, endMark).duration / 1000;
 
   noteWasmMarkup(variant, markup);
-  return { markup, durationSec };
+  return { markup, durationSec, inputStarts };
 };
 
 /**
@@ -131,22 +144,26 @@ const applyXmlEdit = async (
   variant: XmlVariant,
   nextXml: string,
   markupToJson: (editedTab: 'wasm', markup: string) => Promise<void>,
+  convertWithDetails?: typeof convertWithDetailsFn,
 ): Promise<void> => {
   let markup = '';
   let xmlError: Error | undefined;
   let durationSec: number | undefined;
+  let inputStarts: number[] | undefined;
 
   try {
-    const result = convertXmlToBitmark(convert, variant, nextXml);
+    const result = convertXmlToBitmark(convert, variant, nextXml, convertWithDetails);
     markup = result.markup;
     durationSec = result.durationSec;
+    inputStarts = result.inputStarts;
   } catch (e) {
     xmlError = e as Error;
   }
 
   // The XML the user is editing, stored verbatim so the editor is never
-  // clobbered while focused. The duration is deliberately not recorded here.
-  bitmarkState.setEditedXml(variant, nextXml, xmlError);
+  // clobbered while focused, with where its bits are. The duration is
+  // deliberately not recorded here.
+  bitmarkState.setEditedXml(variant, nextXml, xmlError, inputStarts);
 
   // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
   bitmarkState.setLastEdit(XML_MAPPING[variant], nextXml, XML_LABEL[variant]);

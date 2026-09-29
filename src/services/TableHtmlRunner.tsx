@@ -1,12 +1,15 @@
 // @awa-component: PLAN-007-TableHtmlRunner
 // @awa-component: PLAN-014-TableHtmlRunner
-import type { convert as convertFn } from '@gmb/bitmark-parser';
+import type {
+  convert as convertFn,
+  convertWithDetails as convertWithDetailsFn,
+} from '@gmb/bitmark-parser';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
 import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState } from '../state/bitmarkState';
-import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParser } from './BitmarkParser';
 
 type ConvertOptions = NonNullable<Parameters<typeof convertFn>[1]>;
 // The published `OutputFormat` omits config mapping ids (see XmlRunner).
@@ -66,22 +69,32 @@ let markSeq = 0;
 /**
  * Flow A: convert HTML input to bitmark.
  *
- * Returns the bitmark and the conversion duration. Pre-seeds the Original -> HTML
- * dedupe with the produced bitmark so the caller's `markupToJson` does not bounce
- * back and overwrite the HTML the user is editing.
+ * Returns the bitmark, the conversion duration and where each bit starts in
+ * the HTML (PLAN-020; undefined on an engine without `convertWithDetails`).
+ * Pre-seeds the Original -> HTML dedupe with the produced bitmark so the
+ * caller's `markupToJson` does not bounce back and overwrite the HTML the user
+ * is editing.
  */
 const convertHtmlToBitmark = (
   convert: typeof convertFn,
   html: string,
-): { markup: string; durationSec: number } => {
+  convertWithDetails?: typeof convertWithDetailsFn,
+): { markup: string; durationSec: number; inputStarts: number[] | undefined } => {
   const seq = ++markSeq;
   const startMark = `tableHtml-h2b-start-${seq}`;
   const endMark = `tableHtml-h2b-end-${seq}`;
   performance.mark(startMark);
 
   let markup = '';
+  let inputStarts: number[] | undefined = [];
   if (html !== '') {
-    markup = throwIfParserError(convert(html, HTML_TO_BITMARK_OPTS));
+    // @awa-impl: PLAN-020-Step3 (the HTML's own positions, from its conversion)
+    ({ output: markup, inputStarts } = convertWithBitStarts(
+      convert,
+      convertWithDetails,
+      html,
+      HTML_TO_BITMARK_OPTS,
+    ));
   }
 
   performance.mark(endMark);
@@ -89,7 +102,7 @@ const convertHtmlToBitmark = (
     performance.measure(`tableHtml-htmlToBitmark-${seq}`, startMark, endMark).duration / 1000;
 
   noteOriginalMarkup(markup);
-  return { markup, durationSec };
+  return { markup, durationSec, inputStarts };
 };
 
 /**
@@ -103,22 +116,26 @@ const applyHtmlEdit = async (
   convert: typeof convertFn,
   nextHtml: string,
   markupToJson: (editedTab: 'js', markup: string) => Promise<void>,
+  convertWithDetails?: typeof convertWithDetailsFn,
 ): Promise<void> => {
   let markup = '';
   let htmlError: Error | undefined;
   let durationSec: number | undefined;
+  let inputStarts: number[] | undefined;
 
   try {
-    const result = convertHtmlToBitmark(convert, nextHtml);
+    const result = convertHtmlToBitmark(convert, nextHtml, convertWithDetails);
     markup = result.markup;
     durationSec = result.durationSec;
+    inputStarts = result.inputStarts;
   } catch (e) {
     htmlError = e as Error;
   }
 
   // The HTML the user is editing, stored verbatim so the editor is never
-  // clobbered while focused.
-  bitmarkState.setTableHtml(nextHtml, htmlError, undefined);
+  // clobbered while focused, with where its bits are (none when the
+  // conversion failed: the pinned markers move with the edits).
+  bitmarkState.setTableHtml(nextHtml, htmlError, undefined, inputStarts);
 
   // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
   bitmarkState.setLastEdit(HTML_FORMAT, nextHtml, 'HTML');

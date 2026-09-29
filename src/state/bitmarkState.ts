@@ -218,13 +218,23 @@ export interface BitmarkState {
   /** Set the edited tab's JSON verbatim (raw user input; clears JSON error). */
   setEditedJson(parser: ParserType, json: string): void;
   /**
+   * Where each bit starts in the JSON the user typed, as its own conversion
+   * read it (PLAN-020). Ignored unless the tab still shows exactly `json`.
+   */
+  setEditedJsonBitStarts(parser: ParserType, json: string, bitStarts: readonly number[]): void;
+  /**
    * Set an XML tab's document verbatim (raw user input).
    *
    * Unlike `setXml`, this does NOT touch the duration: the user typed this XML,
    * the app did not generate it, so the tab's generation time is left as-is
    * (mirrors `setEditedMarkup` / `setEditedJson`).
    */
-  setEditedXml(variant: XmlVariant, xml: string, xmlError: Error | undefined): void;
+  setEditedXml(
+    variant: XmlVariant,
+    xml: string,
+    xmlError: Error | undefined,
+    bitStarts?: readonly number[],
+  ): void;
   /** Record the window the user just edited (drives the mapping report). */
   setLastEdit(inputFormat: string, content: string, label: string): void;
   setMappings(
@@ -586,10 +596,19 @@ const bitmarkState = proxy<BitmarkState>({
   setEditedJson: (parser: ParserType, json: string) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     slice.jsonAsString = json;
-    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
+    // @awa-impl: PLAN-018-Step2 (typed text: no known positions until its
+    // conversion reads them — PLAN-020)
     slice.jsonBitStarts = undefined;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
+  },
+
+  // @awa-impl: PLAN-020-Step2 (the typed JSON's positions, from its conversion)
+  setEditedJsonBitStarts: (parser: ParserType, json: string, bitStarts: readonly number[]) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    // A later edit has replaced the text these positions describe.
+    if (slice.jsonAsString !== json) return;
+    slice.jsonBitStarts = bitStarts;
   },
 
   // @awa-impl: PLAN-014-Step1 (record the last edited window)
@@ -654,11 +673,17 @@ const bitmarkState = proxy<BitmarkState>({
   },
 
   // @awa-impl: PLAN-013-Step1 (setEditedXml; user input, duration untouched)
-  setEditedXml: (variant: XmlVariant, xml: string, xmlError: Error | undefined) => {
+  setEditedXml: (
+    variant: XmlVariant,
+    xml: string,
+    xmlError: Error | undefined,
+    bitStarts?: readonly number[],
+  ) => {
     const slice = bitmarkState[variant] as Writable<XmlSlice>;
     slice.xml = xml;
-    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
-    slice.xmlBitStarts = undefined;
+    // @awa-impl: PLAN-020-Step3 (typed text: the positions its own conversion
+    // read; none when it failed, and the pinned markers move with the edits)
+    slice.xmlBitStarts = bitStarts;
 
     if (xmlError) {
       slice.xmlError = xmlError;

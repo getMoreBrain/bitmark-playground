@@ -18,6 +18,23 @@ describe('bitmarkState bit starts', () => {
     expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
   });
 
+  // @awa-test: PLAN-020-Step2 (the typed JSON's positions, only for that text)
+  it('stores the positions the typed JSON was read with, unless it has changed since', () => {
+    bitmarkState.setEditedJson('wasm', '[{"bit": {}}]');
+    bitmarkState.setEditedJsonBitStarts('wasm', '[{"bit": {}}]', [1]);
+    expect(bitmarkState.wasm.jsonBitStarts).toEqual([1]);
+    // A later edit: positions of the earlier text are ignored.
+    bitmarkState.setEditedJson('wasm', '[ {"bit": {}}]');
+    bitmarkState.setEditedJsonBitStarts('wasm', '[{"bit": {}}]', [1]);
+    expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
+  });
+
+  // @awa-test: PLAN-020-Step3 (typed XML keeps the positions its conversion read)
+  it('stores the positions typed XML was read with', () => {
+    bitmarkState.setEditedXml('xmlNiso', '<bit/>\n<bit/>', undefined, [0, 7]);
+    expect(bitmarkState.xmlNiso.xmlBitStarts).toEqual([0, 7]);
+  });
+
   it('stores the HTML positions with the HTML, and forgets them for typed HTML', () => {
     bitmarkState.setTableHtml('<a/>\n<b/>', undefined, 0, [0, 5]);
     expect(bitmarkState.tableHtml.htmlBitStarts).toEqual([0, 5]);
