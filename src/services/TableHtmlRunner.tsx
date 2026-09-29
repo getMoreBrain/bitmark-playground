@@ -4,6 +4,7 @@ import type { convert as convertFn } from '@gmb/bitmark-parser';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
+import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState } from '../state/bitmarkState';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 
@@ -133,7 +134,7 @@ const applyHtmlEdit = async (
 
 // @awa-impl: PLAN-007-Step2 (Original bitmark -> HTML refresh)
 const useTableHtmlRunner = (): void => {
-  const { convert: wasmConvert, loadSuccess, markupReady } = useBitmarkParser();
+  const { convert: wasmConvert, convertWithDetails, loadSuccess, markupReady } = useBitmarkParser();
 
   useEffect(() => {
     // A markup format needs the `full` engine (stage 2 of the load).
@@ -141,11 +142,12 @@ const useTableHtmlRunner = (): void => {
 
     const run = (markup: string) => {
       if (markup === '') {
-        bitmarkState.setTableHtml('', undefined, undefined);
+        bitmarkState.setTableHtml('', undefined, undefined, []);
         return;
       }
 
       let html: string | undefined;
+      let bitStarts: number[] | undefined;
       let htmlError: Error | undefined;
 
       const seq = ++markSeq;
@@ -154,7 +156,12 @@ const useTableHtmlRunner = (): void => {
       performance.mark(startMark);
 
       try {
-        html = throwIfParserError(wasmConvert(markup, BITMARK_TO_HTML_OPTS));
+        ({ output: html, bitStarts } = convertWithBitStarts(
+          wasmConvert,
+          convertWithDetails,
+          markup,
+          BITMARK_TO_HTML_OPTS,
+        ));
       } catch (e) {
         htmlError = e as Error;
       }
@@ -163,7 +170,7 @@ const useTableHtmlRunner = (): void => {
       const durationSec =
         performance.measure(`tableHtml-bitmarkToHtml-${seq}`, startMark, endMark).duration / 1000;
 
-      bitmarkState.setTableHtml(html, htmlError, durationSec);
+      bitmarkState.setTableHtml(html, htmlError, durationSec, bitStarts);
     };
 
     const evaluate = () => {
@@ -183,7 +190,7 @@ const useTableHtmlRunner = (): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess, markupReady]);
+  }, [wasmConvert, convertWithDetails, loadSuccess, markupReady]);
 };
 
 // Renderless component that drives the Original -> HTML refresh. Mount once

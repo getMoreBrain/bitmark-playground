@@ -30,6 +30,8 @@ const fakeWasmParser = {
   convert: () => '',
   info: () => '',
   semanticTokens: undefined,
+  splitBits: undefined,
+  convertWithDetails: undefined,
   diagnostics: undefined,
   complete: undefined,
   resolve: undefined,

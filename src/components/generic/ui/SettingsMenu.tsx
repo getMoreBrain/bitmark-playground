@@ -105,6 +105,29 @@ const SettingsMenu = () => {
               Show diff / lex
             </Label>
           </Flex>
+
+          {/* @awa-impl: PLAN-018-Step8 (link scrolling toggle) */}
+          <Flex sx={{ alignItems: 'center', gap: 2, mt: 1 }}>
+            <Label
+              sx={{
+                cursor: 'pointer',
+                fontSize: 1,
+                color: 'text',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                width: 'auto',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={snap.linkScroll}
+                onChange={(e) => uiState.setLinkScroll(e.target.checked)}
+                style={{ accentColor: '#7dc13a' }}
+              />
+              Link scrolling
+            </Label>
+          </Flex>
         </Box>
       )}
     </Box>

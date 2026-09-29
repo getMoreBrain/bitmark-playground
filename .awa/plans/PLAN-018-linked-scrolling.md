@@ -94,11 +94,14 @@ because junk and unknown bits become `_error` bits rather than being dropped.
     slot at a time, because only one right-hand tab is mounted.
   - The coordinator listens to `onDidScrollChange`, but only acts when
     `scrollTopChanged` is set.
-- No feedback loop. When the coordinator scrolls the follower, it records
-  the follower's resulting `getScrollTop()` as the value it expects. When
-  that follower's own scroll event reports that value, the event is an echo
-  of the sync and is dropped. Any other value is a real user scroll, and
-  that pane becomes the leader.
+- No feedback loop. Monaco reports a `setScrollTop` synchronously, so the
+  coordinator sets a flag while it scrolls the follower and drops the scroll
+  events that arrive under it. Any other scroll is a real user scroll, and
+  that pane becomes the leader. A scroll that comes with a height change is
+  Monaco clamping after a content change, and is treated as one.
+- Who leads after a change. When a pane's content, markers or layout
+  change, the pane the user is typing in (has focus) leads; a pane whose
+  content changed under it follows the other.
 - Re-sync when the follower changes. The follower is re-synced to the
   last leader's position when:
   - its content or markers change (typing on the left rebuilds the JSON on
@@ -120,34 +123,34 @@ because junk and unknown bits become `_error` bits rather than being dropped.
 
 ## Steps
 
-- [ ] Step 1 — Parser context: add `splitBits` and `convertWithDetails` to `BitmarkParserModule` and `IBitmarkParserContext`. `setSplitBitsSource` in `EditorServicesRunner`.
-- [ ] Step 2 — State: `bitStarts` beside the text in the Text, HTML and each XML slice, and in each parser's JSON slice. The JSON writer in `setJson` (D1, output identical to `JSON.stringify(…, 2)`); the raw-text setter clears them.
-- [ ] Step 3 — Runners: `TextRunner`, `TableHtmlRunner`, `XmlRunner` call `convertWithDetails` for bitmark → X and store the span starts with the text.
-- [ ] Step 4 — `src/scrollSync/bitMarkers.ts`: pin starts as decorations when the editor's text equals the state's text (D4); read their current offsets.
-- [ ] Step 5 — `src/scrollSync/mapScrollTop.ts`: knot construction (pair to `min(n, m)`, clamp, non-decreasing) and the piecewise-linear interpolation.
-- [ ] Step 6 — `src/scrollSync/scrollSync.ts`: the coordinator. It provides:
+- [x] Step 1 — Parser context: add `splitBits` and `convertWithDetails` to `BitmarkParserModule` and `IBitmarkParserContext`. `setSplitBitsSource` in `EditorServicesRunner`.
+- [x] Step 2 — State: `bitStarts` beside the text in the Text, HTML and each XML slice, and in each parser's JSON slice. The JSON writer in `setJson` (D1, output identical to `JSON.stringify(…, 2)`); the raw-text setter clears them.
+- [x] Step 3 — Runners: `TextRunner`, `TableHtmlRunner`, `XmlRunner` call `convertWithDetails` for bitmark → X and store the span starts with the text.
+- [x] Step 4 — `src/scrollSync/bitMarkers.ts`: pin starts as decorations when the editor's text equals the state's text (D4); read their current offsets.
+- [x] Step 5 — `src/scrollSync/mapScrollTop.ts`: knot construction (pair to `min(n, m)`, clamp, non-decreasing) and the piecewise-linear interpolation.
+- [x] Step 6 — `src/scrollSync/scrollSync.ts`: the coordinator. It provides:
   - `attachScrollSync(editor, slot, bitStarts)` and `setSplitBitsSource`;
   - the `versionId` cache for split panes and the pixel-position cache;
   - echo suppression and the leader rules;
   - re-sync on follower content / marker change, relayout and mount;
   - a `uiState.linkScroll` check on every event, and a re-sync when it turns on.
-- [ ] Step 7 — Wire the panes in `editorDidMount` / `editorWillUnmount`:
+- [x] Step 7 — Wire the panes in `editorDidMount` / `editorWillUnmount`:
   - `BitmarkMarkupTextBox` → slot `bitmark`, split;
   - `WasmCheckPanel` → `output`, split;
   - `BitmarkJsonTextBox` (JSON tabs) → `output`, pinned;
   - `TableHtmlPanel`, `XmlPanel`, `TextPanel` → `output`, pinned.
-- [ ] Step 8 — Toggle: `uiState.linkScroll` + `setLinkScroll`, a settings v9 → v10 migration with validation, persistence, and a "Link scrolling" checkbox in `SettingsMenu`.
+- [x] Step 8 — Toggle: `uiState.linkScroll` + `setLinkScroll`, a settings v9 → v10 migration with validation, persistence, and a "Link scrolling" checkbox in `SettingsMenu`.
 - [ ] Step 9 — Point `@gmb/bitmark-parser` at the release that carries PLAN-221 (see Dependencies).
 
 ### Testing
 
-- [ ] JSON writer: output identical to `JSON.stringify(json, undefined, 2)` (empty array, one bit, many bits, non-ASCII); `jsonAsString.slice(start)` begins with that bit's `{`.
-- [ ] Runners: the stored starts equal the span starts, and are cleared on an error result.
-- [ ] `bitMarkers`: pinned when the texts are equal, untouched when they differ; markers move with an insert before them; deleting a bit's text keeps the order.
-- [ ] `mapScrollTop` properties: the end knots map to each other; bit *i*'s top maps to bit *i*'s top when neither is clamped; the mapping is monotonic; with no positions it is proportional; with unequal counts the extra bits are ignored; zero-width bits do not break it.
-- [ ] Coordinator tests with a fake editor (the Monaco mock has no scroll or decoration API): the follower follows the leader; the echo does not bounce back; a user scroll on the follower makes it the leader; a follower content change re-syncs it; nothing happens with `linkScroll` off; turning it on re-syncs; dispose detaches.
-- [ ] Settings: the v9 → v10 migration defaults `linkScroll` to `true`, and an invalid value is rejected. Also a `SettingsMenu` checkbox test.
-- [ ] Verified in a real browser (headless Chromium over the dev server with `?engine=local`, driving the DOM only), with a document of about 30 bits, some long:
+- [x] JSON writer: output identical to `JSON.stringify(json, undefined, 2)` (empty array, one bit, many bits, non-ASCII); `jsonAsString.slice(start)` begins with that bit's `{`.
+- [x] Runners: the stored starts equal the span starts; an engine without `convertWithDetails` still converts, with no starts; a failed conversion keeps the last good text and its starts beside it (the pane shows the error, so its markers are cleared).
+- [x] `bitMarkers`: pinned when the texts are equal, untouched when they differ with focus or for typed text, cleared when the pane shows other text; read back in order. (Markers moving through edits is Monaco's own behaviour; it is covered by the browser check on broken HTML.)
+- [x] `mapScrollTop` properties: the end knots map to each other; bit *i*'s top maps to bit *i*'s top when neither is clamped; the mapping is monotonic; with no positions it is proportional; with unequal counts the extra bits are ignored; zero-width bits do not break it.
+- [x] Coordinator tests with a fake editor (the Monaco mock has no scroll or decoration API): the follower follows the leader; the echo does not bounce back; a user scroll on the follower makes it the leader; a follower content change re-syncs it; nothing happens with `linkScroll` off; turning it on re-syncs; dispose detaches.
+- [x] Settings: the v9 → v10 migration defaults `linkScroll` to `true`, and an invalid value is rejected. Also a `SettingsMenu` checkbox test.
+- [x] Verified in a real browser (headless Chromium over the dev server with `?engine=local`, driving the DOM only), with a document of about 30 bits, some long:
   - Scrolling the bitmark keeps the same bit at the top of the JSON, HTML, XML and Text tabs.
   - Scrolling the JSON pane drives the bitmark.
   - Typing in the bitmark keeps the JSON aligned.
@@ -158,11 +161,11 @@ because junk and unknown bits become `_error` bits rather than being dropped.
 
 ### Documentation
 
-- [ ] ARCHITECTURE.md:
+- [x] ARCHITECTURE.md:
   - UI Layer responsibility: linked scrolling by bit;
   - a `src/scrollSync/` entry in the directory structure;
   - a change-log line.
-- [ ] README: mention the Settings toggle, if the README lists settings.
+- [x] README: mention the Settings toggle, if the README lists settings. (It does not; no change.)
 
 ## Risks
 
@@ -173,11 +176,10 @@ because junk and unknown bits become `_error` bits rather than being dropped.
 - Markers can be lost, e.g. the user replaces a whole output pane's text.
   Mitigation: that pane scrolls proportionally until the next conversion
   rewrites it and re-pins.
-- Echo detection relies on `setScrollTop` giving back the value it
-  settled on. Monaco clamps and rounds the value. Mitigation: record the
-  value read back with `getScrollTop()` after setting it, not the requested
-  one. `smoothScrolling` is off in every editor here; if it is ever turned
-  on, echoes arrive late and this needs a short time window instead.
+- Echo detection relies on Monaco reporting the coordinator's own
+  `setScrollTop` synchronously (verified in the browser). `smoothScrolling`
+  is off in every editor here; if it is ever turned on, echoes arrive late
+  and this needs a short time window instead.
 - Cost on large documents. `splitBits` runs once per content version, spans
   come with the conversion, and `getTopForPosition` runs once per bit per
   layout, all cached. If a document with thousands of bits is slow, a binary
@@ -193,10 +195,10 @@ because junk and unknown bits become `_error` bits rather than being dropped.
 
 ## Completion Criteria
 
-- [ ] `npx eslint src vite.config.ts`, `npx tsc --noEmit` and `npx vitest run` pass.
+- [x] `npx eslint src vite.config.ts`, `npx tsc --noEmit` and `npx vitest run` pass.
 - [ ] `awa check` passes.
-- [ ] Verified in a real browser (see Testing).
-- [ ] With linking off, every pane scrolls exactly as before.
+- [x] Verified in a real browser (see Testing).
+- [x] With linking off, every pane scrolls exactly as before.
 
 ## Open Questions
 

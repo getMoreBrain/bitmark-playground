@@ -76,6 +76,7 @@ src/services/                     # Parser loading, conversion, and application 
 src/state/                        # Valtio-based reactive state
 src/theme/                        # Theme UI theme configuration
 src/monaco-bitmark/               # Bitmark language, theme and semantic tokens provider for Monaco
+src/scrollSync/                   # Linked scrolling by bit: bit positions, pinned markers, scroll mapping, coordinator
 src/logging/                      # Console logging wrapper
 src/utils/                        # Shared utility functions
 src/generated/                    # Auto-generated build metadata
@@ -95,6 +96,7 @@ RESPONSIBILITIES
 - Render two-panel editor layout (markup and JSON)
 - Display conversion duration per panel
 - Show application version and parser version in status bar
+- Link the scrolling of the top two panes by bit: the bitmark editor and the right-hand JSON, WASM Check, HTML, XML and Text tabs keep the same bit in view, whichever is scrolled (Settings → "Link scrolling", on by default)
 - Apply dark theme via Theme UI provider
 
 CONSTRAINTS
@@ -238,3 +240,4 @@ Core markup-to-JSON and JSON-to-markup conversion is functional. Deployed to Git
 
 - 1.0.0 (2026-02-17): Initial architecture
 - 1.1.0 (2026-09-09): Tree-sitter highlighting replaced by the WASM parser's semantic tokens (PLAN-016)
+- 1.2.0 (2026-09-29): Linked scrolling between the bitmark and output panes, by bit, from the parser's bit spans (PLAN-018)

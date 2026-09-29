@@ -3,9 +3,11 @@
 import type {
   bitmarkToObjects as bitmarkToObjectsFn,
   convert as convertFn,
+  convertWithDetails as convertWithDetailsFn,
   info as infoFn,
   init as initFn,
   semanticTokens as semanticTokensFn,
+  splitBits as splitBitsFn,
 } from '@gmb/bitmark-parser';
 import {
   createContext,
@@ -73,6 +75,10 @@ interface BitmarkParserModule {
   info: typeof infoFn;
   semanticTokens: typeof semanticTokensFn;
   version: () => string;
+  // Bit positions for linked scrolling (parser PLAN-221). An engine without
+  // them leaves every pane unlinked (PLAN-018 D2).
+  convertWithDetails?: typeof convertWithDetailsFn;
+  splitBits?: typeof splitBitsFn;
   // The editor services (parser PLAN-196). Optional: a parser older than the
   // release that carries them simply has no such export, and the playground
   // then runs without markers, completion or hover.
@@ -99,8 +105,10 @@ interface IBitmarkParserContext {
   markupReady: boolean;
   bitmarkToObjects: typeof bitmarkToObjectsFn | undefined;
   convert: typeof convertFn | undefined;
+  convertWithDetails: typeof convertWithDetailsFn | undefined;
   info: typeof infoFn | undefined;
   semanticTokens: typeof semanticTokensFn | undefined;
+  splitBits: typeof splitBitsFn | undefined;
   diagnostics: DiagnosticsSource | undefined;
   complete: CompleteSource | undefined;
   resolve: ResolveSource | undefined;
@@ -114,8 +122,10 @@ const defaultState: IBitmarkParserContext = {
   markupReady: false,
   bitmarkToObjects: undefined,
   convert: undefined,
+  convertWithDetails: undefined,
   info: undefined,
   semanticTokens: undefined,
+  splitBits: undefined,
   diagnostics: undefined,
   complete: undefined,
   resolve: undefined,
@@ -162,8 +172,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           markupReady: false,
           bitmarkToObjects: module.bitmarkToObjects,
           convert: module.convert,
+          convertWithDetails: module.convertWithDetails,
           info: undefined,
           semanticTokens: module.semanticTokens,
+          splitBits: module.splitBits,
           diagnostics: module.diagnostics,
           complete: module.complete,
           resolve: module.resolve,
@@ -191,8 +203,10 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           markupReady: false,
           bitmarkToObjects: undefined,
           convert: undefined,
+          convertWithDetails: undefined,
           info: undefined,
           semanticTokens: undefined,
+          splitBits: undefined,
           diagnostics: undefined,
           complete: undefined,
           resolve: undefined,

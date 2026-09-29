@@ -49,6 +49,40 @@ describe('useTextRunner', () => {
     });
   });
 
+  // @awa-test: PLAN-018-Step3 (the text is stored with its bit starts)
+  it('stores the bit starts from convertWithDetails with the text', async () => {
+    const convertWithDetails = vi.fn().mockReturnValue({
+      output: 'one\ntwo',
+      bitSpans: {
+        positionEncoding: 'utf-16',
+        spans: [
+          { index: 0, start: 0, end: 3 },
+          { index: 1, start: 4, end: 7 },
+        ],
+      },
+    });
+    const value = {
+      loadSuccess: true,
+      markupReady: true,
+      loadError: false,
+      convert: vi.fn(),
+      convertWithDetails,
+      version: 'test',
+    } as unknown as ContextValue;
+    renderHook(() => useTextRunner(), {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <BitmarkParserContext.Provider value={value}>{children}</BitmarkParserContext.Provider>
+      ),
+    });
+
+    bitmarkState.setEditedMarkup('wasm', '[.article] one\n\n[.article] two');
+
+    await waitFor(() => {
+      expect(bitmarkState.text.text).toBe('one\ntwo');
+      expect(bitmarkState.text.textBitStarts).toEqual([0, 4]);
+    });
+  });
+
   it('stores error when the conversion throws', async () => {
     const convert = vi.fn().mockImplementation(() => {
       throw new Error('boom');

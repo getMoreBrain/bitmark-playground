@@ -39,13 +39,27 @@ describe('SettingsMenu', () => {
     uiState.setSettingsOpen(true);
     render(<SettingsMenu />, { wrapper });
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'Show diff / lex' })).toBeInTheDocument();
     });
-    const checkbox = screen.getByRole('checkbox');
+    const checkbox = screen.getByRole('checkbox', { name: 'Show diff / lex' });
     fireEvent.click(checkbox);
     await waitFor(() => {
       expect(uiState.showDiffLex).toBe(true);
     });
+  });
+
+  // @awa-test: PLAN-018-Step8 (link scrolling toggle)
+  it('toggles linkScroll on checkbox change', async () => {
+    uiState.setSettingsOpen(true);
+    uiState.setLinkScroll(true);
+    render(<SettingsMenu />, { wrapper });
+    const checkbox = await screen.findByRole('checkbox', { name: 'Link scrolling' });
+    expect(checkbox).toBeChecked();
+    fireEvent.click(checkbox);
+    await waitFor(() => {
+      expect(uiState.linkScroll).toBe(false);
+    });
+    uiState.setLinkScroll(true);
   });
 });
 

@@ -2,12 +2,13 @@
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
+import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState } from '../state/bitmarkState';
-import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParser } from './BitmarkParser';
 
 // @awa-impl: PLAN-011-Step2 (WASM optimized bitmark -> plain text)
 const useTextRunner = (): void => {
-  const { convert: wasmConvert, loadSuccess } = useBitmarkParser();
+  const { convert: wasmConvert, convertWithDetails, loadSuccess } = useBitmarkParser();
 
   useEffect(() => {
     if (!loadSuccess || !wasmConvert) return;
@@ -16,11 +17,12 @@ const useTextRunner = (): void => {
 
     const run = (markup: string) => {
       if (markup === '') {
-        bitmarkState.setText('', undefined, undefined);
+        bitmarkState.setText('', undefined, undefined, []);
         return;
       }
 
       let text: string | undefined;
+      let bitStarts: number[] | undefined;
       let textError: Error | undefined;
 
       const startMark = `text-b2t-start-${Date.now()}`;
@@ -28,9 +30,12 @@ const useTextRunner = (): void => {
       performance.mark(startMark);
 
       try {
-        text = throwIfParserError(
-          wasmConvert(markup, { inputFormat: 'bitmark', outputFormat: 'text' }),
-        );
+        ({ output: text, bitStarts } = convertWithBitStarts(
+          wasmConvert,
+          convertWithDetails,
+          markup,
+          { inputFormat: 'bitmark', outputFormat: 'text' },
+        ));
       } catch (e) {
         textError = e as Error;
       }
@@ -39,7 +44,7 @@ const useTextRunner = (): void => {
       const durationSec =
         performance.measure('text-bitmarkToText', startMark, endMark).duration / 1000;
 
-      bitmarkState.setText(text, textError, durationSec);
+      bitmarkState.setText(text, textError, durationSec, bitStarts);
     };
 
     const evaluate = () => {
@@ -58,7 +63,7 @@ const useTextRunner = (): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess]);
+  }, [wasmConvert, convertWithDetails, loadSuccess]);
 };
 
 // Renderless component that drives the WASM-opt-bitmark -> text view. Mount once

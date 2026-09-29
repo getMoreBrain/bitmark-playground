@@ -17,6 +17,7 @@ const validSettings: PersistedSettings = {
   showDiffLex: true,
   leftOutputTab: 'diff',
   rightOutputTab: 'lexer',
+  linkScroll: true,
 };
 
 describe('settingsStorage', () => {
@@ -62,7 +63,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'lexer',
       };
       const result = migrateSettings(v1Settings);
-      expect(result).toEqual({ ...v1Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v1Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     // @awa-test: PLAN-006-Step7 (v2 → v3 migration preserves prior values)
@@ -76,7 +77,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'lexer',
       };
       const result = migrateSettings(v2Settings);
-      expect(result).toEqual({ ...v2Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v2Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     it('accepts wasmFull as valid ParserType', () => {
@@ -115,7 +116,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'diff',
       };
       const result = migrateSettings(v3Settings);
-      expect(result).toEqual({ ...v3Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v3Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     // @awa-test: PLAN-007-Step7 ('tableHtml' accepted as activeJsonTab at v4)
@@ -147,7 +148,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'lexer',
       };
       const result = migrateSettings(v4Settings);
-      expect(result).toEqual({ ...v4Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v4Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     // @awa-test: PLAN-011-Step7 ('text' accepted as activeJsonTab at v5)
@@ -189,7 +190,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'lexer',
       };
       const result = migrateSettings(v5Settings);
-      expect(result).toEqual({ ...v5Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v5Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     // @awa-test: PLAN-013-Step7 ('xmlNisoEs' accepted as activeJsonTab at v7)
@@ -217,7 +218,7 @@ describe('settingsStorage', () => {
         rightOutputTab: 'lexer',
       };
       const result = migrateSettings(v6Settings);
-      expect(result).toEqual({ ...v6Settings, v: CURRENT_VERSION });
+      expect(result).toEqual({ ...v6Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
     // @awa-test: PLAN-014-Step5 ('mappings' accepted as an output tab at v8)
@@ -244,7 +245,11 @@ describe('settingsStorage', () => {
         leftOutputTab: 'diff',
         rightOutputTab: 'lexer',
       };
-      expect(migrateSettings(v7Settings)).toEqual({ ...v7Settings, v: CURRENT_VERSION });
+      expect(migrateSettings(v7Settings)).toEqual({
+        ...v7Settings,
+        v: CURRENT_VERSION,
+        linkScroll: true,
+      });
     });
 
     // @awa-test: PLAN-015-Step4 ('info' accepted as an output tab at v9)
@@ -271,7 +276,43 @@ describe('settingsStorage', () => {
         leftOutputTab: 'mappings',
         rightOutputTab: 'lexer',
       };
-      expect(migrateSettings(v8Settings)).toEqual({ ...v8Settings, v: CURRENT_VERSION });
+      expect(migrateSettings(v8Settings)).toEqual({
+        ...v8Settings,
+        v: CURRENT_VERSION,
+        linkScroll: true,
+      });
+    });
+
+    // @awa-test: PLAN-018-Step8 (v9 settings migrate with linking on)
+    it('migrates v9 settings to current version with linkScroll on', () => {
+      const v9Settings = {
+        v: 9,
+        activeMarkupTab: 'wasm',
+        activeJsonTab: 'text',
+        showDiffLex: false,
+        leftOutputTab: 'info',
+        rightOutputTab: 'lexer',
+      };
+      expect(migrateSettings(v9Settings)).toEqual({
+        ...v9Settings,
+        v: CURRENT_VERSION,
+        linkScroll: true,
+      });
+    });
+
+    // @awa-test: PLAN-018-Step8 (a stored linkScroll: false is kept)
+    it('keeps linkScroll off', () => {
+      expect(migrateSettings({ ...validSettings, linkScroll: false })).toEqual({
+        ...validSettings,
+        linkScroll: false,
+      });
+    });
+
+    // @awa-test: PLAN-018-Step8 (an invalid linkScroll is rejected)
+    it('returns null for invalid linkScroll', () => {
+      expect(migrateSettings({ ...validSettings, linkScroll: 'yes' })).toBeNull();
+      const { linkScroll: _omit, ...missing } = validSettings;
+      expect(migrateSettings(missing)).toBeNull();
     });
 
     it('returns null for invalid activeMarkupTab', () => {
