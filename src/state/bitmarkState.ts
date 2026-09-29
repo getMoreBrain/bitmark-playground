@@ -4,6 +4,7 @@
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
+import { jsonWithBitStarts } from '../scrollSync/jsonText';
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
@@ -31,6 +32,12 @@ export interface ParserSlice {
   readonly markupUpdates: number;
   readonly json: BitWrapperJson[];
   readonly jsonAsString: string;
+  /**
+   * Where each bit starts in the JSON text (UTF-16 offsets), recorded by
+   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the JSON text was
+   * typed by the user, so no positions are known for it.
+   */
+  readonly jsonBitStarts: readonly number[] | undefined;
   readonly jsonError: Error | undefined;
   readonly jsonErrorAsString: string | undefined;
   readonly jsonDurationSec: number | undefined;
@@ -65,6 +72,12 @@ export interface JsRoundTripSlice {
 export interface TableHtmlSlice {
   readonly html: string;
   readonly htmlError: Error | undefined;
+  /**
+   * Where each bit starts in the html (UTF-16 offsets), recorded by
+   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the html was
+   * typed by the user, so no positions are known for it.
+   */
+  readonly htmlBitStarts: readonly number[] | undefined;
   readonly htmlErrorAsString: string | undefined;
   readonly htmlDurationSec: number | undefined;
   readonly htmlUpdates: number;
@@ -74,6 +87,12 @@ export interface TableHtmlSlice {
 export interface TextSlice {
   readonly text: string;
   readonly textError: Error | undefined;
+  /**
+   * Where each bit starts in the text (UTF-16 offsets), recorded by
+   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the text was
+   * typed by the user, so no positions are known for it.
+   */
+  readonly textBitStarts: readonly number[] | undefined;
   readonly textErrorAsString: string | undefined;
   readonly textDurationSec: number | undefined;
   readonly textUpdates: number;
@@ -83,6 +102,12 @@ export interface TextSlice {
 export interface XmlSlice {
   readonly xml: string;
   readonly xmlError: Error | undefined;
+  /**
+   * Where each bit starts in the xml (UTF-16 offsets), recorded by
+   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the xml was
+   * typed by the user, so no positions are known for it.
+   */
+  readonly xmlBitStarts: readonly number[] | undefined;
   readonly xmlErrorAsString: string | undefined;
   readonly xmlDurationSec: number | undefined;
   readonly xmlUpdates: number;
@@ -167,13 +192,24 @@ export interface BitmarkState {
     error: Error | undefined,
     durationSec?: number,
   ): void;
-  setTableHtml(html: string | undefined, htmlError: Error | undefined, durationSec?: number): void;
-  setText(text: string | undefined, textError: Error | undefined, durationSec?: number): void;
+  setTableHtml(
+    html: string | undefined,
+    htmlError: Error | undefined,
+    durationSec?: number,
+    bitStarts?: readonly number[],
+  ): void;
+  setText(
+    text: string | undefined,
+    textError: Error | undefined,
+    durationSec?: number,
+    bitStarts?: readonly number[],
+  ): void;
   setXml(
     variant: XmlVariant,
     xml: string | undefined,
     xmlError: Error | undefined,
     durationSec?: number,
+    bitStarts?: readonly number[],
   ): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: JsonTabType): void;
@@ -207,6 +243,7 @@ const createParserSlice = (): ParserSlice => ({
   markupUpdates: 0,
   json: [],
   jsonAsString: '',
+  jsonBitStarts: undefined,
   jsonError: undefined,
   jsonErrorAsString: undefined,
   jsonDurationSec: undefined,
@@ -236,6 +273,7 @@ const createJsRoundTripSlice = (): JsRoundTripSlice => ({
 const createTableHtmlSlice = (): TableHtmlSlice => ({
   html: '',
   htmlError: undefined,
+  htmlBitStarts: undefined,
   htmlErrorAsString: undefined,
   htmlDurationSec: undefined,
   htmlUpdates: 0,
@@ -245,6 +283,7 @@ const createTableHtmlSlice = (): TableHtmlSlice => ({
 const createXmlSlice = (): XmlSlice => ({
   xml: '',
   xmlError: undefined,
+  xmlBitStarts: undefined,
   xmlErrorAsString: undefined,
   xmlDurationSec: undefined,
   xmlUpdates: 0,
@@ -254,6 +293,7 @@ const createXmlSlice = (): XmlSlice => ({
 const createTextSlice = (): TextSlice => ({
   text: '',
   textError: undefined,
+  textBitStarts: undefined,
   textErrorAsString: undefined,
   textDurationSec: undefined,
   textUpdates: 0,
@@ -324,7 +364,10 @@ const bitmarkState = proxy<BitmarkState>({
     } else {
       slice.json = json ?? [];
       try {
-        slice.jsonAsString = JSON.stringify(slice.json, undefined, 2);
+        // @awa-impl: PLAN-018-Step2 (the JSON text with each bit's start)
+        const { text, bitStarts } = jsonWithBitStarts(slice.json);
+        slice.jsonAsString = text;
+        slice.jsonBitStarts = bitStarts;
         slice.jsonError = undefined;
         slice.jsonErrorAsString = undefined;
       } catch (e) {
@@ -425,11 +468,18 @@ const bitmarkState = proxy<BitmarkState>({
   // editable editor is never clobbered), while error is set/cleared separately.
   // On error with html undefined (e.g. bitmark -> HTML failed), the last good
   // html is preserved.
-  setTableHtml: (html: string | undefined, htmlError: Error | undefined, durationSec?: number) => {
+  setTableHtml: (
+    html: string | undefined,
+    htmlError: Error | undefined,
+    durationSec?: number,
+    bitStarts?: readonly number[],
+  ) => {
     const slice = bitmarkState.tableHtml as Writable<TableHtmlSlice>;
 
     if (html !== undefined) {
       slice.html = html;
+      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
+      slice.htmlBitStarts = bitStarts;
     }
 
     if (htmlError) {
@@ -452,7 +502,12 @@ const bitmarkState = proxy<BitmarkState>({
   },
 
   // @awa-impl: PLAN-011-Step1 (setText setter; read-only WASM-opt-bitmark -> text view)
-  setText: (text: string | undefined, textError: Error | undefined, durationSec?: number) => {
+  setText: (
+    text: string | undefined,
+    textError: Error | undefined,
+    durationSec?: number,
+    bitStarts?: readonly number[],
+  ) => {
     const slice = bitmarkState.text as Writable<TextSlice>;
 
     if (textError) {
@@ -468,6 +523,8 @@ const bitmarkState = proxy<BitmarkState>({
       }
     } else {
       slice.text = text ?? '';
+      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
+      slice.textBitStarts = bitStarts;
       slice.textError = undefined;
       slice.textErrorAsString = undefined;
     }
@@ -485,11 +542,14 @@ const bitmarkState = proxy<BitmarkState>({
     xml: string | undefined,
     xmlError: Error | undefined,
     durationSec?: number,
+    bitStarts?: readonly number[],
   ) => {
     const slice = bitmarkState[variant] as Writable<XmlSlice>;
 
     if (xml !== undefined) {
       slice.xml = xml;
+      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
+      slice.xmlBitStarts = bitStarts;
     }
 
     if (xmlError) {
@@ -526,6 +586,8 @@ const bitmarkState = proxy<BitmarkState>({
   setEditedJson: (parser: ParserType, json: string) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     slice.jsonAsString = json;
+    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
+    slice.jsonBitStarts = undefined;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
   },
@@ -595,6 +657,8 @@ const bitmarkState = proxy<BitmarkState>({
   setEditedXml: (variant: XmlVariant, xml: string, xmlError: Error | undefined) => {
     const slice = bitmarkState[variant] as Writable<XmlSlice>;
     slice.xml = xml;
+    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
+    slice.xmlBitStarts = undefined;
 
     if (xmlError) {
       slice.xmlError = xmlError;

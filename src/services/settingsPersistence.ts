@@ -17,6 +17,7 @@ function collectSettings(): PersistedSettings {
     showDiffLex: uiState.showDiffLex,
     leftOutputTab: uiState.leftOutputTab,
     rightOutputTab: uiState.rightOutputTab,
+    linkScroll: uiState.linkScroll,
   };
 }
 

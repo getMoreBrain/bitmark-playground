@@ -3,14 +3,17 @@ import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { bitmarkState, ParserType } from '../state/bitmarkState';
-import { useBitmarkConverter } from './BitmarkConverter';
+import { flushOldParser, useBitmarkConverter } from './BitmarkConverter';
 import { BitmarkParserContext } from './BitmarkParser';
 import { BitmarkParserGeneratorContext } from './BitmarkParserGenerator';
 
 // Fake JS parser (bpg): markup->json returns an array (detected by jsonOptions),
 // json->markup returns a string (detected by bitmarkOptions). Throws on 'BAD'.
+// Every call is recorded in `bpgCalls` as `m2j:<input>` or `j2m:<input>`.
+const bpgCalls: string[] = [];
 const fakeBpg = {
   convert: async (input: string, options?: { jsonOptions?: unknown; bitmarkOptions?: unknown }) => {
+    bpgCalls.push(`${options?.jsonOptions ? 'm2j' : 'j2m'}:${input}`);
     if (input === 'BAD') throw new Error('bpg bad');
     if (options?.jsonOptions) return [{ bit: { kind: 'js', src: input } }];
     return `js<<${input}>>`;
@@ -70,6 +73,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
 
     await act(async () => {
       await result.current.jsonToMarkup('js', 'J');
+      await flushOldParser();
     });
 
     // Edited tab: JSON kept verbatim, cross-side markup computed.
@@ -91,6 +95,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
 
     await act(async () => {
       await result.current.markupToJson('js', 'M');
+      await flushOldParser();
     });
 
     // Edited tab: markup kept verbatim, cross-side json computed.
@@ -107,11 +112,30 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
 
     await act(async () => {
       await result.current.markupToJson('wasm', 'M');
+      await flushOldParser();
     });
 
     expect(bitmarkState.wasm.markup).toBe('M'); // edited tab verbatim
     expect(bitmarkState.js.markup).not.toBe('M'); // back-filled
     expect(bitmarkState.js.markup.startsWith('js<<')).toBe(true);
+  });
+
+  // @awa-test: PLAN-019-Step1 (a burst runs the old parser once, on the last input)
+  it('runs the old parser once for a burst of edits, and the WASM parsers for each', async () => {
+    const { result } = renderHook(() => useBitmarkConverter(), { wrapper });
+    bpgCalls.length = 0;
+    await act(async () => {
+      await result.current.markupToJson('wasm', 'M1');
+      expect(bitmarkState.wasm.jsonAsString).toContain('M1');
+      await result.current.markupToJson('wasm', 'M2');
+      expect(bitmarkState.wasm.jsonAsString).toContain('M2');
+      await result.current.markupToJson('wasm', 'M3');
+      // Not yet: the old parser waits for a pause.
+      expect(bpgCalls).toEqual([]);
+      await flushOldParser();
+    });
+    expect(bpgCalls.filter((c) => c.startsWith('m2j:'))).toEqual(['m2j:M3']);
+    expect(bitmarkState.js.jsonAsString).toContain('"src": "M3"');
   });
 
   it('keeps last good value on the same side when the edit fails to convert', async () => {
@@ -120,6 +144,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     // Seed a good round-trip first.
     await act(async () => {
       await result.current.jsonToMarkup('js', 'GOOD');
+      await flushOldParser();
     });
     const goodWasmJson = bitmarkState.wasm.jsonAsString;
     expect(goodWasmJson).toContain('wasm<<optimized:GOOD>>');
@@ -127,6 +152,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     // Now edit Original JSON with input that fails to convert.
     await act(async () => {
       await result.current.jsonToMarkup('js', 'BAD');
+      await flushOldParser();
     });
 
     // Cross-side (bitmark) shows the error.
@@ -141,12 +167,14 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     // Seed a good round-trip so there is a last-good markup to preserve.
     await act(async () => {
       await result.current.jsonToMarkup('js', 'GOOD');
+      await flushOldParser();
     });
     expect(bitmarkState.wasm.markup).toBe('wasm<<optimized:GOOD>>');
 
     // wasm convert now returns `error: …` instead of throwing.
     await act(async () => {
       await result.current.jsonToMarkup('js', 'ERRSTR');
+      await flushOldParser();
     });
 
     expect(bitmarkState.wasm.markupError?.message).toContain('InvalidJson');
@@ -159,6 +187,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
 
     await act(async () => {
       await result.current.markupToJson('wasm', 'M');
+      await flushOldParser();
     });
 
     expect(bitmarkState.wasm.lexerOutput).toBe('Text(Body, false) Span { start: 0, end: 1 } "M"');
@@ -172,6 +201,7 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
 
     await act(async () => {
       await result.current.markupToJson('wasm', 'LEXERR');
+      await flushOldParser();
     });
 
     expect(bitmarkState.wasm.lexerOutput).toMatch(/^Lexer error: .*lexer exploded/);

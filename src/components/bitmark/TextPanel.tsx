@@ -3,6 +3,7 @@
 import { editor } from 'monaco-editor';
 
 import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 
 const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -15,12 +16,16 @@ const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
 export interface TextPanelProps {
   /** Plain text produced from the WASM optimized bitmark */
   text: string;
+  /** Where each bit starts in `text`, recorded by the conversion (PLAN-018 D1) */
+  bitStarts?: readonly number[];
   /** Error string from the conversion, displayed in place of text when present */
   errorAsString?: string;
 }
 
 // @awa-impl: PLAN-011-Step3 (read-only plain-text view)
-const TextPanel = ({ text, errorAsString }: TextPanelProps) => {
+const TextPanel = ({ text, bitStarts, errorAsString }: TextPanelProps) => {
+  // @awa-impl: PLAN-018-Step7 (linked to the bitmark editor's scrolling)
+  const { onMount, onUnmount } = usePinnedScrollSync(text, bitStarts);
   const value = errorAsString ?? text;
 
   return (
@@ -29,6 +34,8 @@ const TextPanel = ({ text, errorAsString }: TextPanelProps) => {
       language="plaintext"
       value={value}
       options={READ_ONLY_OPTIONS}
+      editorDidMount={onMount}
+      editorWillUnmount={onUnmount}
     />
   );
 };

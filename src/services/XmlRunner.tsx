@@ -3,6 +3,7 @@ import type { convert as convertFn } from '@gmb/bitmark-parser';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
 
+import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState, XmlVariant } from '../state/bitmarkState';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 
@@ -163,7 +164,7 @@ const applyXmlEdit = async (
 
 // @awa-impl: PLAN-013-Step2 (WASM bitmark -> XML refresh, per variant)
 const useXmlRunner = (variant: XmlVariant): void => {
-  const { convert: wasmConvert, loadSuccess, markupReady } = useBitmarkParser();
+  const { convert: wasmConvert, convertWithDetails, loadSuccess, markupReady } = useBitmarkParser();
 
   useEffect(() => {
     // A markup format needs the `full` engine (stage 2 of the load).
@@ -171,11 +172,12 @@ const useXmlRunner = (variant: XmlVariant): void => {
 
     const run = (markup: string) => {
       if (markup === '') {
-        bitmarkState.setXml(variant, '', undefined, undefined);
+        bitmarkState.setXml(variant, '', undefined, undefined, []);
         return;
       }
 
       let xml: string | undefined;
+      let bitStarts: number[] | undefined;
       let xmlError: Error | undefined;
 
       const seq = ++markSeq;
@@ -184,7 +186,12 @@ const useXmlRunner = (variant: XmlVariant): void => {
       performance.mark(startMark);
 
       try {
-        xml = throwIfParserError(wasmConvert(markup, bitmarkToXmlOpts(variant)));
+        ({ output: xml, bitStarts } = convertWithBitStarts(
+          wasmConvert,
+          convertWithDetails,
+          markup,
+          bitmarkToXmlOpts(variant),
+        ));
       } catch (e) {
         xmlError = e as Error;
       }
@@ -193,7 +200,7 @@ const useXmlRunner = (variant: XmlVariant): void => {
       const durationSec =
         performance.measure(`${variant}-bitmarkToXml-${seq}`, startMark, endMark).duration / 1000;
 
-      bitmarkState.setXml(variant, xml, xmlError, durationSec);
+      bitmarkState.setXml(variant, xml, xmlError, durationSec, bitStarts);
     };
 
     const evaluate = () => {
@@ -214,7 +221,7 @@ const useXmlRunner = (variant: XmlVariant): void => {
     return () => {
       unsubscribe();
     };
-  }, [wasmConvert, loadSuccess, variant, markupReady]);
+  }, [wasmConvert, convertWithDetails, loadSuccess, variant, markupReady]);
 };
 
 export interface XmlRunnerProps {

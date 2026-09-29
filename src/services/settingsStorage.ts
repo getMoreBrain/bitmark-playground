@@ -11,10 +11,11 @@ export interface PersistedSettings {
   showDiffLex: boolean;
   leftOutputTab: OutputTab;
   rightOutputTab: OutputTab;
+  linkScroll: boolean;
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 9;
+export const CURRENT_VERSION = 10;
 
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
 const VALID_JSON_TABS: readonly string[] = [
@@ -36,6 +37,7 @@ const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer', 'info', 'mappings
 // @awa-impl: PLAN-013-Step7 (v5 → v6 migration)
 // @awa-impl: PLAN-014-Step5 (v7 → v8 migration)
 // @awa-impl: PLAN-015-Step4 (v8 → v9 migration)
+// @awa-impl: PLAN-018-Step8 (v9 → v10 migration)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -86,8 +88,15 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v8 → v9: 'info' added as valid output tab, existing values still valid
   if (obj.v === 8) {
+    obj.v = 9;
+    // Fall through
+  }
+
+  // Migrate v9 → v10: 'linkScroll' added, on by default
+  if (obj.v === 9) {
     obj.v = CURRENT_VERSION;
-    // Fall through to v9 validation
+    obj.linkScroll = true;
+    // Fall through to v10 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
@@ -101,7 +110,8 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
       typeof obj.leftOutputTab === 'string' &&
       VALID_OUTPUT_TABS.includes(obj.leftOutputTab) &&
       typeof obj.rightOutputTab === 'string' &&
-      VALID_OUTPUT_TABS.includes(obj.rightOutputTab)
+      VALID_OUTPUT_TABS.includes(obj.rightOutputTab) &&
+      typeof obj.linkScroll === 'boolean'
     ) {
       return obj as unknown as PersistedSettings;
     }

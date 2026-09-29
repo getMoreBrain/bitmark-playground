@@ -9,6 +9,7 @@ import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
@@ -33,6 +34,17 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     useBitmarkConverter();
 
   const activeTab = bitmarkStateSnap.activeJsonTab;
+
+  // @awa-impl: PLAN-018-Step7 (the JSON tabs link to the bitmark editor's scrolling)
+  // Hooks run on every render; the other tabs link in their own panels.
+  const jsonSlice =
+    activeTab === 'js' || activeTab === 'wasm' || activeTab === 'wasmFull'
+      ? bitmarkStateSnap[activeTab]
+      : undefined;
+  const { onMount, onUnmount } = usePinnedScrollSync(
+    jsonSlice?.jsonAsString ?? '',
+    jsonSlice?.jsonBitStarts,
+  );
 
   // At least one parser must be loaded
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
@@ -73,6 +85,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     return (
       <TableHtmlPanel
         html={bitmarkStateSnap.tableHtml.html}
+        bitStarts={bitmarkStateSnap.tableHtml.htmlBitStarts}
         errorAsString={bitmarkStateSnap.tableHtml.htmlErrorAsString}
       />
     );
@@ -83,6 +96,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     return (
       <TextPanel
         text={bitmarkStateSnap.text.text}
+        bitStarts={bitmarkStateSnap.text.textBitStarts}
         errorAsString={bitmarkStateSnap.text.textErrorAsString}
       />
     );
@@ -92,7 +106,12 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   if (activeTab === 'xmlNiso' || activeTab === 'xmlNisoEs') {
     const xmlSlice = bitmarkStateSnap[activeTab];
     return (
-      <XmlPanel variant={activeTab} xml={xmlSlice.xml} errorAsString={xmlSlice.xmlErrorAsString} />
+      <XmlPanel
+        variant={activeTab}
+        xml={xmlSlice.xml}
+        bitStarts={xmlSlice.xmlBitStarts}
+        errorAsString={xmlSlice.xmlErrorAsString}
+      />
     );
   }
 
@@ -113,6 +132,8 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
         value={value}
         options={opts}
         onInput={onInput}
+        editorDidMount={onMount}
+        editorWillUnmount={onUnmount}
       />
     );
   } else {

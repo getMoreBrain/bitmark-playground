@@ -19,6 +19,8 @@ export interface UiState {
   readonly rightOutputTab: OutputTab;
   /** Whether settings dropdown is open */
   readonly settingsOpen: boolean;
+  /** Whether the top panes scroll together, by bit (PLAN-018) */
+  readonly linkScroll: boolean;
 
   setShowDiffLex(value: boolean): void;
   setBottomPanelHeight(value: number): void;
@@ -26,6 +28,7 @@ export interface UiState {
   setLeftOutputTab(tab: OutputTab): void;
   setRightOutputTab(tab: OutputTab): void;
   setSettingsOpen(value: boolean): void;
+  setLinkScroll(value: boolean): void;
 }
 
 // @awa-impl: PLAN-003-Step1 (settings state)
@@ -39,6 +42,8 @@ const uiState = proxy<UiState>({
   leftOutputTab: stored?.leftOutputTab ?? 'diff',
   rightOutputTab: stored?.rightOutputTab ?? 'diff',
   settingsOpen: false,
+  // @awa-impl: PLAN-018-Step8 (on by default)
+  linkScroll: stored?.linkScroll ?? true,
 
   setShowDiffLex(value: boolean) {
     (uiState as Writable<UiState>).showDiffLex = value;
@@ -62,6 +67,10 @@ const uiState = proxy<UiState>({
 
   setSettingsOpen(value: boolean) {
     (uiState as Writable<UiState>).settingsOpen = value;
+  },
+
+  setLinkScroll(value: boolean) {
+    (uiState as Writable<UiState>).linkScroll = value;
   },
 });
 

@@ -10,6 +10,7 @@ import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
 import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { applyXmlEdit } from '../../services/XmlRunner';
@@ -36,13 +37,17 @@ export interface XmlPanelProps {
   variant: XmlVariant;
   /** Current NISO-STS XML document (bidirectionally synced with the WASM bitmark) */
   xml: string;
+  /** Where each bit starts in `xml`, recorded by the conversion (PLAN-018 D1) */
+  bitStarts?: readonly number[];
   /** Last conversion error (either direction), shown in place of the xml when present */
   errorAsString?: string;
 }
 
 // @awa-impl: PLAN-013-Step3 (editable XML editor; XML -> WASM bitmark on input)
-const XmlPanel = ({ variant, xml, errorAsString }: XmlPanelProps) => {
+const XmlPanel = ({ variant, xml, bitStarts, errorAsString }: XmlPanelProps) => {
   const { convert: wasmConvert } = useBitmarkParser();
+  // @awa-impl: PLAN-018-Step7 (linked to the bitmark editor's scrolling)
+  const { onMount, onUnmount } = usePinnedScrollSync(xml, bitStarts);
   const { markupToJson } = useBitmarkConverter();
 
   const onInput = useCallback(
@@ -80,6 +85,8 @@ const XmlPanel = ({ variant, xml, errorAsString }: XmlPanelProps) => {
       value={value}
       options={DEFAULT_MONACO_OPTIONS}
       onInput={onInput}
+      editorDidMount={onMount}
+      editorWillUnmount={onUnmount}
     />
   );
 };

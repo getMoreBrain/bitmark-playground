@@ -18,6 +18,13 @@ export const editor = {
   }),
   // PLAN-017: markers from the parser's diagnostics.
   setModelMarkers: (..._args: unknown[]) => {},
+  /** Monaco's own values (`monaco.editor.TrackedRangeStickiness`); PLAN-018 bit markers. */
+  TrackedRangeStickiness: {
+    AlwaysGrowsWhenTypingAtEdges: 0,
+    NeverGrowsWhenTypingAtEdges: 1,
+    GrowsOnlyWhenTypingBefore: 2,
+    GrowsOnlyWhenTypingAfter: 3,
+  },
 };
 
 /** Monaco's own values (`monaco.MarkerSeverity`). */

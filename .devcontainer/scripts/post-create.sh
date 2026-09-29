@@ -15,3 +15,7 @@ sudo chown -R vscode:vscode ${CONTAINER_WORKSPACE_FOLDER} 2>/dev/null || true
 mise install
 mise exec -- bun install
 
+# Headless Chromium for browser tests: the system libraries (apt, via sudo)
+# and the Playwright browser build, into PLAYWRIGHT_BROWSERS_PATH.
+mise run playwright-install
+

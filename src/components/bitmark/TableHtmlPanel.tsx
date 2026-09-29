@@ -10,6 +10,7 @@ import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
 import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { applyHtmlEdit } from '../../services/TableHtmlRunner';
@@ -22,13 +23,17 @@ const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
 export interface TableHtmlPanelProps {
   /** Current HTML-table document (bidirectionally synced with the Original bitmark) */
   html: string;
+  /** Where each bit starts in `html`, recorded by the conversion (PLAN-018 D1) */
+  bitStarts?: readonly number[];
   /** Last conversion error (either direction), shown in place of the html when present */
   errorAsString?: string;
 }
 
 // @awa-impl: PLAN-007-Step3 (editable HTML editor; HTML -> bitmark on input)
-const TableHtmlPanel = ({ html, errorAsString }: TableHtmlPanelProps) => {
+const TableHtmlPanel = ({ html, bitStarts, errorAsString }: TableHtmlPanelProps) => {
   const { convert: wasmConvert } = useBitmarkParser();
+  // @awa-impl: PLAN-018-Step7 (linked to the bitmark editor's scrolling)
+  const { onMount, onUnmount } = usePinnedScrollSync(html, bitStarts);
   const { markupToJson } = useBitmarkConverter();
 
   const onInput = useCallback(
@@ -66,6 +71,8 @@ const TableHtmlPanel = ({ html, errorAsString }: TableHtmlPanelProps) => {
       value={value}
       options={DEFAULT_MONACO_OPTIONS}
       onInput={onInput}
+      editorDidMount={onMount}
+      editorWillUnmount={onUnmount}
     />
   );
 };

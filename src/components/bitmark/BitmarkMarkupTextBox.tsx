@@ -11,6 +11,7 @@ import {
   BITMARK_LANGUAGE_ID,
   MONACO_THEME,
 } from '../../monaco-bitmark/bitmarkLanguage';
+import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
@@ -36,6 +37,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     useBitmarkConverter();
   const highlighterRef = useRef<IDisposable>();
   const diagnosticsRef = useRef<IDisposable>();
+  const scrollSync = useSplitScrollSync('bitmark');
 
   const activeTab = bitmarkStateSnap.activeMarkupTab;
   const activeSlice = bitmarkStateSnap[activeTab];
@@ -57,17 +59,24 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
 
   // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
   // @awa-impl: PLAN-017-Step3 (and marked from parser diagnostics)
-  const editorDidMount = useCallback<EditorDidMount>((editor) => {
-    highlighterRef.current = attachBitmarkHighlighter(editor);
-    diagnosticsRef.current = attachBitmarkDiagnostics(editor);
-  }, []);
+  // @awa-impl: PLAN-018-Step7 (and linked to the output pane's scrolling)
+  const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = scrollSync;
+  const editorDidMount = useCallback<EditorDidMount>(
+    (editor) => {
+      highlighterRef.current = attachBitmarkHighlighter(editor);
+      diagnosticsRef.current = attachBitmarkDiagnostics(editor);
+      scrollSyncMount(editor);
+    },
+    [scrollSyncMount],
+  );
 
   const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
     highlighterRef.current?.dispose();
     highlighterRef.current = undefined;
     diagnosticsRef.current?.dispose();
     diagnosticsRef.current = undefined;
-  }, []);
+    scrollSyncUnmount();
+  }, [scrollSyncUnmount]);
 
   // Do initial conversion with the initial markup
   useEffect(() => {

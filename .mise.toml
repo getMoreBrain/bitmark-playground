@@ -2,6 +2,16 @@
 python = "3.14"
 node = '24.16.0'
 bun = '1.3.14'
+"npm:@playwright/test" = "1.63.0"
+"npm:@playwright/cli" = "0.1.22"
 
 "npm:@anthropic-ai/claude-code" = { version = "latest", npm_args = "--ignore-scripts=false" }
 
+[tasks.playwright-install]
+description = "Install the Chromium build for Playwright browser tests"
+run = """
+playwright install --with-deps chromium
+playwright-cli install
+playwright-cli install-browser --with-deps chromium
+playwright-cli install --skills
+"""

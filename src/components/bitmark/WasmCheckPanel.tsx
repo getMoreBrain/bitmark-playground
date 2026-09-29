@@ -9,6 +9,7 @@ import {
   BITMARK_LANGUAGE_ID,
   MONACO_THEME,
 } from '../../monaco-bitmark/bitmarkLanguage';
+import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 
 const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -30,16 +31,23 @@ export interface WasmCheckPanelProps {
 // @awa-impl: PLAN-006-Step5 (read-only round-trip bitmark view)
 const WasmCheckPanel = ({ markup, errorAsString }: WasmCheckPanelProps) => {
   const highlighterRef = useRef<IDisposable>();
+  const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = useSplitScrollSync('output');
 
   // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
-  const editorDidMount = useCallback<EditorDidMount>((editor) => {
-    highlighterRef.current = attachBitmarkHighlighter(editor);
-  }, []);
+  // @awa-impl: PLAN-018-Step7 (and linked to the bitmark editor's scrolling)
+  const editorDidMount = useCallback<EditorDidMount>(
+    (editor) => {
+      highlighterRef.current = attachBitmarkHighlighter(editor);
+      scrollSyncMount(editor);
+    },
+    [scrollSyncMount],
+  );
 
   const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
     highlighterRef.current?.dispose();
     highlighterRef.current = undefined;
-  }, []);
+    scrollSyncUnmount();
+  }, [scrollSyncUnmount]);
 
   const value = errorAsString ?? markup;
 
