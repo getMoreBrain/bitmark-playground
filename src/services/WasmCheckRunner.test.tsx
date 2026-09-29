@@ -50,6 +50,23 @@ describe('useWasmCheckRunner', () => {
     });
   });
 
+  // @awa-test: PLAN-019-Step2 (a burst of JSON changes converts once, on the last JSON)
+  it('converts once, on the last JSON, after a burst of changes', async () => {
+    const convert = vi.fn().mockResolvedValue(ROUND_TRIPPED_MARKUP);
+    renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });
+
+    for (const json of ['{"x":1}', '{"x":2}', '{"x":3}']) {
+      bitmarkState.setEditedJson('wasm', json);
+      // Let valtio deliver each change on its own.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    expect(convert).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(bitmarkState.wasmCheck.markup).toBe(ROUND_TRIPPED_MARKUP));
+    expect(convert).toHaveBeenCalledTimes(1);
+    expect(convert).toHaveBeenCalledWith('{"x":3}', expect.any(Object));
+  });
+
   it('stores error when JS parser convert rejects', async () => {
     const convert = vi.fn().mockRejectedValue(new Error('boom'));
     renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });

@@ -2,6 +2,7 @@
 // @awa-component: PLAN-008-BitmarkConverter
 import type { LexToken } from '@gmb/bitmark-parser';
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
+import debounce from 'lodash/debounce';
 import { useCallback } from 'react';
 
 import { bitmarkState, ParserType } from '../state/bitmarkState';
@@ -9,7 +10,23 @@ import { StringUtils } from '../utils/StringUtils';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
-const PARSERS: readonly ParserType[] = ['js', 'wasm', 'wasmFull'];
+// @awa-impl: PLAN-019-Step1 (the WASM parsers convert on every edit)
+const WASM_PARSERS: readonly ParserType[] = ['wasm', 'wasmFull'];
+const OLD_PARSERS: readonly ParserType[] = ['js'];
+
+/** How long the old (bpg) parser waits for a pause in editing (PLAN-019 D2). */
+export const OLD_PARSER_DEBOUNCE_MS = 250;
+
+// @awa-impl: PLAN-019-Step1 (the old parser runs after a pause, on the latest input)
+// Module level: every editor's converter shares it, so an edit in one tab
+// supersedes a pending one from another.
+const scheduleOldParser = debounce(
+  (job: () => Promise<void>): Promise<void> => job(),
+  OLD_PARSER_DEBOUNCE_MS,
+);
+
+/** Run the pending old-parser conversion now. For tests. */
+export const flushOldParser = (): Promise<void> => scheduleOldParser.flush() ?? Promise.resolve();
 
 // Per-direction JS (bpg) options (constant per direction).
 // Exported so other bpg consumers (e.g. JsRoundTripRunner) convert identically.
@@ -148,14 +165,11 @@ const useBitmarkConverter = (): BitmarkConverter => {
   }, [wasmConvert]);
 
   // @awa-impl: PLAN-008-Step2 (markupToJson: forward calc + per-tab round-trip back-fill)
-  const markupToJson = useCallback(
-    async (editedTab: ParserType, markup: string) => {
-      // Edited tab keeps the user input verbatim.
-      bitmarkState.setEditedMarkup(editedTab, markup);
-
+  const markupToJsonFor = useCallback(
+    async (parsers: readonly ParserType[], editedTab: ParserType, markup: string) => {
       // Forward: markup -> json for every parser, from the edited (source) markup.
       await Promise.allSettled(
-        PARSERS.map(async (parser) => {
+        parsers.map(async (parser) => {
           const r = await markupToJsonForParser(parser, markup);
           if (!r) return;
           bitmarkState.setJson(parser, r.json, r.error, r.durationSec);
@@ -165,29 +179,37 @@ const useBitmarkConverter = (): BitmarkConverter => {
       // Back: json -> markup for each non-edited tab, from its own freshly-computed
       // JSON, via its own parser. Keep last good value on failure.
       await Promise.allSettled(
-        PARSERS.filter((p) => p !== editedTab).map(async (parser) => {
-          const slice = bitmarkState[parser];
-          if (slice.jsonError) return; // forward failed -> keep last good
-          const r = await jsonToMarkupForParser(parser, slice.jsonAsString);
-          if (!r || r.error || r.markup === undefined) return; // keep last good
-          bitmarkState.setMarkup(parser, r.markup, undefined, r.durationSec);
-        }),
+        parsers
+          .filter((p) => p !== editedTab)
+          .map(async (parser) => {
+            const slice = bitmarkState[parser];
+            if (slice.jsonError) return; // forward failed -> keep last good
+            const r = await jsonToMarkupForParser(parser, slice.jsonAsString);
+            if (!r || r.error || r.markup === undefined) return; // keep last good
+            bitmarkState.setMarkup(parser, r.markup, undefined, r.durationSec);
+          }),
       );
-
-      lexWasmOptimized();
     },
-    [markupToJsonForParser, jsonToMarkupForParser, lexWasmOptimized],
+    [markupToJsonForParser, jsonToMarkupForParser],
+  );
+
+  const markupToJson = useCallback(
+    async (editedTab: ParserType, markup: string) => {
+      // Edited tab keeps the user input verbatim.
+      bitmarkState.setEditedMarkup(editedTab, markup);
+      await markupToJsonFor(WASM_PARSERS, editedTab, markup);
+      lexWasmOptimized();
+      void scheduleOldParser(() => markupToJsonFor(OLD_PARSERS, editedTab, markup));
+    },
+    [markupToJsonFor, lexWasmOptimized],
   );
 
   // @awa-impl: PLAN-008-Step2 (jsonToMarkup: forward calc + per-tab round-trip back-fill)
-  const jsonToMarkup = useCallback(
-    async (editedTab: ParserType, json: string) => {
-      // Edited tab keeps the user input verbatim.
-      bitmarkState.setEditedJson(editedTab, json);
-
+  const jsonToMarkupFor = useCallback(
+    async (parsers: readonly ParserType[], editedTab: ParserType, json: string) => {
       // Forward: json -> markup for every parser, from the edited (source) JSON.
       await Promise.allSettled(
-        PARSERS.map(async (parser) => {
+        parsers.map(async (parser) => {
           const r = await jsonToMarkupForParser(parser, json);
           if (!r) return;
           // bpg may legitimately return a non-string ('Expected string'); keep last good.
@@ -199,18 +221,29 @@ const useBitmarkConverter = (): BitmarkConverter => {
       // Back: markup -> json for each non-edited tab, from its own freshly-computed
       // markup, via its own parser. Keep last good value on failure.
       await Promise.allSettled(
-        PARSERS.filter((p) => p !== editedTab).map(async (parser) => {
-          const slice = bitmarkState[parser];
-          if (slice.markupError) return; // forward failed -> keep last good
-          const r = await markupToJsonForParser(parser, slice.markup);
-          if (!r || r.error || r.json === undefined) return; // keep last good
-          bitmarkState.setJson(parser, r.json, undefined, r.durationSec);
-        }),
+        parsers
+          .filter((p) => p !== editedTab)
+          .map(async (parser) => {
+            const slice = bitmarkState[parser];
+            if (slice.markupError) return; // forward failed -> keep last good
+            const r = await markupToJsonForParser(parser, slice.markup);
+            if (!r || r.error || r.json === undefined) return; // keep last good
+            bitmarkState.setJson(parser, r.json, undefined, r.durationSec);
+          }),
       );
-
-      lexWasmOptimized();
     },
-    [jsonToMarkupForParser, markupToJsonForParser, lexWasmOptimized],
+    [jsonToMarkupForParser, markupToJsonForParser],
+  );
+
+  const jsonToMarkup = useCallback(
+    async (editedTab: ParserType, json: string) => {
+      // Edited tab keeps the user input verbatim.
+      bitmarkState.setEditedJson(editedTab, json);
+      await jsonToMarkupFor(WASM_PARSERS, editedTab, json);
+      lexWasmOptimized();
+      void scheduleOldParser(() => jsonToMarkupFor(OLD_PARSERS, editedTab, json));
+    },
+    [jsonToMarkupFor, lexWasmOptimized],
   );
 
   return {
