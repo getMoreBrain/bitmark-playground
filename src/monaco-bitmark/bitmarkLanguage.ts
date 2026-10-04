@@ -25,11 +25,26 @@ const SEMANTIC_TOKENS_OPTIONS = { tokensLayout: 'absolute', positionEncoding: 'u
 
 let languageRegistered = false;
 
+/**
+ * The language's bracket pairs — the same declaration as the VS Code
+ * extension's `language-configuration.json` (PLAN-021 D4): typing `[`
+ * auto-closes to `[]`, and a selection can be surrounded. Monaco only
+ * auto-closes what the language declares, so without this `[.` left the
+ * author to type the `]`; with it, a bit-type template snippet must also
+ * replace that `]` (`replacedSuffixLength`).
+ */
+export const BITMARK_LANGUAGE_CONFIGURATION: monaco.languages.LanguageConfiguration = {
+  brackets: [['[', ']']],
+  autoClosingPairs: [{ open: '[', close: ']' }],
+  surroundingPairs: [{ open: '[', close: ']' }],
+};
+
 /** Register the bitmark language and inject the token stylesheet (idempotent). */
 export const registerBitmarkLanguage = (): void => {
   if (languageRegistered) return;
   languageRegistered = true;
   monaco.languages.register({ id: BITMARK_LANGUAGE_ID });
+  monaco.languages.setLanguageConfiguration(BITMARK_LANGUAGE_ID, BITMARK_LANGUAGE_CONFIGURATION);
 
   const style = document.createElement('style');
   style.setAttribute('data-bitmark-highlight', '');

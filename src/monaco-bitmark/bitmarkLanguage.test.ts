@@ -6,11 +6,29 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { log } from '../logging/log';
 import {
   attachBitmarkHighlighter,
+  BITMARK_LANGUAGE_CONFIGURATION,
+  BITMARK_LANGUAGE_ID,
   buildBitmarkDecorations,
   HIGHLIGHT_DEBOUNCE_MS,
+  registerBitmarkLanguage,
   SemanticTokensSource,
   setBitmarkSemanticTokensSource,
 } from './bitmarkLanguage';
+
+// @awa-test: PLAN-021-Step3 (the `[` `]` pair auto-closes, as in the VS Code extension)
+describe('registerBitmarkLanguage', () => {
+  it('declares the bracket pair so Monaco auto-closes `[` and can surround with it', () => {
+    const configured = vi.spyOn(monaco.languages, 'setLanguageConfiguration');
+    registerBitmarkLanguage();
+    expect(configured).toHaveBeenCalledWith(BITMARK_LANGUAGE_ID, BITMARK_LANGUAGE_CONFIGURATION);
+    expect(BITMARK_LANGUAGE_CONFIGURATION.autoClosingPairs).toEqual([{ open: '[', close: ']' }]);
+    expect(BITMARK_LANGUAGE_CONFIGURATION.brackets).toEqual([['[', ']']]);
+    expect(BITMARK_LANGUAGE_CONFIGURATION.surroundingPairs).toEqual([{ open: '[', close: ']' }]);
+    // Idempotent: a second call registers nothing again.
+    registerBitmarkLanguage();
+    expect(configured).toHaveBeenCalledTimes(1);
+  });
+});
 
 const legend = { tokenTypes: [], tokenModifiers: [] };
 

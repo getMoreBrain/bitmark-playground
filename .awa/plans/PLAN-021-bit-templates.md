@@ -26,6 +26,11 @@ the `]` after the cursor.
   the cursor for the prefix rule.
 - D3 — `resolve` stays as it is: it finds the item by label and kind, and
   the documentation does not depend on the insert text.
+- D4 — The language declares its bracket pair (`BITMARK_LANGUAGE_CONFIGURATION`,
+  the VS Code extension's `language-configuration.json` verbatim): Monaco
+  only auto-closes what a language declares, and bitmark had declared
+  nothing, so `[` never closed. Now `[.` yields `[.]`, and D2's rule is what
+  keeps a template from doubling the `]`.
 
 ## Steps
 
@@ -33,3 +38,4 @@ the `]` after the cursor.
   `lineAfterCursor`; `CompleteSource` options gain `bitTemplate`. Tests in
   `bitmarkCompletion.test.ts`.
 - Step 2 — Parser `^7.8.1` (the first release with templates); README.
+- Step 3 — The language configuration (D4) and its test.
