@@ -97,7 +97,13 @@ export type DiagnosticsSource = (
 export type CompleteSource = (
   input: string,
   position: EditorPosition,
-  options?: { positionEncoding?: string; includeDeprecated?: boolean; triggerCharacter?: string },
+  options?: {
+    positionEncoding?: string;
+    includeDeprecated?: boolean;
+    triggerCharacter?: string;
+    /** A bit-type item inserts the bit's template as a snippet (parser PLAN-225 D9). */
+    bitTemplate?: boolean;
+  },
 ) => BitmarkCompletionList;
 
 /**

@@ -59,6 +59,26 @@ export const replacedPrefixLength = (before: string, label: string): number => {
   return 0;
 };
 
+/**
+ * The options every completion query carries (parser PLAN-225 D9): a
+ * bit-type item inserts the bit's template — its usual tags, body and card
+ * structure — as a snippet, from the name onward, instead of the name alone.
+ */
+export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
+
+/**
+ * The text after the cursor an item replaces as well: the `]` Monaco
+ * auto-closed when a bit-type snippet carries its own (`article]⏎…`), so
+ * the bracket is not doubled.
+ */
+export const replacedSuffixLength = (after: string, item: BitmarkCompletionItem): number =>
+  item.kind === LspCompletionKind.Class &&
+  item.insertTextFormat === 2 &&
+  item.insertText.includes(']') &&
+  after.startsWith(']')
+    ? 1
+    : 0;
+
 /** The query a suggestion came from — what the parser's `resolve` needs. */
 export interface CompletionQuery {
   input: string;
@@ -80,8 +100,10 @@ export const toMonacoSuggestion = (
   position: monaco.IPosition,
   lineBeforeCursor: string,
   query?: CompletionQuery,
+  lineAfterCursor = '',
 ): BitmarkSuggestion => {
   const replaced = replacedPrefixLength(lineBeforeCursor, item.label);
+  const replacedAfter = replacedSuffixLength(lineAfterCursor, item);
   return {
     bitmark: query ? { query, item } : undefined,
     label: item.label,
@@ -104,7 +126,7 @@ export const toMonacoSuggestion = (
       startLineNumber: position.lineNumber,
       endLineNumber: position.lineNumber,
       startColumn: position.column - replaced,
-      endColumn: position.column,
+      endColumn: position.column + replacedAfter,
     },
   };
 };
@@ -182,17 +204,26 @@ export const registerBitmarkCompletion = (): void => {
           position: { line: position.lineNumber - 1, character: position.column - 1 },
         };
         const triggerCharacter = triggerCharacterOf(context);
-        const list = source(query.input, query.position, { triggerCharacter });
+        const list = source(query.input, query.position, {
+          triggerCharacter,
+          ...COMPLETE_OPTIONS,
+        });
         const lineBeforeCursor = model.getValueInRange({
           startLineNumber: position.lineNumber,
           startColumn: 1,
           endLineNumber: position.lineNumber,
           endColumn: position.column,
         });
+        const lineAfterCursor = model.getValueInRange({
+          startLineNumber: position.lineNumber,
+          startColumn: position.column,
+          endLineNumber: position.lineNumber,
+          endColumn: model.getLineMaxColumn(position.lineNumber),
+        });
         return {
           incomplete: list.isIncomplete,
           suggestions: list.items.map((i) =>
-            toMonacoSuggestion(i, position, lineBeforeCursor, query),
+            toMonacoSuggestion(i, position, lineBeforeCursor, query, lineAfterCursor),
           ),
         };
       } catch (e) {
