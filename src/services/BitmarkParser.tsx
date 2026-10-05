@@ -19,6 +19,8 @@ import {
   useState,
 } from 'react';
 
+import type { BitmarkEngine } from '../lib/engine';
+import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '../lib/engine';
 import { log } from '../logging/log';
 import type {
   CompleteSource,
@@ -50,23 +52,6 @@ export const engineUrl = (search: string, base: string, cacheBuster: number): st
 
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
-
-// The string-based API (`convert`, `info`) reports failures by returning an
-// `error: …`-prefixed string rather than throwing.
-const PARSER_ERROR_PREFIX = 'error:';
-
-/**
- * Return `out` unchanged, or throw when it is a parser error string.
- *
- * Call this on every `convert` / `info` result that is piped onward, otherwise
- * an error message is treated as document content and re-parsed downstream.
- */
-const throwIfParserError = (out: string): string => {
-  if (out.startsWith(PARSER_ERROR_PREFIX)) {
-    throw new Error(out.slice(PARSER_ERROR_PREFIX.length).trim());
-  }
-  return out;
-};
 
 interface BitmarkParserModule {
   init: typeof initFn;
@@ -114,6 +99,12 @@ interface IBitmarkParserContext {
   resolve: ResolveSource | undefined;
   hover: HoverSource | undefined;
   version: string;
+  /**
+   * The same parser as an async engine (PLAN-021 Step 1), for code moving
+   * to `src/lib`. The raw functions above stay until the playground runs on
+   * the package (PLAN-021 Step 14).
+   */
+  engine: BitmarkEngine | undefined;
 }
 
 const defaultState: IBitmarkParserContext = {
@@ -131,6 +122,7 @@ const defaultState: IBitmarkParserContext = {
   resolve: undefined,
   hover: undefined,
   version: '',
+  engine: undefined,
 };
 
 const BitmarkParserContext = createContext<IBitmarkParserContext>(defaultState);
@@ -148,18 +140,21 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const moduleUrl = engineUrl(window.location.search, import.meta.env.BASE_URL, _cacheBuster);
 
+    // @awa-impl: PLAN-021-Step1 (the provider loads through the lib's load path)
     const load = async () => {
       try {
-        // Load ES module via dynamic import
-        const module = (await import(/* @vite-ignore */ moduleUrl)) as BitmarkParserModule;
-
         // Stage 1: the smallest variant, so the editor is live as soon as
         // possible — bitmark ↔ JSON, highlighting, diagnostics, completion
         // and hover. `info` waits: this variant renders it as JSON only.
-        await module.init({ feature: 'bitmark-json' });
-
-        // Get version from the library itself
-        const resolvedVersion = module.version();
+        // Stage 2 (`full`) — the markup formats, `info` as text, and the
+        // `info` meta layer (bit and tag descriptions, which completion
+        // documentation and hover show) — loads in the background while
+        // stage 1 keeps serving; the package swaps atomically.
+        const { module: loadedModule, stage2 } = await loadBitmarkModule(moduleUrl, {
+          feature: 'full',
+        });
+        const module = loadedModule as BitmarkParserModule;
+        const engine = createBitmarkEngine(loadedModule, { feature: 'bitmark-json' });
 
         // @awa-impl: PLAN-017-Step5 (the JSON pane validates against the
         // schema the SAME parser version publishes). Independent of the
@@ -180,39 +175,22 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           complete: module.complete,
           resolve: module.resolve,
           hover: module.hover,
-          version: resolvedVersion,
+          version: engine.version,
+          engine,
         };
         setState(loaded);
 
-        // Stage 2: `full` — the markup formats, `info` as text, and the
-        // `info` meta layer (bit and tag descriptions, which completion
-        // documentation and hover show). Loads in the background while
-        // stage 1 keeps serving; the package swaps atomically. A failure
-        // here leaves stage 1 in place.
-        try {
-          await module.init({ feature: 'full' });
-          setState({ ...loaded, markupReady: true, info: module.info });
-        } catch (e) {
-          log.error('BitmarkParserProvider: the full engine failed to load', e);
-        }
+        // A stage-2 failure leaves stage 1 in place.
+        stage2.then(
+          (feature) => {
+            engine.setFeature(feature);
+            setState({ ...loaded, markupReady: true, info: module.info });
+          },
+          (e) => log.error('BitmarkParserProvider: the full engine failed to load', e),
+        );
       } catch (e) {
         log.error('BitmarkParserProvider: failed to load', e);
-        setState({
-          loadSuccess: false,
-          loadError: true,
-          markupReady: false,
-          bitmarkToObjects: undefined,
-          convert: undefined,
-          convertWithDetails: undefined,
-          info: undefined,
-          semanticTokens: undefined,
-          splitBits: undefined,
-          diagnostics: undefined,
-          complete: undefined,
-          resolve: undefined,
-          hover: undefined,
-          version: '',
-        });
+        setState({ ...defaultState, loadError: true });
       }
     };
 

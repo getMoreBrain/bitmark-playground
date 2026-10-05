@@ -80,6 +80,44 @@ const config = [
   },
 
   //
+  // src/lib: the future @gmb/bitmark-editor core (PLAN-020 D6, D8). It must
+  // lift out unchanged: no playground imports, no framework or state
+  // library, and Monaco only as types (the host injects the instance).
+  //
+  {
+    files: ['src/lib/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'monaco-editor',
+              message: 'src/lib receives Monaco by injection (PLAN-020 D8); import types only.',
+              allowTypeImports: true,
+            },
+          ],
+          patterns: [
+            {
+              group: ['react', 'react-*', 'valtio', 'valtio/*', 'theme-ui', 'lodash', 'lodash/*'],
+              message: 'src/lib is framework-free (PLAN-020 D6).',
+            },
+            {
+              group: ['monaco-editor/*'],
+              message: 'src/lib receives Monaco by injection (PLAN-020 D8); import types only.',
+              allowTypeImports: true,
+            },
+            {
+              group: ['../../*'],
+              message: 'src/lib must not import from outside src/lib (PLAN-020 D6).',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  //
   // JavaScript files
   //
   {

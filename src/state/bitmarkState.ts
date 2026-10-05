@@ -4,7 +4,7 @@
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
-import { jsonWithBitStarts } from '../scrollSync/jsonText';
+import { jsonWithBitStarts } from '../lib/json/jsonText';
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 

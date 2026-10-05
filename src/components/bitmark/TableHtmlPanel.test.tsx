@@ -36,6 +36,7 @@ const fakeWasmParser = {
   resolve: undefined,
   hover: undefined,
   version: 'test',
+  engine: undefined,
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
