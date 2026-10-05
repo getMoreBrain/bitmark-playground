@@ -28,6 +28,9 @@ const config = [
       '.awa',
       'src/generated',
       '**/*.d.ts',
+      // PLAN-020 Phase 0 spikes: throwaway, not linted.
+      'packages/bitmark-editor/spikes',
+      'packages/bitmark-editor/playground-spike',
     ],
   },
 

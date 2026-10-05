@@ -46,3 +46,8 @@ junit.xml
 
 
 # PACKAGE SPECIFIC
+
+# Spikes
+/packages/**/node_modules
+/packages/**/spikes/**/dist
+/packages/**/spikes/**/results

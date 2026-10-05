@@ -91,6 +91,8 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // The playground's own tests only; `packages/` carry their own runners.
+    include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
