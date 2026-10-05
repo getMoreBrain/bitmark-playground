@@ -167,11 +167,11 @@ and to the package in Phase 2.
     Rebuilding it on `createTextEditor` (dropping `react-monaco-editor`)
     moves to Step 14, where the playground's components are replaced
     anyway.
-- [ ] Step 7 — `createBitmarkSession`: state, the edit flow with the
+- [x] Step 7 — `createBitmarkSession`: state, the edit flow with the
   "skip the source" rule, errors with the last good value kept, events.
   Error display (D15): markers on the source pane, the stale state on the
   others, and the `error` event.
-- [ ] Step 8 — Panes: bitmark, JSON (`mode`), HTML, XML (`mapping`) and Text,
+- [x] Step 8 — Panes: bitmark, JSON (`mode`), HTML, XML (`mapping`) and Text,
   with `readOnly` and `scrollSync` options and setters. Ported from
   `BitmarkMarkupTextBox`, `BitmarkJsonTextBox`, the runners and the panels.
 

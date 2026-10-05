@@ -72,6 +72,17 @@ export const createFakeModel = (text: string, uri = `inmemory://model/${++modelS
     dispose: () => {
       model.disposed = true;
     },
+    getPositionAt: (offset: number) => {
+      const before = value.slice(0, offset).split('\n');
+      return { lineNumber: before.length, column: before[before.length - 1]!.length + 1 };
+    },
+    getOffsetAt: ({ lineNumber, column }: { lineNumber: number; column: number }) => {
+      const lines = value.split('\n');
+      let offset = 0;
+      for (let i = 0; i < lineNumber - 1; i++) offset += lines[i]!.length + 1;
+      return offset + column - 1;
+    },
+    getLineMaxColumn: (line: number) => (value.split('\n')[line - 1]?.length ?? 0) + 1,
     getValueInRange: (r: FakeRange) => {
       const line = value.split('\n')[r.startLineNumber - 1] ?? '';
       return line.slice(r.startColumn - 1, r.endColumn - 1);
@@ -93,7 +104,13 @@ export const createFakeMonaco = () => {
   const languages: { id: string }[] = [];
   const setDiagnosticsOptions = vi.fn();
   const setTheme = vi.fn();
-  const editors: { focused: boolean; options: Record<string, unknown>; disposed: boolean }[] = [];
+  const editors: {
+    focused: boolean;
+    options: Record<string, unknown>;
+    disposed: boolean;
+    scrollTop: number;
+    decorations: unknown[];
+  }[] = [];
   const monaco = {
     Range: FakeRange,
     Uri: { parse: (u: string) => ({ toString: () => u }) },
@@ -106,9 +123,17 @@ export const createFakeMonaco = () => {
         return model;
       },
       create: (_element: unknown, options: Record<string, unknown>) => {
-        const state = { focused: false, options: { ...options }, disposed: false };
+        const state = {
+          focused: false,
+          options: { ...options },
+          disposed: false,
+          scrollTop: 0,
+          decorations: [] as unknown[],
+        };
         editors.push(state);
         const model = options['model'] as FakeModel;
+        const noop = () => ({ dispose: () => {} });
+        const scroll = emitter<{ scrollTopChanged: boolean; scrollHeightChanged: boolean }>();
         return {
           getModel: () => model,
           hasTextFocus: () => state.focused,
@@ -117,6 +142,34 @@ export const createFakeMonaco = () => {
           dispose: () => {
             state.disposed = true;
           },
+          onDidChangeModelContent: (cb: () => void) => model.onDidChangeContent(cb),
+          onDidChangeModel: noop,
+          onDidContentSizeChange: noop,
+          onDidLayoutChange: noop,
+          onDidScrollChange: scroll.on,
+          getContribution: () => ({}),
+          createDecorationsCollection: () => {
+            let ranges: { range: FakeRange }[] = [];
+            return {
+              set: (d: { range: FakeRange }[]) => {
+                ranges = d;
+                state.decorations = d;
+              },
+              clear: () => {
+                ranges = [];
+                state.decorations = [];
+              },
+              getRanges: () => ranges.map((r) => r.range),
+            };
+          },
+          getScrollTop: () => state.scrollTop,
+          setScrollTop: (top: number) => {
+            state.scrollTop = top;
+            scroll.fire({ scrollTopChanged: true, scrollHeightChanged: false });
+          },
+          getScrollHeight: () => model.getValue().split('\n').length * 10,
+          getLayoutInfo: () => ({ height: 50 }),
+          getTopForPosition: (line: number) => (line - 1) * 10,
         };
       },
       setModelMarkers: (model: TextModel, owner: string, m: unknown[]) => {
