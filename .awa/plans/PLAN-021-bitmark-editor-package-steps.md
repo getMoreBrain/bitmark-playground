@@ -99,16 +99,28 @@ takes an injected Monaco and parser (D2, D8). All 9 browser checks pass.
 Keep the playground green after every step. The code moves to `src/lib/` first
 and to the package in Phase 2.
 
-- [ ] Step 1 — Engine: the async `BitmarkEngine` (D14),
+- [x] Step 1 — Engine: the async `BitmarkEngine` (D14),
   `createBitmarkEngine` (main thread, sync calls wrapped), and
   `loadBitmarkEngine` (two-stage init, stage subscription, per-URL cache).
   `BitmarkParserProvider` becomes a thin React wrapper over it. `engineUrl`
   stays in the playground.
-- [ ] Step 1a — Worker engine (D14): the worker script, and
-  `loadBitmarkEngine({ worker: true })` / `createBitmarkWorkerEngine(url)`:
-  - the parser and the JSON text with bit starts built in the worker;
-  - latest-wins coalescing, and a fast lane for tokens and diagnostics;
-  - model-version tags, and stale results dropped.
+- [x] Step 1a — Worker engine (D14): the worker script (`engineWorker`),
+  `serveBitmarkEngine`, and `createBitmarkWorkerEngine({ createPort })`:
+  - the parser and the JSON text with bit starts are built in the worker;
+  - a fast lane for tokens, diagnostics, completion, hover and splits;
+  - latest-wins coalescing per caller (`createLatestRunner`);
+  - model-version tags (stale results dropped) are applied by the callers
+    in Steps 2–8.
+
+  Measured in Chromium on 351 KB, ten edits each converted, tokenised and
+  validated:
+  - on the main thread, the longest blocking task is about 1.1 s;
+  - with the worker engine, a single result never makes a long task, and
+    a burst of three large results occasionally does (100–150 ms, likely
+    GC).
+
+  The `{ worker: true }` shorthand on `loadBitmarkEngine` waits for the
+  package build (Step 11), which decides how the worker script is shipped.
 - [ ] Step 2 — Per-instance sources in `src/monaco-bitmark/*`. The attachers
   take the engine. The completion and hover providers find the engine
   through the model map. The `set…Source` globals and `SemanticTokensRunner`

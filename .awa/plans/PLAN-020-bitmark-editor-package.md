@@ -321,9 +321,13 @@ likes, and the playground consumes the package.
     `createBitmarkWorkerEngine(url)` for hosts that bundle the worker.
     - The worker runs the parser and builds the JSON text and bit starts.
       It posts back strings, so the main thread does only Monaco work.
-    - Requests are coalesced, latest edit wins (this generalises D12's
-      `debounceMs`). Highlighting and diagnostics run on a fast lane, so a
-      long conversion never delays colouring.
+    - Highlighting and diagnostics run on a fast lane (a second worker), so
+      a long conversion never delays colouring.
+    - Latest-wins coalescing belongs to each caller, not to the engine
+      (`createLatestRunner`). One engine can serve several documents, so
+      "the latest call" is only meaningful per caller. Each caller has at
+      most one call in flight, and intermediate requests are dropped. This
+      generalises D12's `debounceMs`. (Refined in Phase 1 Step 1a.)
     - It is a second wasm instance from the same pinned URL (D13), so it
       comes from cache. In `/bundled`, the worker starts from a blob URL,
       like Monaco's (D12).
