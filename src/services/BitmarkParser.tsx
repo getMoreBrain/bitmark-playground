@@ -2,13 +2,18 @@
 
 import type {
   bitmarkToObjects as bitmarkToObjectsFn,
+  complete as completeFn,
   convert as convertFn,
   convertWithDetails as convertWithDetailsFn,
+  diagnostics as diagnosticsFn,
+  hover as hoverFn,
   info as infoFn,
   init as initFn,
+  resolve as resolveFn,
   semanticTokens as semanticTokensFn,
   splitBits as splitBitsFn,
 } from '@gmb/bitmark-parser';
+import * as monaco from 'monaco-editor';
 import {
   createContext,
   ReactElement,
@@ -21,14 +26,8 @@ import {
 
 import type { BitmarkEngine } from '../lib/engine';
 import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '../lib/engine';
+import { bindBitmarkJsonSchema, loadBitmarkJsonSchema, Monaco, schemaUrlFor } from '../lib/monaco';
 import { log } from '../logging/log';
-import type {
-  CompleteSource,
-  DiagnosticsSource,
-  HoverSource,
-  ResolveSource,
-} from '../monaco-bitmark/bitmarkEditorTypes';
-import { registerBitmarkJsonSchema } from '../monaco-bitmark/bitmarkJsonSchema';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
@@ -67,10 +66,10 @@ interface BitmarkParserModule {
   // The editor services (parser PLAN-196). Optional: a parser older than the
   // release that carries them simply has no such export, and the playground
   // then runs without markers, completion or hover.
-  diagnostics?: DiagnosticsSource;
-  complete?: CompleteSource;
-  resolve?: ResolveSource;
-  hover?: HoverSource;
+  diagnostics?: typeof diagnosticsFn;
+  complete?: typeof completeFn;
+  resolve?: typeof resolveFn;
+  hover?: typeof hoverFn;
 }
 
 interface BitmarkParserProviderProps {
@@ -94,10 +93,10 @@ interface IBitmarkParserContext {
   info: typeof infoFn | undefined;
   semanticTokens: typeof semanticTokensFn | undefined;
   splitBits: typeof splitBitsFn | undefined;
-  diagnostics: DiagnosticsSource | undefined;
-  complete: CompleteSource | undefined;
-  resolve: ResolveSource | undefined;
-  hover: HoverSource | undefined;
+  diagnostics: typeof diagnosticsFn | undefined;
+  complete: typeof completeFn | undefined;
+  resolve: typeof resolveFn | undefined;
+  hover: typeof hoverFn | undefined;
   version: string;
   /**
    * The same parser as an async engine (PLAN-021 Step 1), for code moving
@@ -159,7 +158,13 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         // @awa-impl: PLAN-017-Step5 (the JSON pane validates against the
         // schema the SAME parser version publishes). Independent of the
         // engine: a failure leaves JSON syntax checking as it was.
-        void registerBitmarkJsonSchema(moduleUrl);
+        // Every JSON model in the playground holds a bitmark document (the
+        // JSON tabs and the JSON diff), so the schema applies to all of them.
+        void loadBitmarkJsonSchema(schemaUrlFor(moduleUrl)).then(
+          (schema) =>
+            schema !== undefined &&
+            bindBitmarkJsonSchema(monaco as unknown as Monaco, schema, { fileMatch: ['*'] }),
+        );
 
         const loaded: IBitmarkParserContext = {
           loadSuccess: true,

@@ -2,7 +2,7 @@
 /** @jsxImportSource theme-ui */
 import { editor } from 'monaco-editor';
 
-import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { MONACO_THEME } from '../../lib/theme/tokens';
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 

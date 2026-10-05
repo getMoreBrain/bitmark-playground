@@ -20,7 +20,6 @@ import { EditorServicesRunner } from './services/EditorServicesRunner';
 import { InfoRunner } from './services/InfoRunner';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
 import { MappingsRunner } from './services/MappingsRunner';
-import { SemanticTokensRunner } from './services/SemanticTokensRunner';
 import { TableHtmlRunner } from './services/TableHtmlRunner';
 import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
@@ -219,7 +218,6 @@ function App() {
           <InfoRunner />
           <XmlRunner variant="xmlNiso" />
           <XmlRunner variant="xmlNisoEs" />
-          <SemanticTokensRunner />
           <EditorServicesRunner />
           <Flex
             sx={{

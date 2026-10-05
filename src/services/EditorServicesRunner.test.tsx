@@ -1,29 +1,16 @@
-// @awa-test: PLAN-017-Step2 (runner installs / removes the parser's editor services)
+// @awa-test: PLAN-018-Step1 (runner installs / removes the parser's splitBits for linked scrolling)
 import { render } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  setBitmarkCompleteSource,
-  setBitmarkResolveSource,
-} from '../monaco-bitmark/bitmarkCompletion';
-import { setBitmarkDiagnosticsSource } from '../monaco-bitmark/bitmarkDiagnostics';
-import { setBitmarkHoverSource } from '../monaco-bitmark/bitmarkHover';
+import { setSplitBitsSource } from '../scrollSync/scrollSync';
 import { BitmarkParserContext } from './BitmarkParser';
 import { EditorServicesRunner } from './EditorServicesRunner';
 
-vi.mock('../monaco-bitmark/bitmarkCompletion', () => ({
-  setBitmarkCompleteSource: vi.fn(),
-  setBitmarkResolveSource: vi.fn(),
-}));
-vi.mock('../monaco-bitmark/bitmarkDiagnostics', () => ({ setBitmarkDiagnosticsSource: vi.fn() }));
-vi.mock('../monaco-bitmark/bitmarkHover', () => ({ setBitmarkHoverSource: vi.fn() }));
+vi.mock('../scrollSync/scrollSync', () => ({ setSplitBitsSource: vi.fn() }));
 
 type ContextValue = Parameters<typeof BitmarkParserContext.Provider>[0]['value'];
 
-const diagnostics = vi.fn();
-const complete = vi.fn();
-const resolve = vi.fn();
-const hover = vi.fn();
+const splitBits = vi.fn();
 
 const renderWith = (value: Partial<ContextValue>) =>
   render(
@@ -35,43 +22,17 @@ const renderWith = (value: Partial<ContextValue>) =>
   );
 
 describe('EditorServicesRunner', () => {
-  beforeEach(() => {
-    vi.mocked(setBitmarkDiagnosticsSource).mockClear();
-    vi.mocked(setBitmarkCompleteSource).mockClear();
-    vi.mocked(setBitmarkResolveSource).mockClear();
-    vi.mocked(setBitmarkHoverSource).mockClear();
-  });
+  beforeEach(() => vi.mocked(setSplitBitsSource).mockClear());
 
-  it('installs the three services once the parser has loaded, and removes them on unmount', () => {
-    const { unmount } = renderWith({
-      loadSuccess: true,
-      markupReady: true,
-      diagnostics: diagnostics as unknown as ContextValue['diagnostics'],
-      complete: complete as unknown as ContextValue['complete'],
-      resolve: resolve as unknown as ContextValue['resolve'],
-      hover: hover as unknown as ContextValue['hover'],
-    });
-    expect(setBitmarkDiagnosticsSource).toHaveBeenLastCalledWith(diagnostics);
-    expect(setBitmarkCompleteSource).toHaveBeenLastCalledWith(complete);
-    expect(setBitmarkResolveSource).toHaveBeenLastCalledWith(resolve);
-    expect(setBitmarkHoverSource).toHaveBeenLastCalledWith(hover);
-
+  it('installs splitBits once the parser has loaded, and removes it on unmount', () => {
+    const { unmount } = renderWith({ loadSuccess: true, splitBits } as Partial<ContextValue>);
+    expect(setSplitBitsSource).toHaveBeenLastCalledWith(splitBits);
     unmount();
-    expect(setBitmarkDiagnosticsSource).toHaveBeenLastCalledWith(undefined);
-    expect(setBitmarkCompleteSource).toHaveBeenLastCalledWith(undefined);
-    expect(setBitmarkResolveSource).toHaveBeenLastCalledWith(undefined);
-    expect(setBitmarkHoverSource).toHaveBeenLastCalledWith(undefined);
+    expect(setSplitBitsSource).toHaveBeenLastCalledWith(undefined);
   });
 
   it('installs nothing before the parser has loaded', () => {
-    renderWith({ loadSuccess: false });
-    expect(setBitmarkDiagnosticsSource).not.toHaveBeenCalled();
-  });
-
-  it('installs only what the loaded parser has — an older engine has no services', () => {
-    renderWith({ loadSuccess: true });
-    expect(setBitmarkDiagnosticsSource).toHaveBeenLastCalledWith(undefined);
-    expect(setBitmarkCompleteSource).toHaveBeenLastCalledWith(undefined);
-    expect(setBitmarkHoverSource).toHaveBeenLastCalledWith(undefined);
+    renderWith({ splitBits } as Partial<ContextValue>);
+    expect(setSplitBitsSource).not.toHaveBeenCalled();
   });
 });

@@ -17,5 +17,11 @@ test('the playground loads, converts and highlights', async ({ page }) => {
   // Diagnostics: an unknown bit type is marked.
   await page.keyboard.type('\n\n[.no-such-bit-xyz]\nx');
   await expect(page.locator('.markup-editor .squiggly-error, .markup-editor .squiggly-warning').first()).toBeVisible({ timeout: 10_000 });
+  // Completion opens on `[` + `.`, and hover describes a bit type.
+  await page.keyboard.type('\n\n[.');
+  await expect(page.locator('.suggest-widget.visible').first()).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.press('Escape');
+  await page.locator('.markup-editor .bm-tok-bitType').first().hover();
+  await expect(page.locator('.monaco-hover:not(.hidden)').first()).toBeVisible({ timeout: 10_000 });
   expect(errors.filter((e) => !e.includes('favicon'))).toEqual([]);
 });

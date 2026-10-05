@@ -24,14 +24,13 @@ import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution';
 // Import codicon font (needed for Monaco's UI icons: folding arrows, suggestions, etc.)
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles';
 
+import * as monaco from 'monaco-editor';
 // Configure Monaco to locate the web workers
 // This replaces what vite-plugin-monaco-editor was doing
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 
-import { registerBitmarkCompletion } from './monaco-bitmark/bitmarkCompletion';
-import { registerBitmarkHover } from './monaco-bitmark/bitmarkHover';
-import { registerBitmarkLanguage } from './monaco-bitmark/bitmarkLanguage';
+import { Monaco, setupBitmarkMonaco } from './lib/monaco';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string) {
@@ -43,8 +42,6 @@ self.MonacoEnvironment = {
 };
 
 // @awa-impl: PLAN-016-Step5 (bitmark language + token stylesheet registered before any editor mounts)
-registerBitmarkLanguage();
-// @awa-impl: PLAN-017-Step4 (completion + hover providers; they answer once
-// the parser has loaded and installed its sources)
-registerBitmarkCompletion();
-registerBitmarkHover();
+// @awa-impl: PLAN-021-Step4 (on the playground's own Monaco, injected; the
+// providers answer for each editor's model with that editor's engine)
+setupBitmarkMonaco({ monaco: monaco as unknown as Monaco });

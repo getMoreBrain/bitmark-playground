@@ -1,42 +1,28 @@
 // @awa-component: PLAN-017-EditorServicesRunner
 import { useEffect } from 'react';
 
-import {
-  setBitmarkCompleteSource,
-  setBitmarkResolveSource,
-} from '../monaco-bitmark/bitmarkCompletion';
-import { setBitmarkDiagnosticsSource } from '../monaco-bitmark/bitmarkDiagnostics';
-import { setBitmarkHoverSource } from '../monaco-bitmark/bitmarkHover';
 import { setSplitBitsSource } from '../scrollSync/scrollSync';
 import { useBitmarkParser } from './BitmarkParser';
 
-// @awa-impl: PLAN-017-Step2 (parser diagnostics / complete / hover -> Monaco)
-// @awa-impl: PLAN-018-Step1 (and splitBits -> linked scrolling)
+// @awa-impl: PLAN-018-Step1 (splitBits -> linked scrolling)
+// Highlighting, diagnostics, completion and hover no longer go through
+// module-level sources: each editor attaches the lib's services with its
+// engine (PLAN-021 Step 2). Only the scroll sync's splitBits remains here,
+// until the scroll group takes its engine per pane (PLAN-021 Step 5).
 const useEditorServicesRunner = (): void => {
-  const { diagnostics, complete, resolve, hover, splitBits, loadSuccess } = useBitmarkParser();
+  const { splitBits, loadSuccess } = useBitmarkParser();
 
   useEffect(() => {
     if (!loadSuccess) return;
-    // Each is installed only when the loaded parser has it: an engine older
-    // than the release that carries the editor services simply leaves the
-    // editor without markers, completion or hover.
-    setBitmarkDiagnosticsSource(diagnostics);
-    setBitmarkCompleteSource(complete);
-    setBitmarkResolveSource(resolve);
-    setBitmarkHoverSource(hover);
     setSplitBitsSource(splitBits);
     return () => {
-      setBitmarkDiagnosticsSource(undefined);
-      setBitmarkCompleteSource(undefined);
-      setBitmarkResolveSource(undefined);
-      setBitmarkHoverSource(undefined);
       setSplitBitsSource(undefined);
     };
-  }, [diagnostics, complete, resolve, hover, splitBits, loadSuccess]);
+  }, [splitBits, loadSuccess]);
 };
 
-// Renderless component that feeds the WASM parser's editor services to the
-// bitmark editors. Mount once inside `BitmarkParserProvider`.
+// Renderless component that feeds the WASM parser's bit splits to the
+// scroll sync. Mount once inside `BitmarkParserProvider`.
 const EditorServicesRunner = (): null => {
   useEditorServicesRunner();
   return null;

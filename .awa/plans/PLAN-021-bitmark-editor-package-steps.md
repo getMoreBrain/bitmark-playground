@@ -121,13 +121,13 @@ and to the package in Phase 2.
 
   The `{ worker: true }` shorthand on `loadBitmarkEngine` waits for the
   package build (Step 11), which decides how the worker script is shipped.
-- [ ] Step 2 — Per-instance sources in `src/monaco-bitmark/*`. The attachers
+- [x] Step 2 — Per-instance sources in `src/monaco-bitmark/*`. The attachers
   take the engine. The completion and hover providers find the engine
   through the model map. The `set…Source` globals and `SemanticTokensRunner`
   / `EditorServicesRunner` go away, or become playground shims.
-- [ ] Step 3 — Scope the JSON schema to the package's model URI scheme
+- [x] Step 3 — Scope the JSON schema to the package's model URI scheme
   (`bitmarkJsonSchema.ts`). Add the `schema` option.
-- [ ] Step 4 — `setupBitmarkMonaco({ monaco })` replaces the bitmark part of
+- [x] Step 4 — `setupBitmarkMonaco({ monaco })` replaces the bitmark part of
   `monaco-setup.ts` (D8):
   - every core file switches from `import * as monaco` to `import type`
     plus the injected instance;
@@ -135,6 +135,18 @@ and to the package in Phase 2.
 
   The playground keeps its own worker setup and contribution imports, and
   passes in its Monaco.
+  Done: `src/lib/monaco` (setup, model-bound providers, async highlighter and
+  diagnostics with stale results dropped, `attachBitmarkEditor` with
+  `setEngine`, the scoped schema). `src/monaco-bitmark`,
+  `SemanticTokensRunner` and the module-level sources are gone. The
+  playground attaches through `useBitmarkEditorServices` and keeps
+  `fileMatch: ['*']`, since all its JSON models are bitmark JSON.
+  - The parser's published types already carry the editor-service shapes
+    and mapping-id output formats, so `bitmarkEditorTypes.ts` went too.
+    That leaves one D16 upstream ask: the active-variant export.
+  - The version-range warning is replaced by capability checks: Monaco has
+    no runtime version on its ESM API, so the package detects the APIs and
+    contributions instead.
 - [ ] Step 5 — `createScrollSyncGroup`: from two slots to an N-member group
   with runtime join and leave (D9). Remove `scrollSync`'s dependency on
   `uiState`; the playground's "Link scrolling" toggle sets the membership.

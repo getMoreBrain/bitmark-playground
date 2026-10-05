@@ -9,7 +9,7 @@ import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 
-import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { MONACO_THEME } from '../../lib/theme/tokens';
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { useBitmarkParser } from '../../services/BitmarkParser';

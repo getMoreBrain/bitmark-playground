@@ -1,7 +1,7 @@
 // @awa-test: PLAN-016-Step1 (stylesheet covers every parser token type and the styled modifiers)
 import { describe, expect, it } from 'vitest';
 
-import { buildBitmarkHighlightCss, TOKEN_STYLES, tokenClassName } from './bitmarkTheme';
+import { buildBitmarkHighlightCss, TOKEN_STYLES, tokenClassName } from './tokens';
 
 describe('tokenClassName', () => {
   it('uses the type class alone when no modifier changes the look', () => {

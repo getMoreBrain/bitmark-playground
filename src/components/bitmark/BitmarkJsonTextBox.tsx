@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
-import { MONACO_THEME } from '../../monaco-bitmark/bitmarkLanguage';
+import { MONACO_THEME } from '../../lib/theme/tokens';
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
