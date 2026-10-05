@@ -206,14 +206,14 @@ and to the package in Phase 2.
     worker files, asset base option).
 
   Size budget: report the `/bundled` sizes in the README.
-- [ ] Step 12 — Custom elements:
+- [x] Step 12 — Custom elements:
   - `<bitmark-session>` and `<bitmark-pane>`: binding by ancestor or id,
     attributes, properties and events, a pane that appears before its
     session (late binding), `dispose` on disconnect, and re-attach on
     reconnect;
   - then the optional `<bitmark-tabs>`, `<bitmark-split>` and the
     `<bitmark-editor>` preset.
-- [ ] Step 13 — React adapter `./react`.
+- [x] Step 13 — React adapter `./react`.
 - [ ] Step 13a — Angular wrapper `@gmb/bitmark-editor-angular` (D10):
   - ng-packagr build;
   - `bm-session` / `bm-pane` and the layout helpers;
@@ -243,7 +243,8 @@ and to the package in Phase 2.
 
   It is the reproducible CI test for cosmic's setup, which cosmic itself
   cannot provide (it has no test runner).
-- [ ] Step 15b — Package features for D12:
+- [ ] Step 15b — Package features for D12 (done: `lazy`, `narrow`,
+  `debounceMs`, `messages`, the error slot; left: CDN-safe workers, Step 11):
   - `lazy`, `narrow`, `debounceMs`, `messages`, the per-pane error slot;
   - CDN-safe workers in `/bundled`.
 - [ ] Step 16 — Publish config, for both packages (`@gmb/bitmark-editor`,

@@ -8,9 +8,9 @@ import tseslint from 'typescript-eslint';
 export default [
   { ignores: ['dist', 'spikes', 'playground-spike', 'examples', 'node_modules', 'scripts'] },
   eslint.configs.recommended,
-  ...tseslint.configs.recommended.map((c) => ({ ...c, files: ['src/**/*.ts'] })),
+  ...tseslint.configs.recommended.map((c) => ({ ...c, files: ['src/**/*.{ts,tsx}'] })),
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.{ts,tsx}'],
     plugins: { prettier, 'simple-import-sort': simpleImportSort },
     languageOptions: { parserOptions: { project: ['./tsconfig.json'], tsconfigRootDir: import.meta.dirname } },
     rules: {
@@ -48,6 +48,16 @@ export default [
             },
           ],
         },
+      ],
+    },
+  },
+  // The React adapter is the one place React is allowed (PLAN-020 D3).
+  {
+    files: ['src/react/**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        { paths: [{ name: 'monaco-editor', allowTypeImports: true, message: 'Types only (PLAN-020 D8).' }] },
       ],
     },
   },
