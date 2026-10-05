@@ -1,8 +1,8 @@
 // @awa-component: PLAN-018-BitMarkers
-import * as monaco from 'monaco-editor';
+import type { CodeEditor, IDisposable, Monaco } from '../monaco/types';
 
 /** An output pane's bit starts, pinned in its editor so they follow every edit. */
-export interface BitMarkers extends monaco.IDisposable {
+export interface BitMarkers extends IDisposable {
   /**
    * Pin `bitStarts` if the editor shows exactly `text` (PLAN-018 D4).
    * - `bitStarts` undefined (the user typed that text): nothing changes, and
@@ -24,7 +24,8 @@ export interface BitMarkers extends monaco.IDisposable {
  */
 // @awa-impl: PLAN-018-Step4 (pin bit starts as decorations; read them back)
 export const attachBitMarkers = (
-  editor: monaco.editor.ICodeEditor,
+  monaco: Monaco,
+  editor: CodeEditor,
   onChange: () => void,
 ): BitMarkers => {
   const collection = editor.createDecorationsCollection();

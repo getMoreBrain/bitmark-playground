@@ -1,9 +1,17 @@
 // @awa-component: PLAN-018-UseScrollSync
-import type * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { attachBitMarkers, BitMarkers } from './bitMarkers';
-import { attachScrollSync, ScrollSlot, ScrollSyncHandle, splitBitStarts } from './scrollSync';
+import type { Monaco } from '../lib/monaco';
+import {
+  attachBitMarkers,
+  BitMarkers,
+  createSplitBitStarts,
+  ScrollSyncMember,
+  SplitBitStarts,
+} from '../lib/scroll';
+import { useBitmarkParser } from '../services/BitmarkParser';
+import { joinScrollSync } from './scrollSync';
 
 /** Mount / unmount callbacks for a pane; call them from its own. */
 export interface ScrollSyncCallbacks {
@@ -13,22 +21,36 @@ export interface ScrollSyncCallbacks {
 
 /**
  * Link a pane that shows bitmark (the bitmark editor, WASM Check). Its bit
- * starts are split from its own text (PLAN-018 D1).
+ * starts are split from its own text by the engine (PLAN-018 D1, PLAN-021
+ * Step 5), asynchronously.
  */
 // @awa-impl: PLAN-018-Step7 (split panes)
-export const useSplitScrollSync = (slot: ScrollSlot): ScrollSyncCallbacks => {
-  const syncRef = useRef<ScrollSyncHandle>();
+export const useSplitScrollSync = (): ScrollSyncCallbacks => {
+  const { engine } = useBitmarkParser();
+  const engineRef = useRef(engine);
+  engineRef.current = engine;
+  const ref = useRef<{ split: SplitBitStarts; member: ScrollSyncMember }>();
 
-  const onMount = useCallback(
-    (editor: monaco.editor.ICodeEditor) => {
-      syncRef.current = attachScrollSync(editor, slot, () => splitBitStarts(editor));
-    },
-    [slot],
-  );
+  useEffect(() => {
+    ref.current?.split.refresh();
+  }, [engine]);
+
+  const onMount = useCallback((editor: monaco.editor.ICodeEditor) => {
+    // The split reports to the member, which joins after it.
+    const link: { member?: ScrollSyncMember } = {};
+    const split = createSplitBitStarts(
+      editor,
+      () => engineRef.current,
+      () => link.member?.invalidate(),
+    );
+    const member = (link.member = joinScrollSync(editor, () => split.bitStarts()));
+    ref.current = { split, member };
+  }, []);
 
   const onUnmount = useCallback(() => {
-    syncRef.current?.dispose();
-    syncRef.current = undefined;
+    ref.current?.member.dispose();
+    ref.current?.split.dispose();
+    ref.current = undefined;
   }, []);
 
   return { onMount, onUnmount };
@@ -45,19 +67,23 @@ export const usePinnedScrollSync = (
   text: string,
   bitStarts: readonly number[] | undefined,
 ): ScrollSyncCallbacks => {
-  const ref = useRef<{ markers: BitMarkers; sync: ScrollSyncHandle }>();
+  const ref = useRef<{ markers: BitMarkers; member: ScrollSyncMember }>();
   const latest = useRef({ text, bitStarts });
   latest.current = { text, bitStarts };
 
   const onMount = useCallback((editor: monaco.editor.ICodeEditor) => {
-    const markers = attachBitMarkers(editor, () => sync.invalidate());
-    const sync = attachScrollSync(editor, 'output', () => markers.bitStarts());
-    ref.current = { markers, sync };
+    // The markers report to the member, which joins after them.
+    const link: { member?: ScrollSyncMember } = {};
+    const markers = attachBitMarkers(monaco as unknown as Monaco, editor, () =>
+      link.member?.invalidate(),
+    );
+    const member = (link.member = joinScrollSync(editor, () => markers.bitStarts()));
+    ref.current = { markers, member };
     markers.pin(latest.current.text, latest.current.bitStarts);
   }, []);
 
   const onUnmount = useCallback(() => {
-    ref.current?.sync.dispose();
+    ref.current?.member.dispose();
     ref.current?.markers.dispose();
     ref.current = undefined;
   }, []);

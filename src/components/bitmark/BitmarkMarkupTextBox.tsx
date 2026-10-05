@@ -33,7 +33,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } =
     useBitmarkConverter();
   const services = useBitmarkEditorServices();
-  const scrollSync = useSplitScrollSync('bitmark');
+  const scrollSync = useSplitScrollSync();
 
   const activeTab = bitmarkStateSnap.activeMarkupTab;
   const activeSlice = bitmarkStateSnap[activeTab];

@@ -147,7 +147,7 @@ and to the package in Phase 2.
   - The version-range warning is replaced by capability checks: Monaco has
     no runtime version on its ESM API, so the package detects the APIs and
     contributions instead.
-- [ ] Step 5 — `createScrollSyncGroup`: from two slots to an N-member group
+- [x] Step 5 — `createScrollSyncGroup`: from two slots to an N-member group
   with runtime join and leave (D9). Remove `scrollSync`'s dependency on
   `uiState`; the playground's "Link scrolling" toggle sets the membership.
 - [ ] Step 5a — Theme (D11):
