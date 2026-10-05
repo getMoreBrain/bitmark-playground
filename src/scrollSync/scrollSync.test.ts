@@ -1,6 +1,7 @@
 import type { splitBits as splitBitsFn } from '@gmb/bitmark-parser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { log } from '../logging/log';
 import { uiState } from '../state/uiState';
 import { createFakeEditor, LINE_HEIGHT } from '../test/fakeEditor';
 import {
@@ -170,5 +171,14 @@ describe('splitBitStarts', () => {
   it('ignores slices without a start (an engine older than parser PLAN-221)', () => {
     setSplitBitsSource((() => [slice(undefined), slice(undefined)]) as typeof splitBitsFn);
     expect(splitBitStarts(createFakeEditor('[.article]').editor)).toEqual([]);
+  });
+
+  it('warns once per engine when its slices have no start', () => {
+    const warn = vi.spyOn(log, 'warn').mockImplementation(() => {});
+    setSplitBitsSource((() => [slice(undefined)]) as typeof splitBitsFn);
+    splitBitStarts(createFakeEditor('[.article]').editor);
+    splitBitStarts(createFakeEditor('[.chapter]').editor);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
   });
 });

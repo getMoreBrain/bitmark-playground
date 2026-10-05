@@ -153,6 +153,7 @@ const splitCache = new WeakMap<
   monaco.editor.ITextModel,
   { versionId: number; source: typeof splitBitsFn; starts: number[] }
 >();
+const warnedNoStart = new WeakSet<typeof splitBitsFn>();
 
 /**
  * Install (or, with `undefined`, remove) the parser function that splits
@@ -180,9 +181,17 @@ export const splitBitStarts = (editor: Pick<ScrollSyncEditor, 'getModel'>): numb
   let starts: number[] = [];
   try {
     // An engine older than parser PLAN-221 has no `start` (PLAN-018 D2).
-    starts = source(model.getValue())
+    const slices = source(model.getValue());
+    starts = slices
       .map((slice) => slice.start)
       .filter((start): start is number => typeof start === 'number');
+    // Said once per engine: without it, linking quietly turns proportional.
+    if (slices.length > 0 && starts.length === 0 && !warnedNoStart.has(source)) {
+      warnedNoStart.add(source);
+      log.warn(
+        'splitBits gives no `start` (parser older than PLAN-221): scroll linking is proportional',
+      );
+    }
   } catch (e) {
     log.error('splitBits failed', e);
   }
