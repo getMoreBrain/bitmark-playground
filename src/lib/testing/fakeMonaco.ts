@@ -26,7 +26,11 @@ const emitter = <T = void>() => {
 };
 
 export interface FakeModel extends TextModel {
+  /** A user edit (one undo step). */
   setText(text: string): void;
+  /** Monaco's undo: back to the text before the last edit. */
+  undo(): void;
+  disposed: boolean;
 }
 
 let modelSeq = 0;
@@ -35,21 +39,45 @@ let modelSeq = 0;
 export const createFakeModel = (text: string, uri = `inmemory://model/${++modelSeq}`): FakeModel => {
   let value = text;
   let version = 1;
+  const history: string[] = [];
   const change = emitter();
+  const edit = (next: string) => {
+    history.push(value);
+    value = next;
+    version++;
+    change.fire();
+  };
   const model = {
     uri: { toString: () => uri },
+    disposed: false,
     getValue: () => value,
     getVersionId: () => version,
+    getFullModelRange: () => ({ startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1 }),
+    pushStackElement: () => {},
+    pushEditOperations: (_sel: unknown, ops: { text: string }[]) => edit(ops[0]!.text),
+    /** Like Monaco's: replaces the text and drops the undo history. */
+    setValue: (next: string) => {
+      history.length = 0;
+      value = next;
+      version++;
+      change.fire();
+    },
+    undo: () => {
+      const prev = history.pop();
+      if (prev === undefined) return;
+      value = prev;
+      version++;
+      change.fire();
+    },
+    dispose: () => {
+      model.disposed = true;
+    },
     getValueInRange: (r: FakeRange) => {
       const line = value.split('\n')[r.startLineNumber - 1] ?? '';
       return line.slice(r.startColumn - 1, r.endColumn - 1);
     },
     onDidChangeContent: change.on,
-    setText: (next: string) => {
-      value = next;
-      version++;
-      change.fire();
-    },
+    setText: (next: string) => edit(next),
   };
   return model as unknown as FakeModel;
 };
@@ -65,11 +93,32 @@ export const createFakeMonaco = () => {
   const languages: { id: string }[] = [];
   const setDiagnosticsOptions = vi.fn();
   const setTheme = vi.fn();
+  const editors: { focused: boolean; options: Record<string, unknown>; disposed: boolean }[] = [];
   const monaco = {
     Range: FakeRange,
+    Uri: { parse: (u: string) => ({ toString: () => u }) },
     MarkerSeverity: { Hint: 1, Info: 2, Warning: 4, Error: 8 },
     editor: {
       getModels: () => models,
+      createModel: (value: string, _language: string, uri?: { toString(): string }) => {
+        const model = createFakeModel(value, uri?.toString());
+        models.push(model);
+        return model;
+      },
+      create: (_element: unknown, options: Record<string, unknown>) => {
+        const state = { focused: false, options: { ...options }, disposed: false };
+        editors.push(state);
+        const model = options['model'] as FakeModel;
+        return {
+          getModel: () => model,
+          hasTextFocus: () => state.focused,
+          updateOptions: (o: Record<string, unknown>) => Object.assign(state.options, o),
+          layout: vi.fn(),
+          dispose: () => {
+            state.disposed = true;
+          },
+        };
+      },
       setModelMarkers: (model: TextModel, owner: string, m: unknown[]) => {
         const list = (markers.get(model) ?? []).filter((x) => x.owner !== owner);
         markers.set(model, [...list, { owner, markers: m }]);
@@ -106,6 +155,8 @@ export const createFakeMonaco = () => {
   return {
     monaco: monaco as unknown as Monaco,
     models,
+    /** The editors created, with their focus flag and options. */
+    editors,
     providers,
     setDiagnosticsOptions,
     setTheme,

@@ -156,11 +156,17 @@ and to the package in Phase 2.
   - `auto` (`prefers-color-scheme`, live);
   - `CustomTheme`;
   - `setTheme` only when the package owns Monaco, or with `applyMonacoTheme`.
-- [ ] Step 6 — `createTextEditor`. Port the `MonacoTextArea` /
-  `MonacoEditorAutoResize` behaviour; the React components become thin
-  wrappers over it.
-  Regeneration uses a full-range `pushEditOperations`, which keeps undo,
-  clamps the cursor and preserves scroll (D16).
+- [x] Step 6 — `createTextEditor`. Port the `MonacoTextArea` /
+  `MonacoEditorAutoResize` behaviour.
+  - Regeneration uses a full-range `pushEditOperations`, which keeps undo,
+    clamps the cursor and preserves scroll (D16).
+  - Done: `src/lib/editor` (`createTextEditor`, `createChangeFilter`,
+    `replaceAllKeepingUndo`, model URIs under the package scheme), and
+    automatic layout through Monaco's own `automaticLayout`.
+  - `MonacoTextArea` uses the lib's change filter and undo-keeping replace.
+    Rebuilding it on `createTextEditor` (dropping `react-monaco-editor`)
+    moves to Step 14, where the playground's components are replaced
+    anyway.
 - [ ] Step 7 — `createBitmarkSession`: state, the edit flow with the
   "skip the source" rule, errors with the last good value kept, events.
   Error display (D15): markers on the source pane, the stale state on the

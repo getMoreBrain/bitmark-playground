@@ -9,35 +9,15 @@ import {
   MonacoEditorProps,
 } from 'react-monaco-editor';
 
+import { createChangeFilter, replaceAllKeepingUndo } from '../../lib/editor/textEditor';
 import { MonacoEditorAutoResize } from './MonacoEditorAutoResize';
+
+export { createChangeFilter };
 
 export interface MonacoTextAreaUncontrolledProps extends MonacoEditorProps {
   value?: string;
   onInput?: (value: string) => void;
 }
-
-/**
- * Passes on only a value that differs from the last one the editor held
- * (reported, or set programmatically). Monaco can apply one input as many
- * edits and fire a content change for each after the batch, every one
- * reading the same final text: without this filter, each would re-run the
- * whole conversion pipeline.
- */
-export const createChangeFilter = (initial: string) => {
-  let last = initial;
-  return {
-    /** True, and remembered, when `next` differs from the last value. */
-    changed: (next: string): boolean => {
-      if (next === last) return false;
-      last = next;
-      return true;
-    },
-    /** The editor now holds `next` without it being reported (programmatic change). */
-    set: (next: string): void => {
-      last = next;
-    },
-  };
-};
 
 interface MonacoEditorRef {
   editor?: monaco.editor.IStandaloneCodeEditor;
@@ -117,7 +97,10 @@ const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
       const currentValue = monacoEditor.getValue();
       if (!hasFocus && currentValue !== value) {
         ref.current.isProgrammaticChange = true;
-        monacoEditor.setValue(value ?? '');
+        // @awa-impl: PLAN-021-Step6 (regeneration keeps the pane's undo, D16)
+        const model = monacoEditor.getModel();
+        if (model) replaceAllKeepingUndo(model, value ?? '');
+        else monacoEditor.setValue(value ?? '');
         ref.current.isProgrammaticChange = false;
         changeFilter.current.set(value ?? '');
       }
