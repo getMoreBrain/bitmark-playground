@@ -3,12 +3,12 @@
 // @awa-component: PLAN-007-BitmarkJsonTextBox
 // @awa-component: PLAN-011-BitmarkJsonTextBox
 // @awa-component: PLAN-013-BitmarkJsonTextBox
+import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
-import { MONACO_THEME } from '../../lib/theme/tokens';
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';

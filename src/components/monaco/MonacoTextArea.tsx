@@ -1,5 +1,6 @@
 /** @jsxImportSource theme-ui */
 
+import { createChangeFilter, replaceAllKeepingUndo } from '@gmb/bitmark-editor';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import {
   EditorDidMount,
@@ -9,7 +10,6 @@ import {
   MonacoEditorProps,
 } from 'react-monaco-editor';
 
-import { createChangeFilter, replaceAllKeepingUndo } from '../../lib/editor/textEditor';
 import { MonacoEditorAutoResize } from './MonacoEditorAutoResize';
 
 export { createChangeFilter };

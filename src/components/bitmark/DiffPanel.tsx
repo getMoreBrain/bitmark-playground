@@ -1,10 +1,10 @@
 // @awa-component: PLAN-005-DiffPanel
 /** @jsxImportSource theme-ui */
+import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { useCallback } from 'react';
 import { DiffEditorDidMount, DiffEditorWillUnmount } from 'react-monaco-editor';
 
-import { BITMARK_LANGUAGE_ID } from '../../lib/monaco';
-import { MONACO_THEME } from '../../lib/theme/tokens';
 import { MonacoDiffEditorAutoResize } from '../monaco/MonacoDiffEditorAutoResize';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
 

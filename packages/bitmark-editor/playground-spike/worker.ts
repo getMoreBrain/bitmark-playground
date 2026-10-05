@@ -1,7 +1,7 @@
-import book from '../../../test/fixtures/bitmark/book.bitmark?raw';
-import { createBitmarkEngine, loadBitmarkModule } from '../../../src/lib/engine';
-import { createBitmarkWorkerEngine } from '../../../src/lib/engine/worker/createBitmarkWorkerEngine';
-import type { EnginePort } from '../../../src/lib/engine/worker/protocol';
+import book from '../test/fixtures/bitmark/book.bitmark?raw';
+import { createBitmarkEngine, loadBitmarkModule } from '../src/engine';
+import { createBitmarkWorkerEngine } from '../src/engine/worker/createBitmarkWorkerEngine';
+import type { EnginePort } from '../src/engine/worker/protocol';
 
 const w = window as unknown as Record<string, unknown>;
 const t: Record<string, unknown> = (w.__spike = {});
@@ -39,7 +39,7 @@ void (async () => {
     const worker = await createBitmarkWorkerEngine({
       url: URL_,
       createPort: () =>
-        new Worker(new URL('../../../src/lib/engine/worker/engineWorker.ts', import.meta.url), {
+        new Worker(new URL('../src/engine/worker/engineWorker.ts', import.meta.url), {
           type: 'module',
         }) as unknown as EnginePort,
     });

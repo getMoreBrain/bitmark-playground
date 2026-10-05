@@ -1,11 +1,11 @@
 // @awa-component: PLAN-006-WasmCheckPanel
 /** @jsxImportSource theme-ui */
+import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 
-import { BITMARK_LANGUAGE_ID } from '../../lib/monaco';
-import { MONACO_THEME } from '../../lib/theme/tokens';
 import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';

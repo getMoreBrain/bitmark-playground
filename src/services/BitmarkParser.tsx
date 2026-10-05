@@ -1,5 +1,13 @@
 // @awa-component: PLAN-002-BitmarkParser
 
+import type { BitmarkEngine } from '@gmb/bitmark-editor';
+import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '@gmb/bitmark-editor';
+import {
+  bindBitmarkJsonSchema,
+  loadBitmarkJsonSchema,
+  Monaco,
+  schemaUrlFor,
+} from '@gmb/bitmark-editor';
 import type {
   bitmarkToObjects as bitmarkToObjectsFn,
   complete as completeFn,
@@ -24,9 +32,6 @@ import {
   useState,
 } from 'react';
 
-import type { BitmarkEngine } from '../lib/engine';
-import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '../lib/engine';
-import { bindBitmarkJsonSchema, loadBitmarkJsonSchema, Monaco, schemaUrlFor } from '../lib/monaco';
 import { log } from '../logging/log';
 
 const BITMARK_PARSER_CDN_URL =

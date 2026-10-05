@@ -6,6 +6,7 @@
       "name": "@gmb/bitmark-playground",
       "dependencies": {
         "@emotion/react": "^11.11.1",
+        "@gmb/bitmark-editor": "workspace:*",
         "@types/lodash": "^4.17.16",
         "@types/node": "^20.8.7",
         "@types/react": "^18.2.31",
@@ -43,6 +44,33 @@
         "vite": "^6.3.5",
         "vitest": "^4.0.18",
       },
+    },
+    "packages/bitmark-editor": {
+      "name": "@gmb/bitmark-editor",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@eslint/js": "^9.39.2",
+        "@gmb/bitmark-parser": "^7.7.0",
+        "@types/node": "^20.19.33",
+        "esbuild": "^0.25.12",
+        "eslint": "^9.39.2",
+        "eslint-plugin-prettier": "^5.5.5",
+        "eslint-plugin-simple-import-sort": "^12.1.1",
+        "jsdom": "^28.1.0",
+        "monaco-editor": "0.52.2",
+        "prettier": "^3.8.1",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.56.0",
+        "vitest": "^4.0.18",
+      },
+      "peerDependencies": {
+        "@gmb/bitmark-parser": ">=7.7.0 <8",
+        "monaco-editor": ">=0.46.0 <1",
+      },
+      "optionalPeers": [
+        "@gmb/bitmark-parser",
+        "monaco-editor",
+      ],
     },
   },
   "packages": {
@@ -209,6 +237,8 @@
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.1", "", { "dependencies": { "@eslint/core": "^0.17.0", "levn": "^0.4.1" } }, "sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA=="],
 
     "@exodus/bytes": ["@exodus/bytes@1.14.1", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ=="],
+
+    "@gmb/bitmark-editor": ["@gmb/bitmark-editor@workspace:packages/bitmark-editor"],
 
     "@gmb/bitmark-parser": ["@gmb/bitmark-parser@7.7.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "7.7.0", "@gmb/bitmark-parser-darwin-x64": "7.7.0", "@gmb/bitmark-parser-linux-arm64": "7.7.0", "@gmb/bitmark-parser-linux-x64": "7.7.0", "@gmb/bitmark-parser-win32-x64": "7.7.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-vjlGTPBOtyRyy3Ob7zLvACIayvuiejvVtFRaJOfrRLkxzE/ImPTtScyejfT3GFDyc8OmXAjZGQtJ1p2ceqzADQ=="],
 

@@ -1,12 +1,12 @@
 // @awa-component: PLAN-002-BitmarkMarkupTextBox
+import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback, useEffect } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
-import { BITMARK_LANGUAGE_ID } from '../../lib/monaco';
-import { MONACO_THEME } from '../../lib/theme/tokens';
 import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';

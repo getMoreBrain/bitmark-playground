@@ -1,0 +1,72 @@
+{
+  "name": "@gmb/bitmark-editor",
+  "version": "0.1.0",
+  "description": "bitmark and JSON editors on Monaco, with optional HTML, XML, Text, Info and Mappings panes, for any framework.",
+  "author": "Get More Brain Ltd",
+  "license": "ISC",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "./dist/elements/*",
+    "./dist/bundled/*"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./worker": {
+      "import": "./dist/esm/engineWorker.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "peerDependencies": {
+    "@gmb/bitmark-parser": ">=7.7.0 <8",
+    "monaco-editor": ">=0.46.0 <1"
+  },
+  "peerDependenciesMeta": {
+    "@gmb/bitmark-parser": {
+      "optional": true
+    },
+    "monaco-editor": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@gmb/bitmark-parser": "^7.7.0",
+    "@types/node": "^20.19.33",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "jsdom": "^28.1.0",
+    "monaco-editor": "0.52.2",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getMoreBrain/bitmark-playground.git",
+    "directory": "packages/bitmark-editor"
+  },
+  "keywords": [
+    "bitmark",
+    "monaco",
+    "editor"
+  ]
+}

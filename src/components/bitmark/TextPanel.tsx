@@ -1,8 +1,8 @@
 // @awa-component: PLAN-011-TextPanel
 /** @jsxImportSource theme-ui */
+import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 
-import { MONACO_THEME } from '../../lib/theme/tokens';
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
 

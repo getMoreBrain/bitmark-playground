@@ -71,6 +71,11 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        // The workspace package, from source (PLAN-021 Step 9).
+        find: /^@gmb\/bitmark-editor$/,
+        replacement: path.resolve(__dirname, 'packages/bitmark-editor/src/index.ts'),
+      },
+      {
         // Redirect bare 'monaco-editor' imports to the selective API entry point.
         // This avoids pulling in editor.main.js which imports ALL languages and features.
         // Uses regex with word boundary to avoid matching 'monaco-editor/esm/...' subpath imports.
@@ -97,6 +102,7 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     css: true,
     alias: {
+      '@gmb/bitmark-editor': path.resolve(__dirname, 'packages/bitmark-editor/src/index.ts'),
       'monaco-editor/esm/vs/editor/editor.api': path.resolve(
         __dirname,
         'src/test/__mocks__/monaco-editor.ts',

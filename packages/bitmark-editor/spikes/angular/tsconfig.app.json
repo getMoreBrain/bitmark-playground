@@ -7,9 +7,9 @@
   "include": [
     "src/**/*.ts",
     "../proto/**/*.ts",
-    "../../../../src/scrollSync/jsonText.ts",
-    "../../../../src/scrollSync/mapScrollTop.ts",
-    "../../../../src/monaco-bitmark/bitmarkTheme.ts"
+    "../../src/json/jsonText.ts",
+    "../../src/scroll/mapScrollTop.ts",
+    "../../src/theme/tokens.ts"
   ],
   "exclude": [
     "src/**/*.spec.ts"

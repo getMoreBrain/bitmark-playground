@@ -1,0 +1,373 @@
+[.book]
+[@id:135647]
+[@lang:en-US]
+[@language:de]
+[@language:en]
+[@language:jp]
+[@language:cn]
+[@publisher:kpmg]
+[@publisherName:KPMG]
+[@theme:grundzuege]
+[@rtl:true]
+[@spaceId:sl]
+[#How the Content-First Standard “bitmark” Enables the Digital Transformation and Democratization of Learning]
+[##Or, what the digitization of textbooks has to do with Schiller and power sockets]
+[@subtype:draft-book]
+[@author:Philippe Pointet]
+[@customerExternalId:a-bow-the-content-n_9374th83h20]
+[@externalId:e-how-the-content-first-standard-bitmark-e_tnn9v9uncnyc]
+[@kind:learning-path]
+[@coverImage:https://docs.bitmark.cloud/bit-books/gmb/bitmark_artikel/web-resources/images/what.png]
+[@coverColor:#F2F2F2]
+[@backgroundImage:https://docs.bitmark.cloud/bit-books/gmb/bitmark_artikel/web-resources/images/bg.png]
+[@hasMarkAsDone]
+[@isPublic]
+[@duration:PT2H]
+[@relatedBook:n_9374th83h20]
+[@relatedBook:g_F2F2F2]
+[@translationOfBook:book_external_id_12345]
+[@levelCEFRp:levelCEFRp]
+[@levelCEFRp:levelCEFRp]
+[@levelCEFR:levelCEFR]
+[@levelILR:levelILR]
+[@levelACTFL:levelACTFL]
+[@maxTocChapterLevel:5]
+[@sourceDocument:http://example.com/source.pdf]
+[@internalPrintPdf:http://example.com/print.pdf]
+[@allowPrint:useSpaceConfiguration]
+[@hasPrintRestriction:false]
+[@processHandIn]
+[@chatWithBook]
+[@isEditable]
+[@chatWithBookBrainKey:12435]
+[@processHandInLocation:Hong Kong]
+[@enforceUpdateOverUserInput]
+[@extractorExtractionTimestamp:2026-01-18T20:05:03Z]
+[@extractorExtractionTimestamp:2026-01-19T08:30:00Z]
+
+
+
+[.article:bitmark++]
+[@id:135648]
+Have you ever wondered why schools, language courses, and professional development programs barely use digital textbooks?
+
+The answer is simple: because there are hardly any digital textbooks.
+|image:https://docs.bitmark.cloud/bit-books/gmb/bitmark_artikel/web-resources/images/what.png|
+The world was made painfully aware of this during the COVID-19 lockdowns (for example, when students received teaching material for distance learning in a large envelope or an email with Word or PDF documents to print out themselves).
+
+But what is the reason for the low penetration of digital textbooks?
+
+[.chapter]
+[▼ch-1]
+[@id:135649]
+[##It’s complicated]
+
+[.article:bitmark--]
+[@id:135650]
+
+Until now, the digitization of textbooks has largely been limited to transferring the learning content to “digital paper” (PDF, eBook and similar formats). However, this is not a good solution, if only because such formats are not suitable for interactive content (e.g. a quiz), nor small screens (mobile). Moreover, PDFs are easily copied and therefore do not adequately protect intellectual property (with the result that PDFs are de facto impossible to monetize).
+
+True digitization requires the transfer of learning content into a structured data format so that it can be processed by machines and played out via any learning media (learning platforms, learning apps, e-book readers etc.) or learning management system (LMS), and used with all devices (computers, tablets, mobiles).
+
+And, of course, digital textbooks must also be didactically useful and at least equal to their analog counterparts — after all, digitization is not an end in itself. In the sense of the emerging term “School 4.0”, the goal must be that digital textbooks enable new forms of learning and self-determined learning (enabling individual learning paths, learning processes etc.), as well as simplifying or, even better, promoting communication between all parties involved (learners, teachers, schools, employers, bots etc.).
+
+[.quote]
+[@id:278204]
+The pandemic has shown us how important it is in schools to break up old patterns and be ready for new forms of learning. Digital transformation in schools does not just mean working with e-books instead of printed books. School 4.0 means rethinking.
+
+— Michael Hasler, Headmaster of Neue Stadtschulen St. Gallen
+
+[.article:bitmark--]
+[@id:278205]
+For the “producers” of learning content (publishers, schools, teachers), true digitization understood in this way is a major challenge.
+
+[.chapter]
+[▼ch-2]
+[@id:135651]
+[##So Hedge Therefore, Who Join Forever]
+
+[.article:bitmark++]
+[@id:135652]
+Publishers must therefore think carefully about the digitization of their content, also from an economic point of view. If publishers want to offer their customers their own apps for playing out the learning content, they will incur development and maintenance costs in addition to the actual digitization costs (conversion of the learning content into a structured data format). If, on the other hand, the publisher uses third-party-developed learning media/LMS that is proprietary, i.e. based on non-public standards, this results in dependencies — a possible change of provider is associated with high additional costs.
+
+However, such a ==lock-in==|link:https://en.wikipedia.org/wiki/Vendor_lock-in| affects not only publishers but also the learners (i.e. the “consumers” of the learning content). As long as schools and publishers rely on proprietary solutions, learners are “trapped” in the application in question. The often very expensive textbooks are not compatible with other learning media/LMS (which may be preferred by the learner), and a manual migration of the content — or even of the learner’s progress, comments, own notes, etc. — to another application is also not possible, or only with a disproportionate effort.
+
+It is therefore not surprising that until now both sides — the publishers and the learners — have largely disdained the digital textbook, true to the German poet Friedrich Schiller’s advice “So Hedge Therefore, Who Join Forever”.
+
+|image:https://docs.bitmark.cloud/bit-books/gmb/bitmark_artikel/web-resources/images/kermit.gif|
+
+[.chapter]
+[▼ch-3]
+[@id:135653]
+[##The plug problem]
+
+[.article:bitmark--]
+[@id:135654]
+The problem is basically the same as with power sockets: there are over a dozen different types of network plugs worldwide (plug type A, B, C…). In addition, network voltages differ from country to country (100 volts, 110 volts, 220 volt…). For example, if you buy a mixer in Japan (plug type A, 100 volts) and want to use it in Switzerland (plug type C, 220 volts), you will need a transition plug and a power adapter.
+
+Similarly, very different formats come into question for the digitization of textbooks in order to structure the learning content and determine how the data is to be interpreted when it is processed electronically by learning media/LMS. To ensure that different data formats are compatible with each other, or playable on the same learning medium/LMS, “adapters” are then also required. However, the development and maintenance of such software components is not only complex and thus expensive but also inherently error-prone. In addition, many existing formats do not even allow automatic conversion, which means that, in the case of a change, the data must in fact be re-entered manually.
+
+[.chapter]
+[▼ch-4]
+[@id:135655]
+[##In principle, the solution would be simple, but…]
+
+[.article:bitmark--]
+[@id:135656]
+The solution is obvious: standardization.
+
+If all plugs had the same shape and power grids the same voltage, the mixer bought in Japan could be used anywhere in the world without any problem.
+
+The same applies to digital textbooks: if all publishers used the same structured data format to digitize their textbooks, all learning content could be played out immediately on any learning media/LMS without the need for migration. There would thus be no lock-in for either publishers or learners, removing the biggest hurdle to the creation, distribution, and use of digital textbooks.
+
+In the case of power sockets, global standardization is probably not realistic — too many devices with different plugs are already in use and no country wants to give up its type of plug. The situation is different with textbooks: standardization for the benefit of all stakeholders is still very much possible, especially since digital textbooks, as mentioned, are still hardly widespread today.
+
+[.chapter]
+[▼ch-5]
+[@id:135657]
+[##Existing e-learning standards (AICC, SCORM etc.) do not meet today’s requirements]
+
+[.article:bitmark++]
+[@id:135658]
+The awareness that standardization of the data format is an important requirement with regard to the dissemination of digital learning content is, of course, not new. Accordingly, several “e-learning standards” have been launched in the past. Well-known examples are the ==AICC-Standard==|link:https://en.wikipedia.org/wiki/Aviation_Industry_Computer-Based_Training_Committee| launched by the US aerospace industry in 1988 and the ==SCORM-Standard==|link:https://en.wikipedia.org/wiki/Sharable_Content_Object_Reference_Model| of the Advanced Distributed Learning Initiative ==(ADL)==|link:https://en.wikipedia.org/wiki/Advanced_Distributed_Learning|. organization founded by the US Department of Defense in 1997. Other examples include the Experience ==API (xAPI)==|link:https://xapi.com/overview/?utm_source=google&utm_medium=natural_search| and  ==cmi5 standards==|link:https://aicc.github.io/CMI-5_Spec_Current/|, also backed by the U.S. aerospace industry and ADL, and the ==QTI-standard==|link:https://www.imsproject.org/question/index.html| from the  ==IMS Global Learning Consortium==|link:https://www.imsglobal.org/|, a U.S. organization founded in 1997.
+
+However, none of these standards has managed to keep pace with today’s requirements. Apart from political reasons (too many cooks…), the main cause seems to be that these approaches are too strongly oriented to old paradigms (especially fixation on layout instead of ==content-First==|link:https://www.clockwork.com/news/2017/03/20/760/what_the_content_first_approach_is_and_why_you_should_use_it/|, see also the comments below). AICC, SCORM, etc. also do not offer solutions for aspects that are crucial for the acceptance and dissemination of a standard, such as user management and monetization.
+
+[.chapter]
+[▼ch-6]
+[@id:135659]
+[##bitmark — the freely accessible content-first standard for interactive learning content]
+
+[.article:bitmark++]
+[@id:135660]
+==bitmark==|link:https://docs.bitmark.cloud/| offers a sustainable solution for the creation of true digital learning tools in accordance with today’s technical and didactical requirements.
+
+bitmark is a **freely accessible** content-first standard **independent** of large corporations and influential nations. It was developed under the leadership of ==Thomas Gabathuler==|link:https://www.linkedin.com/in/thomas-gabathuler/| of the Swiss EdTech startup ==Get More Brain==|link:https://www.getmorebrain.com/| and published in 2019. The bitmark standard is specifically designed for **interactive learning content** such as quizzes and feedback via stored solutions.
+
+With bitmark, learning **content is “atomized”**, meaning it is broken down into small, meaningful “bits” suitable for mobile screens (e.g. quizzes, exercises…) and then assembled into a coherent book.
+
+Unlike previous “theory-based” e-learning standards (AICC, SCORM, etc.), bitmark was created **bottom-up** in collaboration with publishers and other EdTech companies, originally out of the practical need to digitize language textbooks.
+
+[.chapter]
+[▼ch-7]
+[@id:135661]
+[###Suitable for all learning content]
+
+[.article:bitmark--]
+[@id:135662]
+Today, the bitmark standard is used to digitize all learning content at all levels (children’s and adult education, including practical educational paths such as apprenticeship training).
+
+In addition to language textbooks, bitmark is also ideally suited for the digitization of textbooks on, for example, business topics (marketing, project management, leadership, etc.) or scientific subjects (mathematics, chemistry, physics, etc.).
+
+[.chapter]
+[▼ch-8]
+[@id:135663]
+[###Uncompromisingly “content-first”]
+
+[.article:bitmark++]
+[@id:135664]
+Unlike AICC, SCORM etc., the bitmark standard is uncompromisingly “content-first”. This means that bitmark consistently allows only the description of ==metadata==|link:https://en.wikipedia.org/wiki/Metadata| (author, difficulty level, etc.) and learning content (“here is a gap”, “the solution to this gap is”, etc.). Visual information is not allowed — bitmark leaves the graphical representation entirely to the learning media/LMS.
+
+[.chapter]
+[▼ch-9]
+[@id:135665]
+[###Openness of the standard prevents “lock-in” effects]
+
+[.article:bitmark++]
+[@id:135666]
+The openness of bitmark is also central ==(open-source).==|link:https://en.wikipedia.org/wiki/Open-source_model| The standard documentation is freely available to the general public under a ==Creative Commons license==|link:https://en.wikipedia.org/wiki/Creative_Commons| and the software components developed by the ==bitmark Association==|link:https://docs.bitmark.cloud/bitmark-association/about_and_contact/| (see below) can be used free of charge under an ==MIT license==|link:https://en.wikipedia.org/wiki/MIT_License|.
+
+Importantly, the standard is also well suited as an import and export format between different systems.
+
+Unlike closed proprietary systems, bitmark thus does not result in any dependencies; a “lock-in” is avoided from the outset.
+
+[.chapter]
+[▼ch-10]
+[@id:135667]
+[###Digital transformation of learning]
+
+[.article:bitmark--]
+[@id:135668]
+The bitmark standard provides a future-proof foundation for the digital transformation of learning by enabling learners, teachers, classes, schools, employers, bots, etc. to communicate and collaborate in the way that best suits each individual case.
+
+[.chapter]
+[▼ch-11]
+[@id:135669]
+[##Democratization of learning]
+
+[.article:bitmark--]
+[@id:135670]
+bitmark is designed to drastically simplify and accelerate the digitization process, i.e. the preparation, sharing and distribution of digital learning content. This gives smaller publishers and even schools and teachers the chance to digitize learning content and make it available in an appropriate form to learners anywhere in the world.
+
+In this way, bitmark creates the basis for the “democratization of knowledge” and thus contributes to closing the worldwide education gap — all people should have access to high-quality learning content.
+
+[.chapter]
+[▼ch-12]
+[@id:135671]
+[##The “bitmark Association”]
+
+[.article:bitmark++]
+[@id:135672]
+The further development and dissemination of the bitmark standard is supported by the non-profit ==bitmark Association==|link:https://docs.bitmark.cloud/bitmark-association/about_and_contact/|.
+
+The bitmark Association provides **publishers, schools and teachers** as well as **developers of learning media and LMS** with free open-source software for the preparation and use of learning content in bitmark format or for the development of corresponding learning media and LMS.
+
+__You too can contribute to the dissemination of bitmark and thus to the democratization of knowledge, e.g. by becoming a  ==member==|mailto:member@bitmark-association.org| (publishers, schools, EdTech companies, …) or ==patron==|mailto:patron@bitmark-association.org)| (private individuals) of the bitmark Association or by distributing this article.__ 😊
+
+[.chapter]
+[▼ch-13]
+[@id:135673]
+[##Useful links:]
+
+[.article:bitmark--]
+[@id:135674]
+• Documentation of the bitmark standard: https://docs.bitmark.cloud/
+• Homepage of the bitmark Association: https://docs.bitmark.cloud/bitmark-association/about_and_contact/
+• Linkedin page of the bitmark Association: linkedin.com/company/bitmark-association
+
+
+
+[.book-acknowledgements]
+[@id:51877]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-addendum]
+[@id:51876]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-afterword]
+[@id:51873]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-appendix]
+[@id:51875]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-article]
+[@ageRange:18][@ageRange:120]
+〈私が何も反論を口にしないのは、第一に事件について、投資家との間でトラブルが生じ、横領の疑いをかけられている以上のことを本当に知らないからです。（中略）私自身、意見を言うことも何の判断もできない状態だったんです〉
+
+[.book-author-bio]
+[@id:51885]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-bibliography]
+[@id:51879]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-coming-soon]
+[@id:51887]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-conclusion]
+[@id:51872]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-copyright-permissions]
+[@id:51883]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-copyright]
+[@id:51861]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-dedication]
+[@id:51865]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+
+[.book-endnotes]
+[@id:51881]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-epigraph]
+[@id:51890]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-epilogue]
+[@id:51869]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-foreword]
+[@id:51866]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-frontispiece]
+[@id:51862]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-imprint]
+[@id:51862]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-inciting-incident]
+[@id:51871]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-introduction]
+[@id:51870]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-list-of-contributors]
+[@id:51878]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-notes]
+[@id:51882]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-postscript]
+[@id:51874]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-preface]
+[@id:5186]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-prologue]
+[@id:51868]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-read-more]
+[@id:51888]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-reference-list]
+[@id:51880]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-request-for-a-book-review]
+[@id:51886]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+
+[.book-summary]
+[@id:51889]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-teaser]
+[@id:51884]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.
+[.book-title]
+[@id:51863]
+[%][%Ausgleichsmassnahmen für Frauen der Übergangsgeneration]
+Frauen welche der Übergangsgeneration angehören und ≠ ihre Altersrente nicht vorbeziehen, erhalten einen lebenslangen Rentenzuschlag.

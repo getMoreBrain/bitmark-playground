@@ -24,13 +24,12 @@ import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution';
 // Import codicon font (needed for Monaco's UI icons: folding arrows, suggestions, etc.)
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles';
 
+import { Monaco, setupBitmarkMonaco } from '@gmb/bitmark-editor';
 import * as monaco from 'monaco-editor';
 // Configure Monaco to locate the web workers
 // This replaces what vite-plugin-monaco-editor was doing
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-
-import { Monaco, setupBitmarkMonaco } from './lib/monaco';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, label: string) {

@@ -1,9 +1,9 @@
 // @awa-component: PLAN-021-UseBitmarkEditorServices
+import type { AttachBitmarkEditorOptions, CodeEditor } from '@gmb/bitmark-editor';
+import { attachBitmarkEditor, BitmarkEditorServices, Monaco } from '@gmb/bitmark-editor';
 import * as monaco from 'monaco-editor';
 import { useCallback, useEffect, useRef } from 'react';
 
-import type { AttachBitmarkEditorOptions, CodeEditor } from '../../lib/monaco';
-import { attachBitmarkEditor, BitmarkEditorServices, Monaco } from '../../lib/monaco';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 
 /**

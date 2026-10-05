@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
+    "@gmb/bitmark-editor": "workspace:*",
     "@types/lodash": "^4.17.16",
     "@types/node": "^20.8.7",
     "@types/react": "^18.2.31",
@@ -70,5 +71,8 @@
   ],
   "contributors": [
     "Richard Sewell (https://github.com/six5536On)"
+  ],
+  "workspaces": [
+    "packages/bitmark-editor"
   ]
 }

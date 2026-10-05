@@ -1,15 +1,15 @@
 // @awa-component: PLAN-018-UseScrollSync
-import * as monaco from 'monaco-editor';
-import { useCallback, useEffect, useRef } from 'react';
-
-import type { Monaco } from '../lib/monaco';
+import type { Monaco } from '@gmb/bitmark-editor';
 import {
   attachBitMarkers,
   BitMarkers,
   createSplitBitStarts,
   ScrollSyncMember,
   SplitBitStarts,
-} from '../lib/scroll';
+} from '@gmb/bitmark-editor';
+import * as monaco from 'monaco-editor';
+import { useCallback, useEffect, useRef } from 'react';
+
 import { useBitmarkParser } from '../services/BitmarkParser';
 import { joinScrollSync } from './scrollSync';
 

@@ -4,14 +4,14 @@ import 'monaco-editor/esm/vs/basic-languages/html/html.contribution';
 
 import * as monaco from 'monaco-editor';
 
-import type { Monaco } from '../../../src/lib/monaco';
+import type { Monaco } from '../src/monaco';
 import {
   createBitmarkPane,
   createHtmlPane,
   createJsonPane,
   createTextPane,
-} from '../../../src/lib/panes';
-import { createBitmarkSession } from '../../../src/lib/session';
+} from '../src/panes';
+import { createBitmarkSession } from '../src/session';
 
 const w = window as unknown as Record<string, unknown>;
 const t: Record<string, unknown> = (w.__spike = {});

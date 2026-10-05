@@ -1,10 +1,10 @@
 // @awa-component: PLAN-002-BitmarkState
 // @awa-component: PLAN-008-BitmarkState
 // @awa-component: PLAN-011-BitmarkState
+import { jsonWithBitStarts } from '@gmb/bitmark-editor';
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
 
-import { jsonWithBitStarts } from '../lib/json/jsonText';
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 

@@ -28,9 +28,8 @@ const config = [
       '.awa',
       'src/generated',
       '**/*.d.ts',
-      // PLAN-020 Phase 0 spikes: throwaway, not linted.
-      'packages/bitmark-editor/spikes',
-      'packages/bitmark-editor/playground-spike',
+      // The package lints itself (its own eslint.config.mjs, PLAN-020 D6).
+      'packages/bitmark-editor',
     ],
   },
 
@@ -74,44 +73,6 @@ const config = [
         2,
         {
           allowInterfaces: 'always',
-        },
-      ],
-    },
-  },
-
-  //
-  // src/lib: the future @gmb/bitmark-editor core (PLAN-020 D6, D8). It must
-  // lift out unchanged: no playground imports, no framework or state
-  // library, and Monaco only as types (the host injects the instance).
-  //
-  {
-    files: ['src/lib/**/*.ts'],
-    rules: {
-      '@typescript-eslint/no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'monaco-editor',
-              message: 'src/lib receives Monaco by injection (PLAN-020 D8); import types only.',
-              allowTypeImports: true,
-            },
-          ],
-          patterns: [
-            {
-              group: ['react', 'react-*', 'valtio', 'valtio/*', 'theme-ui', 'lodash', 'lodash/*'],
-              message: 'src/lib is framework-free (PLAN-020 D6).',
-            },
-            {
-              group: ['monaco-editor/*'],
-              message: 'src/lib receives Monaco by injection (PLAN-020 D8); import types only.',
-              allowTypeImports: true,
-            },
-            {
-              group: ['../../*'],
-              message: 'src/lib must not import from outside src/lib (PLAN-020 D6).',
-            },
-          ],
         },
       ],
     },

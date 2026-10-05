@@ -177,17 +177,29 @@ and to the package in Phase 2.
 
 ### Phase 2 — The package
 
-- [ ] Step 9 — Bun workspace: `packages/bitmark-editor` with its own
+- [x] Step 9 — Bun workspace: `packages/bitmark-editor` with its own
   `package.json`. Exports: `.`, `./panes/*`, `./elements`, `./react`,
   `./bundled`, `./bundled/style.css`. Move `src/lib` there; the playground
   depends on it via `workspace:*`.
-- [ ] Step 10 — Dependencies:
+- [x] Step 10 — Dependencies:
   - `monaco-editor`: a dev dependency (types, and the `/bundled` build); an
     optional peer with the supported range, for `/esm`;
   - `@gmb/bitmark-parser` as an optional peer (injection, types) and a dev
     dependency;
   - React as an optional peer (`./react` only);
   - no lodash (a local debounce), no valtio, no theme-ui.
+
+  Done (Steps 9–10): `packages/bitmark-editor` with its own `package.json`,
+  `tsconfig.json`, `vitest.config.ts`, `eslint.config.mjs` (carrying the
+  framework-free and Monaco-by-injection guard), README, CHANGELOG and
+  LICENSE, and its own copy of the book fixture.
+  - The playground depends on it as `workspace:*` and resolves it from
+    source (a `paths` entry and a Vite alias), so development needs no
+    build step.
+  - The root lint and Vitest leave the package to its own configs.
+  - The package's dev copies of `monaco-editor` and `@gmb/bitmark-parser`
+    are never reached at runtime, because the source only imports their
+    types (the lint guard enforces this).
 - [ ] Step 11 — Builds:
   - `/esm` (tsup or Vite library mode; `d.ts` files);
   - `/bundled` per the Phase 0 outcome (Monaco + core + element, CSS file,

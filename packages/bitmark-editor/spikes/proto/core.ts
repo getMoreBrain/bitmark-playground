@@ -5,9 +5,9 @@
  */
 import type * as MonacoNs from 'monaco-editor';
 
-import { jsonWithBitStarts } from '../../../../src/scrollSync/jsonText';
-import { mapScrollTop } from '../../../../src/scrollSync/mapScrollTop';
-import { buildBitmarkHighlightCss, tokenClassName } from '../../../../src/monaco-bitmark/bitmarkTheme';
+import { jsonWithBitStarts } from '../../src/json/jsonText';
+import { mapScrollTop } from '../../src/scroll/mapScrollTop';
+import { buildBitmarkHighlightCss, tokenClassName } from '../../src/theme/tokens';
 
 export type Monaco = typeof MonacoNs;
 

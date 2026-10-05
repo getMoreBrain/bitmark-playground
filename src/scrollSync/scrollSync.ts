@@ -1,12 +1,12 @@
 // @awa-component: PLAN-018-ScrollSync
-import { subscribeKey } from 'valtio/utils';
-
 import {
   createScrollSyncGroup,
   ScrollSyncEditor,
   ScrollSyncGroup,
   ScrollSyncMember,
-} from '../lib/scroll';
+} from '@gmb/bitmark-editor';
+import { subscribeKey } from 'valtio/utils';
+
 import { uiState } from '../state/uiState';
 
 /**
