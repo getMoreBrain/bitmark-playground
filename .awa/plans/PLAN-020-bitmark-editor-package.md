@@ -156,7 +156,9 @@ likes, and the playground consumes the package.
       validation;
     - no suggest / hover contributions: no completion / hover.
   - The supported Monaco range starts at 0.46 (cosmic's version) and runs up
-    to the current release; setup warns outside it. Both the AMD global build
+    to the current release, as the peer range. Monaco has no runtime version
+    on its ESM API, so setup checks the APIs and contributions it needs
+    instead of a version number (Phase 1 Step 4). Both the AMD global build
     (0.46, as cosmic loads it) and the ESM build (current, as the playground
     loads it) are tested in CI. `/bundled` always ships the current Monaco.
   - Panes pass Monaco `editorOptions` through. The Angular wrapper defaults
