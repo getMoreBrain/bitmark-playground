@@ -39,6 +39,8 @@ describe('buildBitmarkHighlightCss', () => {
 
   it('puts modifier rules after type rules so they win at equal specificity', () => {
     expect(css.indexOf('.bm-mod-comment{')).toBeGreaterThan(css.lastIndexOf('.bm-tok-'));
-    expect(css).toContain('.bm-mod-unclosed{color:#ff5555;text-decoration:underline;}');
+    expect(css).toContain(
+      '.bm-mod-unclosed{color:var(--bm-mod-unclosed-color,#ff5555);text-decoration:var(--bm-mod-unclosed-decoration,underline);}',
+    );
   });
 });

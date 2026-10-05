@@ -85,9 +85,9 @@ takes an injected Monaco and parser (D2, D8). All 9 browser checks pass.
   Monaco): `import.meta.url` then points at the host's chunk, so the
   sibling CSS and workers are not found. The `assetBase` option and a copy
   recipe are needed. Test in Phase 2 Step 11.
-- [ ] Token CSS variables mapped onto host `--syntax-*`, and `setTheme`
-  from a host toggle (D11): the prototype has no CSS variables yet.
-  Phase 1 Step 5a.
+- [x] Token CSS variables and `setTheme` (D11): built in Phase 1 Step 5a
+  (`applyBitmarkTheme`, unit-tested). The host `--syntax-*` mapping itself
+  is the docs site's own CSS (Step 18).
 - [ ] Zoneless Angular: not tried (cosmic is zone-based). Phase 2 Step 13a.
 - [ ] The current Monaco release is 0.57.0; the spikes used 0.52.2 and
   0.46.0. Add 0.57 to the CI matrix (D8).
@@ -150,7 +150,7 @@ and to the package in Phase 2.
 - [x] Step 5 — `createScrollSyncGroup`: from two slots to an N-member group
   with runtime join and leave (D9). Remove `scrollSync`'s dependency on
   `uiState`; the playground's "Link scrolling" toggle sets the membership.
-- [ ] Step 5a — Theme (D11):
+- [x] Step 5a — Theme (D11):
   - token colours become CSS custom properties under the pane theme classes;
   - a light palette;
   - `auto` (`prefers-color-scheme`, live);
