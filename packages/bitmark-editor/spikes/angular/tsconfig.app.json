@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "include": [
+    "src/**/*.ts",
+    "../proto/**/*.ts",
+    "../../../../src/scrollSync/jsonText.ts",
+    "../../../../src/scrollSync/mapScrollTop.ts",
+    "../../../../src/monaco-bitmark/bitmarkTheme.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}

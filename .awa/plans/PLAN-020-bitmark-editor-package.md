@@ -176,7 +176,8 @@ likes, and the playground consumes the package.
     instance;
   - per-editor state is per instance;
   - the JSON schema applies only to the package's own models (their URI
-    scheme), never `fileMatch: ['*']`.
+    scheme), never `fileMatch: ['*']`. The pattern is the scheme followed by
+    a double-star glob: a single `*` does not cross `/` (Phase 0, PLAN-021).
 - D6 — Location: a bun workspace in this repo for now,
   `packages/bitmark-editor`, with the playground staying at the root. The
   package moves to its own repo later, so it is built to be lifted out

@@ -11,40 +11,88 @@ live here. Read PLAN-020 first; nothing here restates its decisions.
 
 ## Steps
 
-### Phase 0 — Spikes (do first; they decide D4's details)
+### Phase 0 — Spikes (done, 2026-10-05)
 
-- [ ] Angular spike in `packages/bitmark-editor/examples/angular`. Create a
-  recent Angular CLI app (application builder) that loads a hand-built
-  `/bundled` prototype (Monaco + JSON worker + one bitmark editor) as a
-  custom element. Confirm that the workers, the CSS and the asset paths work
-  in `ng serve` and `ng build`. Also check whether zone.js needs
-  `runOutsideAngular` (and zoneless).
-- [ ] No-bundler spike in `examples/static`, shaped like the docs site: a
-  static page that loads the `/bundled` prototype from a CDN URL with a plain
-  `<script type="module">` (D12). Confirm:
-  - same-origin blob-URL workers start;
-  - lazy load on intent works, and the static example shows until then;
-  - the narrow-screen fallback works;
-  - the token CSS variables map onto host `--syntax-*` variables;
-  - measured start-up time for `lazy="idle"`, first visit (cold cache)
-    against a later page (warm cache, pinned URLs);
-  - `setTheme` follows a host theme toggle.
-- [ ] Angular + host Monaco spike: an Angular app that already bundles
-  Monaco its own way injects that instance into the `/esm` prototype. Check:
-  - one Monaco on the page;
-  - the bitmark language works, and so do completion and hover (if the
-    host's Monaco has the contributions);
-  - the host's own JSON editors get no bitmark schema.
-- [ ] Monaco 0.46 AMD spike: the bitmark pane on an injected
-  `window.monaco` 0.46 (the AMD build loaded from assets, as in cosmic).
-  Check that highlighting, diagnostics, completion, hover, the JSON schema
-  and scroll sync all work.
-- [ ] Vite / `/esm` spike: the playground injects its own Monaco (with its
-  existing workers).
-- [ ] `/bundled` beside a host Monaco: the guard warns and leaves the host's
-  `MonacoEnvironment` untouched.
-- [ ] Record the outcomes in this plan (worker strategy, CSS delivery,
-  asset base path).
+The spikes live in `packages/bitmark-editor/spikes/` (throwaway; their own
+`package.json`, run with `bun run build:bundled` and `npx playwright test`)
+and `packages/bitmark-editor/playground-spike/` (served by the playground's
+Vite dev server on port 4604). A minimal prototype core (`spikes/proto/core.ts`)
+takes an injected Monaco and parser (D2, D8). All 9 browser checks pass.
+
+- [x] Prototype core: a bitmark + JSON pair with highlighting, diagnostics,
+  completion, hover, JSON schema, conversion both ways and bit-based scroll
+  sync, with no runtime Monaco import. Its `/esm` build is 13 KB.
+- [x] No-bundler static page, shaped like the docs site (D12), loading
+  `/bundled` cross-origin from a "CDN" origin that serves immutable files
+  with CORS, through a plain `<script type="module">`:
+  - every service works, and the blob-URL workers start;
+  - `lazy="idle"` works, and the static example shows until mount;
+  - `narrow="static"` on a coarse pointer and narrow viewport loads nothing
+    from the CDN;
+  - a blocked CDN leaves the static example in place.
+- [x] Monaco 0.46 AMD (`window.monaco` from assets, as in cosmic), injected:
+  every service works, and the host's own JSON model gets no bitmark schema
+  (D5).
+- [x] `/bundled` beside a host Monaco: the guard warns, and the host's
+  `MonacoEnvironment` is untouched (D8).
+- [x] Angular 21 shaped like cosmic: NgModule bootstrap,
+  `provideZoneChangeDetection`, Monaco 0.46 AMD from assets, and the parser
+  bundled and initialised by the app (`bitmark-json`, `module_or_path`), then
+  injected.
+  - `ng build` (production) passes, with the core compiled in by the
+    Angular builder.
+  - Every service works.
+  - While typing 21 characters, editors created outside the zone cause 0
+    change-detection turns, against 122 inside (D10 confirmed).
+- [x] The playground injects its own Monaco 0.52 ESM (its Vite `?worker`
+  workers and contributions): one Monaco, and every service works.
+
+#### Outcomes
+
+- Worker strategy (`/bundled`): Monaco's workers are built as classic IIFE
+  files beside the bundle. `MonacoEnvironment.getWorker` starts each one from
+  a same-origin blob URL whose script is `importScripts(<url beside
+  import.meta.url>)`. This works cross-origin with no bundler.
+- CSS delivery (`/bundled`): esbuild extracts Monaco's CSS to `bundled.css`
+  (with `codicon.ttf` beside it). The bundle links it itself, once, from
+  `import.meta.url`; the host adds nothing.
+- Build tool: esbuild (both builds). It handles Monaco's CSS imports and
+  the font with no configuration.
+- Sizes (prototype): `bundled.js` is 2.7 MB raw / 557 KB brotli.
+  - A first visit downloads 1.37 MB brotli in all: the bundle, CSS, font,
+    two workers, the parser, both wasm variants, and the schema.
+  - Start-up over localhost with immutable caching: cold 181 ms, warm
+    41–55 ms. A real CDN adds the download time to the cold visit only.
+- JSON schema scoping (D5): `fileMatch` must be the scheme followed by a
+  double-star glob (`bitmark-editor://` then two asterisks). A single `*`
+  does not cross `/` in Monaco's matcher, so `bitmark-editor://*` silently
+  matches nothing.
+- Duplicate Monaco in a workspace: code inside a folder with its own
+  `node_modules/monaco-editor` resolves that copy. Through Vite's dependency
+  pre-bundle, the page then has two Monacos, and `languages.json` sits on
+  the wrong one.
+  - So in the workspace, `monaco-editor` must be only a peer dependency of
+    the package (with a dev copy that the host's resolution never reaches),
+    and the core must never import it at runtime (D8 confirmed).
+  - Phase 2 Step 10 must verify this with the playground.
+- The root playground now scopes Vitest to the `*.test.ts(x)` files under `src/`, and
+  eslint ignores the spike folders. Otherwise the root runs pick up the
+  Playwright specs and the throwaway code.
+
+#### Not covered by Phase 0 (moved on)
+
+- [ ] `/bundled` consumed through a host bundler (e.g. Angular with no
+  Monaco): `import.meta.url` then points at the host's chunk, so the
+  sibling CSS and workers are not found. The `assetBase` option and a copy
+  recipe are needed. Test in Phase 2 Step 11.
+- [ ] Token CSS variables mapped onto host `--syntax-*`, and `setTheme`
+  from a host toggle (D11): the prototype has no CSS variables yet.
+  Phase 1 Step 5a.
+- [ ] Zoneless Angular: not tried (cosmic is zone-based). Phase 2 Step 13a.
+- [ ] The current Monaco release is 0.57.0; the spikes used 0.52.2 and
+  0.46.0. Add 0.57 to the CI matrix (D8).
+- [ ] Start-up over a throttled network (cold visit): measure in Phase 3
+  with the real CDN.
 
 ### Phase 1 — Core extraction, in place
 
