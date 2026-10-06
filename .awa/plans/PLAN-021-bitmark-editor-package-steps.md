@@ -227,7 +227,7 @@ and to the package in Phase 2.
   - then the optional `<bitmark-tabs>`, `<bitmark-split>` and the
     `<bitmark-editor>` preset.
 - [x] Step 13 — React adapter `./react`.
-- [ ] Step 13a — Angular wrapper `@gmb/bitmark-editor-angular` (D10):
+- [x] Step 13a — Angular wrapper `@gmb/bitmark-editor-angular` (D10):
   - ng-packagr build;
   - `bm-session` / `bm-pane` and the layout helpers;
   - `ControlValueAccessor`;
@@ -247,7 +247,7 @@ and to the package in Phase 2.
   `/bundled`, shaped like the docs site) and `angular`. Each
   shows both engine paths (D2): one page loads the engine, one injects it.
   Build them in CI.
-- [ ] Step 15a — The Angular example is shaped like cosmic (D10):
+- [x] Step 15a — The Angular example is shaped like cosmic (D10):
   - Angular 21, NgModule bootstrap, `provideZoneChangeDetection`;
   - Monaco 0.46 AMD copied to assets and read as `window.monaco`;
   - `@gmb/bitmark-parser/browser` bundled and initialised by the app with
@@ -256,6 +256,17 @@ and to the package in Phase 2.
 
   It is the reproducible CI test for cosmic's setup, which cosmic itself
   cannot provide (it has no test runner).
+
+  Done (Steps 13a, 15a): `packages/bitmark-editor-angular`, one Angular CLI
+  workspace holding the library and the `example` app. The example lives
+  with the wrapper rather than in the core's `examples/`, so the two lift
+  out together with one Angular toolchain.
+  - Its Playwright check (`e2e/`) passes on Monaco 0.46 AMD with the
+    injected parser: services, tabs, the form value, the host's JSON model
+    untouched, and 16 zone turns for 15 keystrokes (15 document changes).
+  - Found and fixed in the browser: `bm-pane` needed a filling layout
+    (`height: 100%; flex: 1 1 0`), as the custom element has; and tabs
+    drive a writable `hiddenByTabs` signal (signal inputs are read-only).
 - [x] Step 15b — Package features for D12 (`lazy`, `narrow`, `debounceMs`,
   `messages`, the error slot, CDN-safe workers):
   - `lazy`, `narrow`, `debounceMs`, `messages`, the per-pane error slot;

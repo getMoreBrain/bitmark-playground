@@ -30,6 +30,7 @@ const config = [
       '**/*.d.ts',
       // The package lints itself (its own eslint.config.mjs, PLAN-020 D6).
       'packages/bitmark-editor',
+      'packages/bitmark-editor-angular',
     ],
   },
 
