@@ -1,0 +1,44 @@
+# The pinned default parser version (PLAN-022 D13): weekly, open a PR that
+# bumps it to the latest @gmb/bitmark-parser. The PR runs the full
+# bitmark-editor CI; merging it makes the next patch release.
+name: bitmark-editor parser bump
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+      - id: bump
+        working-directory: packages/bitmark-editor
+        run: echo "version=$(node scripts/bump-parser.mjs)" >> "$GITHUB_OUTPUT"
+      - if: steps.bump.outputs.version != ''
+        run: bun install
+      - if: steps.bump.outputs.version != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # A PR opened with the default GITHUB_TOKEN triggers no workflows:
+          # the bot token lets the bitmark-editor CI run on it.
+          token: ${{ secrets.BITMARK_EDITOR_BOT_TOKEN || github.token }}
+          branch: bitmark-editor/parser-${{ steps.bump.outputs.version }}
+          title: "chore(bitmark-editor): default parser ${{ steps.bump.outputs.version }}"
+          commit-message: "chore(bitmark-editor): default parser ${{ steps.bump.outputs.version }}"
+          body: |
+            Bumps the pinned default parser version (PLAN-022 D13) to `${{ steps.bump.outputs.version }}`
+            (within the declared peer range; a new major is left to a person).
+
+            The bitmark-editor CI should run the full unit and browser suite on this PR.
+            If it shows no checks, the `BITMARK_EDITOR_BOT_TOKEN` secret is not set:
+            run the "bitmark-editor" workflow on this branch by hand before merging.

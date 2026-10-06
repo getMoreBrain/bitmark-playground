@@ -1,4 +1,3 @@
-// @awa-component: PLAN-018-ConvertWithBitStarts
 import type {
   convert as convertFn,
   convertWithDetails as convertWithDetailsFn,
@@ -22,8 +21,6 @@ const offsets = (values: readonly unknown[] | undefined): number[] | undefined =
  * than parser PLAN-223, whose spans have `start` / `end` instead. Throws on a
  * parser error, as `throwIfParserError` does.
  */
-// @awa-impl: PLAN-018-Step3 (conversions record each bit's start)
-// @awa-impl: PLAN-020-Step1 (and where each bit starts in the input)
 export const convertWithBitStarts = (
   convert: typeof convertFn,
   convertWithDetails: typeof convertWithDetailsFn | undefined,

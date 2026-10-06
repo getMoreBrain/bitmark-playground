@@ -1,0 +1,105 @@
+{
+  "name": "@gmb/bitmark-editor",
+  "version": "0.1.0",
+  "description": "bitmark and JSON editors on Monaco, with optional HTML, XML, Text, Info and Mappings panes, for any framework.",
+  "author": "Get More Brain Ltd",
+  "license": "ISC",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "./dist/esm/elements/*",
+    "./dist/bundled/*",
+    "./src/elements/index.ts",
+    "./src/bundled/*"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./elements": {
+      "types": "./dist/types/elements/index.d.ts",
+      "import": "./dist/esm/elements/index.js"
+    },
+    "./react": {
+      "types": "./dist/types/react/index.d.ts",
+      "import": "./dist/esm/react/index.js"
+    },
+    "./worker": {
+      "import": "./dist/esm/engineWorker.js"
+    },
+    "./bundled": {
+      "types": "./dist/types/bundled/index.d.ts",
+      "import": "./dist/bundled/bundled.js"
+    },
+    "./bundled/*": "./dist/bundled/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "docs": "typedoc"
+  },
+  "peerDependencies": {
+    "@gmb/bitmark-parser": ">=7.7.0 <8",
+    "monaco-editor": ">=0.46.0 <1",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@gmb/bitmark-parser": {
+      "optional": true
+    },
+    "monaco-editor": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@gmb/bitmark-parser": "^7.9.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20.19.33",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "jsdom": "^28.1.0",
+    "monaco-editor": "0.57.0",
+    "prettier": "^3.8.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typedoc": "0.28",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getMoreBrain/bitmark-playground.git",
+    "directory": "packages/bitmark-editor"
+  },
+  "keywords": [
+    "bitmark",
+    "monaco",
+    "editor"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/getMoreBrain/bitmark-playground/tree/main/packages/bitmark-editor#readme",
+  "engines": {
+    "node": ">=20"
+  }
+}

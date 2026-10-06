@@ -1,15 +1,14 @@
-// @awa-component: PLAN-005-DiffPanel
 /** @jsxImportSource theme-ui */
-import { IDisposable } from 'monaco-editor';
-import { useCallback, useRef } from 'react';
+import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { MONACO_THEME } from '@gmb/bitmark-editor';
+import { useCallback } from 'react';
 import { DiffEditorDidMount, DiffEditorWillUnmount } from 'react-monaco-editor';
 
-import {
-  attachBitmarkHighlighter,
-  BITMARK_LANGUAGE_ID,
-  MONACO_THEME,
-} from '../../monaco-bitmark/bitmarkLanguage';
 import { MonacoDiffEditorAutoResize } from '../monaco/MonacoDiffEditorAutoResize';
+import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
+
+/** A read-only view: highlighted, not validated. */
+const READ_ONLY_SERVICES = { diagnostics: false } as const;
 
 export interface DiffPanelProps {
   /** Left side content (JS / "Original" parser output) */
@@ -20,26 +19,19 @@ export interface DiffPanelProps {
   language: string;
 }
 
-// @awa-impl: PLAN-005-Step2 (read-only inline diff viewer)
 const DiffPanel = ({ original, modified, language }: DiffPanelProps) => {
-  const highlightersRef = useRef<IDisposable[]>([]);
+  const { attach, detach } = useBitmarkEditorServices(READ_ONLY_SERVICES);
 
-  // @awa-impl: PLAN-016-Step5 (bitmark diff highlighted from parser semantic tokens)
   const editorDidMount = useCallback<DiffEditorDidMount>(
     (diffEditor) => {
       if (language !== BITMARK_LANGUAGE_ID) return;
-      highlightersRef.current = [
-        attachBitmarkHighlighter(diffEditor.getOriginalEditor()),
-        attachBitmarkHighlighter(diffEditor.getModifiedEditor()),
-      ];
+      attach(diffEditor.getOriginalEditor());
+      attach(diffEditor.getModifiedEditor());
     },
-    [language],
+    [attach, language],
   );
 
-  const editorWillUnmount = useCallback<DiffEditorWillUnmount>(() => {
-    for (const highlighter of highlightersRef.current) highlighter.dispose();
-    highlightersRef.current = [];
-  }, []);
+  const editorWillUnmount = useCallback<DiffEditorWillUnmount>(() => detach(), [detach]);
 
   return (
     <MonacoDiffEditorAutoResize

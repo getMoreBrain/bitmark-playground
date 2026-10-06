@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "include": [
+    "src/**/*.ts",
+    "../proto/**/*.ts",
+    "../../src/json/jsonText.ts",
+    "../../src/scroll/mapScrollTop.ts",
+    "../../src/theme/tokens.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}

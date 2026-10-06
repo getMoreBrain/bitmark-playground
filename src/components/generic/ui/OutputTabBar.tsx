@@ -1,4 +1,3 @@
-// @awa-component: PLAN-003-OutputTabBar
 /** @jsxImportSource theme-ui */
 import { Flex, Text } from 'theme-ui';
 
@@ -14,7 +13,6 @@ export interface OutputTabBarProps {
   onTabChange: (id: string) => void;
 }
 
-// @awa-impl: PLAN-003-Step4 (output tab bar)
 const OutputTabBar = ({ label, tabs, activeTab, onTabChange }: OutputTabBarProps) => {
   const tabSx = (active: boolean) =>
     ({

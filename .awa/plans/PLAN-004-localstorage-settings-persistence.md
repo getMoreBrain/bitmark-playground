@@ -1,8 +1,8 @@
 # PLAN-004: LocalStorage Settings Persistence
 
-**Status:** in-progress
-**Workflow direction:** bottom-up
-**Traceability:** Extends `uiState` (PLAN-003-UiState) and `bitmarkState` (PLAN-002-BitmarkState); fulfills "Persistence of settings across page reload" noted as out-of-scope in PLAN-003.
+STATUS: in-progress
+DIRECTION: bottom-up
+TRACEABILITY: Extends `uiState` (PLAN-003-UiState) and `bitmarkState` (PLAN-002-BitmarkState); fulfills "Persistence of settings across page reload" noted as out-of-scope in PLAN-003.
 
 ---
 

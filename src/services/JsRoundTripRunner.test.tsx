@@ -1,4 +1,3 @@
-// @awa-test: PLAN-012-Step2 (JsRoundTripRunner bpg round-trip behaviour)
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

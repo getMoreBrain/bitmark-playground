@@ -46,3 +46,12 @@ junit.xml
 
 
 # PACKAGE SPECIFIC
+
+# Spikes
+/packages/**/node_modules
+/packages/**/spikes/**/dist
+/packages/**/spikes/**/results
+/packages/**/examples/**/results
+/packages/**/examples/**/dist
+/packages/**/examples/**/.angular
+/packages/bitmark-editor/docs/api

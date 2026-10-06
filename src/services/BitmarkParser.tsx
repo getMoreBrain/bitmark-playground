@@ -1,14 +1,25 @@
-// @awa-component: PLAN-002-BitmarkParser
-
+import type { BitmarkEngine } from '@gmb/bitmark-editor';
+import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '@gmb/bitmark-editor';
+import {
+  bindBitmarkJsonSchema,
+  loadBitmarkJsonSchema,
+  Monaco,
+  schemaUrlFor,
+} from '@gmb/bitmark-editor';
 import type {
   bitmarkToObjects as bitmarkToObjectsFn,
+  complete as completeFn,
   convert as convertFn,
   convertWithDetails as convertWithDetailsFn,
+  diagnostics as diagnosticsFn,
+  hover as hoverFn,
   info as infoFn,
   init as initFn,
+  resolve as resolveFn,
   semanticTokens as semanticTokensFn,
   splitBits as splitBitsFn,
 } from '@gmb/bitmark-parser';
+import * as monaco from 'monaco-editor';
 import {
   createContext,
   ReactElement,
@@ -20,13 +31,6 @@ import {
 } from 'react';
 
 import { log } from '../logging/log';
-import type {
-  CompleteSource,
-  DiagnosticsSource,
-  HoverSource,
-  ResolveSource,
-} from '../monaco-bitmark/bitmarkEditorTypes';
-import { registerBitmarkJsonSchema } from '../monaco-bitmark/bitmarkJsonSchema';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
@@ -51,23 +55,6 @@ export const engineUrl = (search: string, base: string, cacheBuster: number): st
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
 
-// The string-based API (`convert`, `info`) reports failures by returning an
-// `error: …`-prefixed string rather than throwing.
-const PARSER_ERROR_PREFIX = 'error:';
-
-/**
- * Return `out` unchanged, or throw when it is a parser error string.
- *
- * Call this on every `convert` / `info` result that is piped onward, otherwise
- * an error message is treated as document content and re-parsed downstream.
- */
-const throwIfParserError = (out: string): string => {
-  if (out.startsWith(PARSER_ERROR_PREFIX)) {
-    throw new Error(out.slice(PARSER_ERROR_PREFIX.length).trim());
-  }
-  return out;
-};
-
 interface BitmarkParserModule {
   init: typeof initFn;
   bitmarkToObjects: typeof bitmarkToObjectsFn;
@@ -82,10 +69,10 @@ interface BitmarkParserModule {
   // The editor services (parser PLAN-196). Optional: a parser older than the
   // release that carries them simply has no such export, and the playground
   // then runs without markers, completion or hover.
-  diagnostics?: DiagnosticsSource;
-  complete?: CompleteSource;
-  resolve?: ResolveSource;
-  hover?: HoverSource;
+  diagnostics?: typeof diagnosticsFn;
+  complete?: typeof completeFn;
+  resolve?: typeof resolveFn;
+  hover?: typeof hoverFn;
 }
 
 interface BitmarkParserProviderProps {
@@ -109,11 +96,17 @@ interface IBitmarkParserContext {
   info: typeof infoFn | undefined;
   semanticTokens: typeof semanticTokensFn | undefined;
   splitBits: typeof splitBitsFn | undefined;
-  diagnostics: DiagnosticsSource | undefined;
-  complete: CompleteSource | undefined;
-  resolve: ResolveSource | undefined;
-  hover: HoverSource | undefined;
+  diagnostics: typeof diagnosticsFn | undefined;
+  complete: typeof completeFn | undefined;
+  resolve: typeof resolveFn | undefined;
+  hover: typeof hoverFn | undefined;
   version: string;
+  /**
+   * The same parser as an async engine (PLAN-023 Step 1), for code moving
+   * to `src/lib`. The raw functions above stay until the playground runs on
+   * the package (PLAN-023 Step 14).
+   */
+  engine: BitmarkEngine | undefined;
 }
 
 const defaultState: IBitmarkParserContext = {
@@ -131,6 +124,7 @@ const defaultState: IBitmarkParserContext = {
   resolve: undefined,
   hover: undefined,
   version: '',
+  engine: undefined,
 };
 
 const BitmarkParserContext = createContext<IBitmarkParserContext>(defaultState);
@@ -150,21 +144,29 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const load = async () => {
       try {
-        // Load ES module via dynamic import
-        const module = (await import(/* @vite-ignore */ moduleUrl)) as BitmarkParserModule;
-
         // Stage 1: the smallest variant, so the editor is live as soon as
         // possible — bitmark ↔ JSON, highlighting, diagnostics, completion
         // and hover. `info` waits: this variant renders it as JSON only.
-        await module.init({ feature: 'bitmark-json' });
+        // Stage 2 (`full`) — the markup formats, `info` as text, and the
+        // `info` meta layer (bit and tag descriptions, which completion
+        // documentation and hover show) — loads in the background while
+        // stage 1 keeps serving; the package swaps atomically.
+        const { module: loadedModule, stage2 } = await loadBitmarkModule(moduleUrl, {
+          feature: 'full',
+        });
+        const module = loadedModule as BitmarkParserModule;
+        const engine = createBitmarkEngine(loadedModule, { feature: 'bitmark-json' });
 
-        // Get version from the library itself
-        const resolvedVersion = module.version();
-
-        // @awa-impl: PLAN-017-Step5 (the JSON pane validates against the
-        // schema the SAME parser version publishes). Independent of the
+        // The JSON pane validates against the schema the SAME parser
+        // version publishes (PLAN-017). Independent of the
         // engine: a failure leaves JSON syntax checking as it was.
-        void registerBitmarkJsonSchema(moduleUrl);
+        // Every JSON model in the playground holds a bitmark document (the
+        // JSON tabs and the JSON diff), so the schema applies to all of them.
+        void loadBitmarkJsonSchema(schemaUrlFor(moduleUrl)).then(
+          (schema) =>
+            schema !== undefined &&
+            bindBitmarkJsonSchema(monaco as unknown as Monaco, schema, { fileMatch: ['*'] }),
+        );
 
         const loaded: IBitmarkParserContext = {
           loadSuccess: true,
@@ -180,39 +182,22 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           complete: module.complete,
           resolve: module.resolve,
           hover: module.hover,
-          version: resolvedVersion,
+          version: engine.version,
+          engine,
         };
         setState(loaded);
 
-        // Stage 2: `full` — the markup formats, `info` as text, and the
-        // `info` meta layer (bit and tag descriptions, which completion
-        // documentation and hover show). Loads in the background while
-        // stage 1 keeps serving; the package swaps atomically. A failure
-        // here leaves stage 1 in place.
-        try {
-          await module.init({ feature: 'full' });
-          setState({ ...loaded, markupReady: true, info: module.info });
-        } catch (e) {
-          log.error('BitmarkParserProvider: the full engine failed to load', e);
-        }
+        // A stage-2 failure leaves stage 1 in place.
+        stage2.then(
+          (feature) => {
+            engine.setFeature(feature);
+            setState({ ...loaded, markupReady: true, info: module.info });
+          },
+          (e) => log.error('BitmarkParserProvider: the full engine failed to load', e),
+        );
       } catch (e) {
         log.error('BitmarkParserProvider: failed to load', e);
-        setState({
-          loadSuccess: false,
-          loadError: true,
-          markupReady: false,
-          bitmarkToObjects: undefined,
-          convert: undefined,
-          convertWithDetails: undefined,
-          info: undefined,
-          semanticTokens: undefined,
-          splitBits: undefined,
-          diagnostics: undefined,
-          complete: undefined,
-          resolve: undefined,
-          hover: undefined,
-          version: '',
-        });
+        setState({ ...defaultState, loadError: true });
       }
     };
 

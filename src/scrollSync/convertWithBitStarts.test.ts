@@ -6,8 +6,6 @@ import { convertWithBitStarts } from './convertWithBitStarts';
 const OPTIONS = { inputFormat: 'bitmark', outputFormat: 'text' } as const;
 
 describe('convertWithBitStarts', () => {
-  // @awa-test: PLAN-018-Step3 (the starts are the parser's span starts)
-  // @awa-test: PLAN-020-Step1 (in the output and in the input)
   it("returns the output and each bit span's output and input start", () => {
     const convert = vi.fn();
     const convertWithDetails = vi.fn(() => ({
@@ -36,7 +34,6 @@ describe('convertWithBitStarts', () => {
     expect(() => convertWithBitStarts(vi.fn(), convertWithDetails, 'x', OPTIONS)).toThrow('boom');
   });
 
-  // @awa-test: PLAN-018-Step3 (an engine without convertWithDetails still converts)
   it('converts without positions on an engine without convertWithDetails', () => {
     const convert = vi.fn(() => 'text');
     expect(convertWithBitStarts(convert, undefined, 'x', OPTIONS)).toEqual({
@@ -46,7 +43,6 @@ describe('convertWithBitStarts', () => {
     });
   });
 
-  // @awa-test: PLAN-018-Step3 (an engine older than parser PLAN-223 gives no positions)
   it('gives no positions for spans without input / output starts', () => {
     const convertWithDetails = vi.fn(() => ({
       output: 'one',

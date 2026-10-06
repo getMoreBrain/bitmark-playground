@@ -1,4 +1,3 @@
-// @awa-component: PLAN-003-UiState
 import { proxy } from 'valtio';
 
 import { loadSettings } from '../services/settingsStorage';
@@ -31,8 +30,6 @@ export interface UiState {
   setLinkScroll(value: boolean): void;
 }
 
-// @awa-impl: PLAN-003-Step1 (settings state)
-// @awa-impl: PLAN-004-Step2 (hydrate from storage)
 const stored = loadSettings();
 
 const uiState = proxy<UiState>({
@@ -42,7 +39,6 @@ const uiState = proxy<UiState>({
   leftOutputTab: stored?.leftOutputTab ?? 'diff',
   rightOutputTab: stored?.rightOutputTab ?? 'diff',
   settingsOpen: false,
-  // @awa-impl: PLAN-018-Step8 (on by default)
   linkScroll: stored?.linkScroll ?? true,
 
   setShowDiffLex(value: boolean) {

@@ -36,7 +36,7 @@ Update or create documentation as specified in the instruction above, following 
 
 ## Documentation Structure Example
 
-```
+```text
 README.md              # Project entry point (user-facing)
 docs/
 ├── {topic}.md         # Documentation on a specific topic

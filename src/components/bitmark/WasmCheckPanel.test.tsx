@@ -1,4 +1,3 @@
-// @awa-test: PLAN-006-Step5 (WasmCheckPanel renders read-only bitmark editor)
 /** @jsxImportSource theme-ui */
 import { render, screen } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';

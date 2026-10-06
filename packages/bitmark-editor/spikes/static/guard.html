@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>/bundled beside a host Monaco</title>
+  </head>
+  <body>
+    <!-- PLAN-022 D8 guard: the host has Monaco (AMD, its own
+         MonacoEnvironment); importing /bundled must warn and leave the
+         host's worker setup untouched. -->
+    <div id="host" style="height: 200px"></div>
+    <script src="/monaco046/vs/loader.js"></script>
+    <script>
+      const t = (window.__spike = {});
+      require.config({ paths: { vs: '/monaco046/vs' } });
+      // A host that configures its own workers, as ngx-monaco-editor-v2 does.
+      window.MonacoEnvironment = { getWorkerUrl: () => '/monaco046/vs/base/worker/workerMain.js', hostMarker: true };
+      require(['vs/editor/editor.main'], async () => {
+        monaco.editor.create(document.getElementById('host'), { value: '{"a": 1}', language: 'json' });
+        const before = window.MonacoEnvironment;
+        const bundle = await import('http://localhost:4602/editor/bundled.js');
+        t.detected = bundle.hostMonacoDetected;
+        t.untouched = window.MonacoEnvironment === before && window.MonacoEnvironment.hostMarker === true;
+        t.done = true;
+      });
+    </script>
+  </body>
+</html>

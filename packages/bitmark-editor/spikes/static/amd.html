@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Monaco 0.46 AMD host spike</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 16px; background: #1e1e1e; color: #ddd; }
+      .row { display: flex; gap: 8px; }
+      .pane { flex: 1; height: 300px; border: 1px solid #444; }
+    </style>
+  </head>
+  <body>
+    <!-- Shaped like cosmic (PLAN-022 D8, D10): Monaco 0.46 AMD from the
+         site's assets, read as `window.monaco`; the host has its own JSON
+         editor. The package core is injected with that Monaco. -->
+    <h3>Host JSON editor (must NOT get the bitmark schema)</h3>
+    <div class="pane" id="host-json"></div>
+    <h3>bitmark pair (injected Monaco 0.46)</h3>
+    <div class="row">
+      <div class="pane" data-pane="bitmark"></div>
+      <div class="pane" data-pane="json"></div>
+    </div>
+    <script src="/monaco046/vs/loader.js"></script>
+    <script>
+      const t = (window.__spike = { start: performance.now() });
+      require.config({ paths: { vs: '/monaco046/vs' } });
+      require(['vs/editor/editor.main'], async () => {
+        const CDN = 'http://localhost:4602';
+        try {
+          // The host's own editor, on a host URI.
+          const hostModel = monaco.editor.createModel(
+            '[{"bit": {"type": 42}}]',
+            'json',
+            monaco.Uri.parse('inmemory://host/config.json'),
+          );
+          window.__hostEditor = monaco.editor.create(document.getElementById('host-json'), {
+            model: hostModel,
+            theme: 'vs-dark',
+          });
+
+          const core = await import(`${CDN}/editor/esm/core.js`);
+          const engine = await core.loadEngine(`${CDN}/parser/dist/browser/bitmark-parser.min.js`);
+          const schema = await fetch(`${CDN}/parser/schema/bitmark.schema.json`).then((r) => r.json());
+          t.schemaApplied = core.setJsonSchema(window.monaco, schema);
+          window.__pair = core.createPair({
+            monaco: window.monaco,
+            engine,
+            bitmarkElement: document.querySelector('[data-pane="bitmark"]'),
+            jsonElement: document.querySelector('[data-pane="json"]'),
+            value: '[.article]\nHello **World**!\n\n[.cloze]\nThe capital of France is [_Paris].',
+          });
+          window.__monaco = window.monaco;
+          t.monacoVersion = '0.46.0';
+          t.mounted = performance.now();
+        } catch (e) {
+          t.error = String(e);
+          console.error(e);
+        }
+      });
+    </script>
+  </body>
+</html>

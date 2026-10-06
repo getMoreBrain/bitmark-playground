@@ -40,17 +40,17 @@ Implement code and tests based on architecture, requirements, and design (tasks 
 
 You MUST add these markers to create explicit traces:
 
-```
+```text
 // @awa-component: {CODE}-{ComponentName}
 ```
 Place directly before the code that implements a design component, and before associated tests.
 
-```
+```text
 // @awa-impl: {CODE}-{n}[.{p}]_AC-{m}
 ```
 Place directly before the code that satisfies an acceptance criterion. Multiple markers allowed per block.
 
-```
+```text
 // @awa-test: {CODE}_P-{n}
 // @awa-test: {CODE}-{n}[.{p}]_AC-{m}
 ```
@@ -85,7 +85,7 @@ Place directly before tests. Use P- for property-based tests, AC- for direct acc
 6. FOR EACH TEST
   - Add @awa-component marker directly before test code
   - Property tests (@awa-test: {CODE}_P-{n}): Use property-based testing framework
-  - Acceptance tests (@awa-test: {CODE}-{n}[.{p}]_AC-{m}): Use example-based assertions
+  - Acceptance tests (@awa-test: {CODE}-{n}\[.{p}]_AC-{m}): Use example-based assertions
   - A single test may verify multiple ACs or properties
 
 7. UPDATE DOCUMENTATION
@@ -115,7 +115,7 @@ Place directly before tests. Use P- for property-based tests, AC- for direct acc
 Given:
 - CFG-1: Config Loading with CFG-1_AC-1 (load from path), CFG-1_AC-2 (merge with defaults)
 - DESIGN component CFG-ConfigLoader with IMPLEMENTS: CFG-1_AC-1, CFG-1_AC-2
-- DESIGN property CFG_P-1 [Default Preservation] VALIDATES: CFG-1_AC-2
+- DESIGN property CFG_P-1 \[Default Preservation] VALIDATES: CFG-1_AC-2
 
 Output:
 

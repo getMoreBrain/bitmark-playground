@@ -1,0 +1,156 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "bitmark-editor-angular": {
+      "projectType": "library",
+      "root": "projects/bitmark-editor-angular",
+      "sourceRoot": "projects/bitmark-editor-angular/src",
+      "prefix": "bm",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/bitmark-editor-angular/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/bitmark-editor-angular/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/bitmark-editor-angular/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "example": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:component": {
+          "skipTests": true,
+          "standalone": false
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true,
+          "standalone": false
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true,
+          "standalone": false
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/example",
+      "sourceRoot": "projects/example/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/example/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/example/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/example/public"
+              },
+              {
+                "glob": "min/**/*",
+                "input": "node_modules/monaco-editor",
+                "output": "/assets/monaco/"
+              },
+              {
+                "glob": "bitmark_json_wasm_bg.wasm",
+                "input": "node_modules/@gmb/bitmark-parser/dist/browser/wasm",
+                "output": "/assets/bitmark-parser/"
+              },
+              {
+                "glob": "bitmark_wasm_bg.wasm",
+                "input": "node_modules/@gmb/bitmark-parser/dist/browser/wasm",
+                "output": "/assets/bitmark-parser/"
+              },
+              {
+                "glob": "bitmark.schema.json",
+                "input": "node_modules/@gmb/bitmark-parser/schema",
+                "output": "/assets/bitmark-parser/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@gmb/bitmark-parser/dist/browser",
+                "output": "/assets/parser-browser/",
+                "ignore": [
+                  "cjs/**",
+                  "**/*.map"
+                ]
+              }
+            ],
+            "styles": [
+              "projects/example/src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "example:build:production"
+            },
+            "development": {
+              "buildTarget": "example:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  }
+}

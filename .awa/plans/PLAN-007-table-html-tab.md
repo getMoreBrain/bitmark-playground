@@ -8,7 +8,7 @@ TRACEABILITY: Extends PLAN-002 (parser tab bar, BitmarkState slices, dual conver
 
 ## Goal
 
-Add a `Table (HTML)` tab as the last tab on the JSON editor's tab bar (top right), after `WASM Check`. The tab hosts an **editable** Monaco editor in `html` language mode. It bidirectionally syncs an HTML-table document with the `Original` bitmark via the parser's new `convertHtmlTable` functionality.
+Add a `Table (HTML)` tab as the last tab on the JSON editor's tab bar (top right), after `WASM Check`. The tab hosts an *editable* Monaco editor in `html` language mode. It bidirectionally syncs an HTML-table document with the `Original` bitmark via the parser's new `convertHtmlTable` functionality.
 
 ## Scope
 
@@ -27,7 +27,7 @@ When `Table (HTML)` is selected, the right pane swaps from the JSON editor to an
 
 ## Conversion API (assumption)
 
-`convertHtmlTable` is provided by the CDN-loaded `bitmarkParserGenerator` (not yet in bundled types). Direction is **explicit** (separate call/option per direction):
+`convertHtmlTable` is provided by the CDN-loaded `bitmarkParserGenerator` (not yet in bundled types). Direction is *explicit* (separate call/option per direction):
 
 - `HTML → bitmark` — used when the Table (HTML) tab is edited.
 - `bitmark → HTML` — used to refresh the Table (HTML) tab when `Original` changes.

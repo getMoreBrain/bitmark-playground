@@ -1,8 +1,8 @@
 # PLAN-002: Dual Parser Integration (@gmb/bitmark-parser)
 
 STATUS: in-progress
-WORKFLOW: top-down
-TRACES: ARCHITECTURE.md (Parser Layer, State Layer, UI Layer)
+DIRECTION: top-down
+TRACEABILITY: ARCHITECTURE.md (Parser Layer, State Layer, UI Layer)
 
 ## Goal
 
@@ -31,8 +31,8 @@ ES module (not UMD). Exports:
 | Export | Signature | Notes |
 |--------|-----------|-------|
 | `init` (default) | `async (wasmUrl?) => void` | Must call before any other API. Loads WASM. |
-| `parse` | `(input: string) => string` | Returns JSON **string**. Needs `JSON.parse()`. |
-| `generate` | `(json: string) => string` | **Throws — not yet implemented.** |
+| `parse` | `(input: string) => string` | Returns JSON *string*. Needs `JSON.parse()`. |
+| `generate` | `(json: string) => string` | *Throws — not yet implemented.* |
 | `lex` | `(input: string, stage?: string) => string` | Token dump (not needed here). |
 | `convert` | `(input: string, format: string) => string` | Undocumented. May overlap with parse/generate. |
 | `info` | `(…) => string` | Undocumented. Possibly returns version/build info. |
@@ -92,7 +92,7 @@ Invalid JSON is not parsed (current behavior preserved).
 Create `src/services/BitmarkParser.tsx`:
 - CDN URL: `https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js`
 - Version from `?v2=` query param (default: `latest`)
-- **ES module loading** via dynamic `import(url)` — cannot use `useScript` hook
+- *ES module loading* via dynamic `import(url)` — cannot use `useScript` hook
 - After import, call `module.default()` (init) to initialize WASM
 - Store `parse` and `generate` functions in context
 - Fetch version from `https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/package.json`
@@ -102,7 +102,7 @@ Create `src/services/BitmarkParser.tsx`:
 
 ### Step 2: State Expansion — `bitmarkState.ts`
 
-Use **nested state per parser** (Option B):
+Use *nested state per parser* (Option B):
 
 ```ts
 type ParserType = 'js' | 'wasm';

@@ -1,0 +1,31 @@
+{
+  "name": "@gmb/bitmark-editor-angular",
+  "version": "0.1.0",
+  "description": "Angular components for @gmb/bitmark-editor: bm-session, bm-pane, bm-tabs, bm-split, with forms support.",
+  "author": "Get More Brain Ltd",
+  "license": "ISC",
+  "peerDependencies": {
+    "@angular/common": ">=21.0.0 <23",
+    "@angular/core": ">=21.0.0 <23",
+    "@angular/forms": ">=21.0.0 <23",
+    "@gmb/bitmark-editor": "^0.1.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getMoreBrain/bitmark-playground.git",
+    "directory": "packages/bitmark-editor-angular"
+  },
+  "keywords": [
+    "bitmark",
+    "monaco",
+    "editor",
+    "angular"
+  ]
+}

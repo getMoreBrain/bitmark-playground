@@ -41,7 +41,7 @@ Update or create the task list document(s) as specified in the instruction above
 
 1. PARSE REQ
    - Extract requirements ({CODE}-{n}) with priorities (must/should/could)
-   - Extract acceptance criteria ({CODE}-{n}[.{p}]_AC-{m}) with types
+   - Extract acceptance criteria ({CODE}-{n}\[.{p}]_AC-{m}) with types
    - Note dependencies between requirements
    - Identify testable criteria
 
@@ -142,7 +142,7 @@ Before output, verify:
 - [ ] Every AC appears in at least one IMPLEMENTS line
 - [ ] Every P appears in at least one TESTS line
 - [ ] Requirement labels only on requirement phase tasks
-- [ ] [P] markers only where truly parallelizable
+- [ ] \[P] markers only where truly parallelizable
 - [ ] Dependencies match DESIGN component order
 - [ ] Each requirement phase has clear test criteria
 - [ ] Trace summary accounts for all ACs and Ps

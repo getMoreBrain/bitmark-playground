@@ -28,6 +28,9 @@ const config = [
       '.awa',
       'src/generated',
       '**/*.d.ts',
+      // The package lints itself (its own eslint.config.mjs, PLAN-022 D6).
+      'packages/bitmark-editor',
+      'packages/bitmark-editor-angular',
     ],
   },
 
@@ -129,6 +132,8 @@ const config = [
   })),
   {
     files: ['**/*.md'],
+    // GitHub-flavoured: task lists (`- [ ]`) are not label references.
+    language: 'markdown/gfm',
     rules: {
       // 'markdown/no-html': 'error',
     },

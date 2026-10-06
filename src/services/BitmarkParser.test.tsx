@@ -1,4 +1,3 @@
-// @awa-test: PLAN-017-Step6 (which engine a page load drives)
 import { describe, expect, it } from 'vitest';
 
 import { engineUrl } from './BitmarkParser';

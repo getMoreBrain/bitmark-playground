@@ -15,22 +15,22 @@ Add a green/red/neutral "LED" to the right of the title in the `WASM Check` tab 
 Compare `bitmarkState.js.json` (Original) vs `bitmarkState.wasm.json` (WASM opt). Each is an array of `{ bitmark?, bit, parser? }` wrappers.
 
 Normalization (decisions confirmed):
-1. **Per entry, keep `entry.bit` only** — strips both `parser` and `bitmark`.
-2. **Strip natural defaults**, recursively (bottom-up): drop any object key whose normalized value deep-equals a natural default — `""`, `false`, `0`, `[]`, `{}`. Array elements are normalized but never dropped (length/order preserved). `null` is left as-is (not in the default set).
-3. **Deep-equal, object-key order independent, array order significant** (e.g. `lodash/isEqual`).
+1. *Per entry, keep `entry.bit` only* — strips both `parser` and `bitmark`.
+2. *Strip natural defaults*, recursively (bottom-up): drop any object key whose normalized value deep-equals a natural default — `""`, `false`, `0`, `[]`, `{}`. Array elements are normalized but never dropped (length/order preserved). `null` is left as-is (not in the default set).
+3. *Deep-equal, object-key order independent, array order significant* (e.g. `lodash/isEqual`).
 
 Result → LED:
-- Both sides valid + equal ⇒ **green** (`match`).
-- Both sides valid + not equal ⇒ **red** (`mismatch`).
-- Not comparable ⇒ **neutral/grey**: either side has a `jsonError`, or either side's `json` is empty (no data / parser not loaded).
+- Both sides valid + equal ⇒ *green* (`match`).
+- Both sides valid + not equal ⇒ *red* (`mismatch`).
+- Not comparable ⇒ *neutral/grey*: either side has a `jsonError`, or either side's `json` is empty (no data / parser not loaded).
 
 ## Components
 
-- **Pure util** `src/utils/parserJsonMatch.ts`
+- *Pure util* `src/utils/parserJsonMatch.ts`
   - `normalizeBitJson(value): unknown` — recursive default-stripping (rule 2).
   - `parserJsonMatch(originalJson, wasmJson): 'match' | 'mismatch' | 'neutral'` — applies rules 1–3, with the neutral guard. Pure, no state. Uses `lodash/isEqual`.
-- **Derive in `App.tsx`** — `useMemo` over the snapshot (keyed on `js.jsonUpdates` + `wasm.jsonUpdates`, and error/empty state) → LED status; pass to the JSON `ParserTabBar` as a prop. No new state (UI derived from snapshot).
-- **`ParserTabBar.tsx`** — new optional prop `wasmCheckLed?: 'match' | 'mismatch' | 'neutral'`. When `showWasmCheck`, render a small circular LED at the **far right** of the `WASM Check` tab (after the duration text). Colours: match→green, mismatch→red, neutral→muted/dim.
+- *Derive in `App.tsx`* — `useMemo` over the snapshot (keyed on `js.jsonUpdates` + `wasm.jsonUpdates`, and error/empty state) → LED status; pass to the JSON `ParserTabBar` as a prop. No new state (UI derived from snapshot).
+- *`ParserTabBar.tsx`* — new optional prop `wasmCheckLed?: 'match' | 'mismatch' | 'neutral'`. When `showWasmCheck`, render a small circular LED at the *far right* of the `WASM Check` tab (after the duration text). Colours: match→green, mismatch→red, neutral→muted/dim.
 
 ## Steps
 

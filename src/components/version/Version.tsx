@@ -1,4 +1,3 @@
-// @awa-component: PLAN-002-Version
 import { Text, TextProps } from 'theme-ui';
 
 import { useApplicationInfo } from '../../services/ApplicationInfo';
@@ -7,7 +6,6 @@ export interface VersionProps extends TextProps {
   //
 }
 
-// @awa-impl: PLAN-002-Step8 (version display with both parsers)
 const Version = (props: VersionProps) => {
   const { ...restProps } = props;
   const applicationInfo = useApplicationInfo();

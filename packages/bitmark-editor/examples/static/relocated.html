@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>bitmark editor: relocated bundle</title>
+    <style>bitmark-pane { display: block; height: 240px; border: 1px solid #8884; }</style>
+  </head>
+  <body>
+    <!-- A host bundler moved bundled.js into its own output, but not
+         monaco.js, monaco.css or the workers: setBitmarkAssetBase points
+         at where those are (PLAN-023 Step 11). -->
+    <bitmark-session id="doc" lazy="click" schema="off" value="[.article]
+Relocated" engine-url="http://localhost:4612/parser/dist/browser/bitmark-parser.min.js">
+      <bitmark-pane type="bitmark"></bitmark-pane>
+      <bitmark-pane type="json"></bitmark-pane>
+    </bitmark-session>
+    <script type="module">
+      const t = (window.__example = {});
+      const m = await import('/relocated/bundled.js');
+      m.setBitmarkAssetBase('http://localhost:4612/pkg/bundled/');
+      const session = document.getElementById('doc');
+      session.addEventListener('ready', () => (t.ready = true));
+      session.addEventListener('error', (e) => (t.error = String(e.detail?.error)));
+      t.loaded = true;
+    </script>
+  </body>
+</html>

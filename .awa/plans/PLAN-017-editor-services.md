@@ -19,11 +19,11 @@ end to end.
 
 ## Design Notes
 
-- **LSP shapes, one small mapping.** The parser returns LSP `Diagnostic`,
+- *LSP shapes, one small mapping.* The parser returns LSP `Diagnostic`,
   `CompletionList` and `Hover` verbatim, so the work here is only what
   Monaco's own editor API numbers differently: `MarkerSeverity` and
   `CompletionItemKind`. Both mappings are a `switch` each, with tests.
-- **Two Monaco contributions.** The app aliases `monaco-editor` to
+- *Two Monaco contributions.* The app aliases `monaco-editor` to
   `editor.api`, which carries the API but none of the editor's feature
   contributions: a registered completion or hover provider is simply never
   asked, because neither the suggest widget nor the hover controller exists.
@@ -31,27 +31,27 @@ end to end.
   and `hover/browser/hoverContribution` — rather than `editor.main`, which
   would pull in every contribution and every language. Found in the browser:
   the providers were registered and answering nothing until they were added.
-- **Same pattern as the highlighter.** Each service is a module in
+- *Same pattern as the highlighter.* Each service is a module in
   `src/monaco-bitmark/` with a module-level source that
   `EditorServicesRunner` installs when the parser context reports success,
   and clears on unmount. Editors attach the per-model pieces (markers) on
   mount; the document-level providers (completion, hover) are registered once
   in `monaco-setup.ts` and answer only once a source is installed.
-- **Optional by construction.** The three are optional members of the loaded
+- *Optional by construction.* The three are optional members of the loaded
   module, so an OLDER engine (the CDN's `latest` before the release lands)
   simply leaves the editor without markers, completion or hover — nothing
   throws, nothing is registered twice.
-- **What a completion item replaces.** Monaco needs a range, and its word
+- *What a completion item replaces.* Monaco needs a range, and its word
   rules cannot express bitmark labels (`@id`, `►`, `====`). The rule here is
   label-driven: replace the longest suffix of the text before the cursor that
   is a prefix of the label. `[.art` → `article` replaces `art`; `[@i` →
   `@id` replaces `@i`; `==x==|bo` → `bold` replaces `bo`.
-- **The JSON pane too.** The parser publishes a JSON Schema of its own output
+- *The JSON pane too.* The parser publishes a JSON Schema of its own output
   beside the engine. Binding it to Monaco's JSON language service gives that
   pane validation, completion and hover with no parser call — and from the
   same version as the engine, since the schema URL is derived from the engine
   URL.
-- **Driving an unreleased parser (`?engine=local`).** The playground is a
+- *Driving an unreleased parser (`?engine=local`).* The playground is a
   submodule of the parser repo, so the dev server can serve
   `packages/bitmark-parser/dist/browser` at `/local-engine` (a small Vite
   plugin, dev only). `main` always loads the published engine; this branch is

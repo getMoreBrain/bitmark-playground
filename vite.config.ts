@@ -69,7 +69,19 @@ export default defineConfig({
     }),
   ],
   resolve: {
+    // One React and one Monaco (PLAN-022 D8): never the package folder's dev copies.
+    dedupe: ['react', 'react-dom', 'monaco-editor'],
     alias: [
+      {
+        // The workspace package, from source (PLAN-023 Step 9).
+        find: /^@gmb\/bitmark-editor$/,
+        replacement: path.resolve(__dirname, 'packages/bitmark-editor/src/index.ts'),
+      },
+      {
+        // Its React adapter, from source too: one copy of the package's code.
+        find: /^@gmb\/bitmark-editor\/react$/,
+        replacement: path.resolve(__dirname, 'packages/bitmark-editor/src/react/index.tsx'),
+      },
       {
         // Redirect bare 'monaco-editor' imports to the selective API entry point.
         // This avoids pulling in editor.main.js which imports ALL languages and features.
@@ -91,10 +103,17 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // The playground's own tests only; `packages/` carry their own runners.
+    include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
     alias: {
+      '@gmb/bitmark-editor/react': path.resolve(
+        __dirname,
+        'packages/bitmark-editor/src/react/index.tsx',
+      ),
+      '@gmb/bitmark-editor': path.resolve(__dirname, 'packages/bitmark-editor/src/index.ts'),
       'monaco-editor/esm/vs/editor/editor.api': path.resolve(
         __dirname,
         'src/test/__mocks__/monaco-editor.ts',

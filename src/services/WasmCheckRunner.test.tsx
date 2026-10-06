@@ -1,4 +1,3 @@
-// @awa-test: PLAN-006-Step2 (WasmCheckRunner round-trip behaviour)
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -50,7 +49,6 @@ describe('useWasmCheckRunner', () => {
     });
   });
 
-  // @awa-test: PLAN-019-Step2 (a burst of JSON changes converts once, on the last JSON)
   it('converts once, on the last JSON, after a burst of changes', async () => {
     const convert = vi.fn().mockResolvedValue(ROUND_TRIPPED_MARKUP);
     renderHook(() => useWasmCheckRunner(), { wrapper: makeWrapper(convert) });
@@ -96,7 +94,6 @@ describe('useWasmCheckRunner', () => {
     });
   });
 
-  // @awa-test: PLAN-006-Step2 (out-of-order completion guard)
   it('does not let a slower earlier convert overwrite a later one', async () => {
     const resolvers: Array<(v: unknown) => void> = [];
     const convert = vi.fn(() => new Promise((resolve) => resolvers.push(resolve)));

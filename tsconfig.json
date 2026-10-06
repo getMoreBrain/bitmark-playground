@@ -21,7 +21,18 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client", "vitest/globals"],
+    // The workspace package, from source: no build step while developing.
+    "paths": {
+      "@gmb/bitmark-editor": ["./packages/bitmark-editor/src/index.ts"],
+      "@gmb/bitmark-editor/react": ["./packages/bitmark-editor/src/react/index.tsx"],
+      // One React: the package's dev copy must not be picked up.
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"],
+      // The package's source is compiled against the playground's own
+      // Monaco (the host's, PLAN-022 D8), not the package's dev copy.
+      "monaco-editor": ["./node_modules/monaco-editor"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

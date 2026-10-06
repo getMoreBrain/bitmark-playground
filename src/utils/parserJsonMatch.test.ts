@@ -1,4 +1,3 @@
-// @awa-test: PLAN-009-Step1 (parserJsonMatch normalization + comparison)
 import { describe, expect, it } from 'vitest';
 
 import { normalizeBitJson, parserJsonMatch } from './parserJsonMatch';

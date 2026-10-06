@@ -1,5 +1,3 @@
-// @awa-component: PLAN-002-BitmarkConverter
-// @awa-component: PLAN-008-BitmarkConverter
 import type { LexToken } from '@gmb/bitmark-parser';
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
 import debounce from 'lodash/debounce';
@@ -11,14 +9,12 @@ import { StringUtils } from '../utils/StringUtils';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
-// @awa-impl: PLAN-019-Step1 (the WASM parsers convert on every edit)
 const WASM_PARSERS: readonly ParserType[] = ['wasm', 'wasmFull'];
 const OLD_PARSERS: readonly ParserType[] = ['js'];
 
 /** How long the old (bpg) parser waits for a pause in editing (PLAN-019 D2). */
 export const OLD_PARSER_DEBOUNCE_MS = 250;
 
-// @awa-impl: PLAN-019-Step1 (the old parser runs after a pause, on the latest input)
 // Module level: every editor's converter shares it, so an edit in one tab
 // supersedes a pending one from another.
 const scheduleOldParser = debounce(
@@ -136,7 +132,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
         } else {
           if (!wasmConvert) return null;
           const mode = parser === 'wasm' ? 'optimized' : 'full';
-          // @awa-impl: PLAN-020-Step2 (the conversion reads where each bit is in the JSON)
           // Only the optimized run's positions are used (below).
           ({ output: markup, inputStarts } = convertWithBitStarts(
             wasmConvert,
@@ -174,7 +169,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
     }
   }, [wasmConvert]);
 
-  // @awa-impl: PLAN-008-Step2 (markupToJson: forward calc + per-tab round-trip back-fill)
   const markupToJsonFor = useCallback(
     async (parsers: readonly ParserType[], editedTab: ParserType, markup: string) => {
       // Forward: markup -> json for every parser, from the edited (source) markup.
@@ -214,7 +208,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
     [markupToJsonFor, lexWasmOptimized],
   );
 
-  // @awa-impl: PLAN-008-Step2 (jsonToMarkup: forward calc + per-tab round-trip back-fill)
   const jsonToMarkupFor = useCallback(
     async (parsers: readonly ParserType[], editedTab: ParserType, json: string) => {
       // Forward: json -> markup for every parser, from the edited (source) JSON.
@@ -225,7 +218,6 @@ const useBitmarkConverter = (): BitmarkConverter => {
           // bpg may legitimately return a non-string ('Expected string'); keep last good.
           if (parser === 'js' && r.error && r.error.message === 'Expected string') return;
           bitmarkState.setMarkup(parser, r.markup, r.error, r.durationSec);
-          // @awa-impl: PLAN-020-Step2 (pin the typed JSON's bits in its own pane)
           // Where the bits are depends on the JSON only, not on the parser that
           // converts it, so the WASM optimized run places them for whichever
           // tab was edited — the Original (bpg) run reports no positions.

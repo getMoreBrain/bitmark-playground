@@ -1,4 +1,3 @@
-// @awa-test: PLAN-004-Step3 (settingsPersistence integration)
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bitmarkState } from '../state/bitmarkState';

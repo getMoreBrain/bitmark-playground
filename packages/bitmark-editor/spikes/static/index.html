@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Static host spike</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 16px; background: #1e1e1e; color: #ddd; }
+      .try-it-editor { display: flex; gap: 8px; }
+      .pane { flex: 1; height: 320px; border: 1px solid #444; }
+      [hidden] { display: none !important; }
+      pre { background: #252526; padding: 8px; }
+    </style>
+  </head>
+  <body>
+    <!-- Shaped like the docs site's "Try it" (PLAN-022 D12): a static example
+         first; the editor replaces it once loaded, on idle. -->
+    <section data-try-it>
+      <h2>Try it</h2>
+      <pre data-try-it-source><code>[.article]
+Hello **World**!
+
+[.cloze]
+The capital of France is [_Paris].</code></pre>
+      <div class="try-it-editor" data-try-it-editor hidden>
+        <div class="pane" data-pane="bitmark"></div>
+        <div class="pane" data-pane="json"></div>
+      </div>
+    </section>
+    <script type="module">
+      const CDN = 'http://localhost:4602';
+      const t = (window.__spike = { start: performance.now() });
+      const narrow = matchMedia('(pointer: coarse) and (max-width: 700px)').matches;
+
+      async function boot() {
+        t.idle = performance.now();
+        try {
+          const bundle = await import(`${CDN}/editor/bundled.js`);
+          t.bundle = performance.now();
+          const engine = await bundle.loadEngine(
+            `${CDN}/parser/dist/browser/bitmark-parser.min.js`,
+            () => (t.full = performance.now()),
+          );
+          t.engine = performance.now();
+          const schema = await fetch(`${CDN}/parser/schema/bitmark.schema.json`).then((r) => r.json());
+          t.schemaApplied = bundle.setJsonSchema(bundle.bundledMonaco, schema);
+          const section = document.querySelector('[data-try-it]');
+          const source = section.querySelector('[data-try-it-source]');
+          const editor = section.querySelector('[data-try-it-editor]');
+          editor.hidden = false;
+          const pair = bundle.createPair({
+            monaco: bundle.bundledMonaco,
+            engine,
+            bitmarkElement: editor.querySelector('[data-pane="bitmark"]'),
+            jsonElement: editor.querySelector('[data-pane="json"]'),
+            value: source.textContent,
+            applyMonacoTheme: true,
+            theme: 'vs-dark',
+          });
+          source.hidden = true;
+          window.__pair = pair;
+          window.__monaco = bundle.bundledMonaco;
+          t.mounted = performance.now();
+          t.version = engine.version();
+        } catch (e) {
+          // Progressive enhancement: the static example stays.
+          t.error = String(e);
+          console.error(e);
+        }
+      }
+
+      if (narrow) {
+        t.narrow = true; // D12: `narrow="static"`, the editor never loads
+      } else if ('requestIdleCallback' in window) {
+        requestIdleCallback(boot, { timeout: 2000 });
+      } else {
+        setTimeout(boot, 1);
+      }
+    </script>
+  </body>
+</html>

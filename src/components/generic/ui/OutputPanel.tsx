@@ -1,6 +1,5 @@
-// @awa-component: PLAN-003-OutputPanel
-// @awa-component: PLAN-005-OutputPanel
 /** @jsxImportSource theme-ui */
+import { ReactNode } from 'react';
 import { Flex } from 'theme-ui';
 
 import { OutputTab as OutputTabType } from '../../../state/uiState';
@@ -12,8 +11,6 @@ const OUTPUT_TABS = [
   { id: 'lexer', label: 'Lexer' },
 ];
 
-// @awa-impl: PLAN-014-Step5 (optional Mappings tab — bottom-left panel only)
-// @awa-impl: PLAN-015-Step4 (optional Info tab — bottom-left only, before Mappings)
 const outputTabs = (showInfo: boolean, showMappings: boolean) => [
   ...OUTPUT_TABS,
   ...(showInfo ? [{ id: 'info', label: 'Info' }] : []),
@@ -34,16 +31,14 @@ export interface OutputPanelProps {
   lexerOutput?: string;
   /** Show the Info tab (bottom-left panel only). */
   showInfo?: boolean;
-  /** Bit info text to display in the Info tab. */
-  infoOutput?: string;
+  /** The Info tab's content (the playground's session pane, PLAN-023 Step 14). */
+  infoPane?: ReactNode;
   /** Show the Mappings tab (bottom-left panel only). */
   showMappings?: boolean;
-  /** Mapping report text to display in the Mappings tab. */
-  mappingsOutput?: string;
+  /** The Mappings tab's content (the playground's session pane, PLAN-023 Step 14). */
+  mappingsPane?: ReactNode;
 }
 
-// @awa-impl: PLAN-003-Step5 (output panel)
-// @awa-impl: PLAN-005-Step3 (wire DiffPanel into OutputPanel)
 const OutputPanel = ({
   label,
   activeTab,
@@ -53,9 +48,9 @@ const OutputPanel = ({
   language,
   lexerOutput,
   showInfo = false,
-  infoOutput,
+  infoPane,
   showMappings = false,
-  mappingsOutput,
+  mappingsPane,
 }: OutputPanelProps) => {
   return (
     <Flex sx={{ flexDirection: 'column', flexGrow: 1, width: '50%', minHeight: 0 }}>
@@ -96,40 +91,8 @@ const OutputPanel = ({
             {lexerOutput}
           </pre>
         ) : null}
-        {activeTab === 'info' && showInfo ? (
-          <pre
-            sx={{
-              margin: 0,
-              padding: 2,
-              fontFamily: 'monospace',
-              fontSize: '13px',
-              color: 'text',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              overflow: 'auto',
-              flexGrow: 1,
-            }}
-          >
-            {infoOutput}
-          </pre>
-        ) : null}
-        {activeTab === 'mappings' && showMappings ? (
-          <pre
-            sx={{
-              margin: 0,
-              padding: 2,
-              fontFamily: 'monospace',
-              fontSize: '13px',
-              color: 'text',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              overflow: 'auto',
-              flexGrow: 1,
-            }}
-          >
-            {mappingsOutput}
-          </pre>
-        ) : null}
+        {activeTab === 'info' && showInfo ? infoPane : null}
+        {activeTab === 'mappings' && showMappings ? mappingsPane : null}
       </Flex>
     </Flex>
   );

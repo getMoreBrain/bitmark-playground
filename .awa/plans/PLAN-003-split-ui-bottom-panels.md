@@ -1,8 +1,8 @@
 # PLAN-003: Split UI — Bottom Output Panels
 
-**Status:** in-progress
-**Workflow direction:** top-down
-**Traceability:** Standalone UI enhancement; no existing REQ/DESIGN artifacts.
+STATUS: in-progress
+DIRECTION: top-down
+TRACEABILITY: Standalone UI enhancement; no existing REQ/DESIGN artifacts.
 
 ---
 

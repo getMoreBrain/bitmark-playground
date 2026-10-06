@@ -39,3 +39,10 @@ the `]` after the cursor.
   `bitmarkCompletion.test.ts`.
 - Step 2 — Parser `^7.8.1` (the first release with templates); README.
 - Step 3 — The language configuration (D4) and its test.
+
+## References
+
+- Moved (PLAN-023 Step 14a): the editor services are now the editor
+  package's: packages/bitmark-editor/src/monaco/{completion,setup}.ts
+  (`COMPLETE_OPTIONS`, `replacedSuffixLength`,
+  `BITMARK_LANGUAGE_CONFIGURATION`).

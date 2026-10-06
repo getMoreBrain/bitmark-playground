@@ -1,4 +1,3 @@
-// @awa-component: PLAN-002-App
 /** @jsxImportSource theme-ui */
 import './App.css';
 
@@ -16,15 +15,9 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
-import { EditorServicesRunner } from './services/EditorServicesRunner';
-import { InfoRunner } from './services/InfoRunner';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
-import { MappingsRunner } from './services/MappingsRunner';
-import { SemanticTokensRunner } from './services/SemanticTokensRunner';
-import { TableHtmlRunner } from './services/TableHtmlRunner';
-import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
-import { XmlRunner } from './services/XmlRunner';
+import { PlaygroundSession, SessionPaneTab } from './session/PlaygroundSession';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
 import { theme } from './theme/theme';
@@ -33,16 +26,13 @@ import { reorderJsonStringToReference } from './utils/reorderJsonKeys';
 
 const initialMarkup = '[.article]\nHello World!';
 
-// @awa-impl: PLAN-002-Step5 (tab bar integration)
-// @awa-impl: PLAN-002-Step7 (provider nesting)
-// @awa-impl: PLAN-003-Step6 (App integration)
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
 
-  // @awa-impl: PLAN-012-Step4 (LED reference is the bpg round-trip JSON, not the raw
-  // bpg parse — bpg's own json -> bitmark -> json loses fields markup cannot express,
-  // which the Rust parser can never produce and must not be marked red for)
+  // The LED reference is the bpg round-trip JSON, not the raw bpg parse: bpg's own
+  // json -> bitmark -> json loses fields markup cannot express, which the Rust
+  // parser can never produce and must not be marked red for.
   const wasmCheckLed = useMemo<WasmCheckLed>(() => {
     if (snap.js.jsonError || snap.wasm.jsonError || snap.jsRoundTrip.error) return 'neutral';
     // Reference not yet recomputed for the current Original JSON — not comparable.
@@ -58,7 +48,6 @@ function App() {
     snap.wasm.jsonError,
   ]);
 
-  // @awa-impl: PLAN-010 (reorder WASM JSON keys to match Original before the JSON diff)
   const wasmJsonForDiff = useMemo(
     () => reorderJsonStringToReference(snap.js.jsonAsString, snap.wasm.jsonAsString),
     [snap.js.jsonAsString, snap.wasm.jsonAsString],
@@ -144,13 +133,13 @@ function App() {
             wasmCheckDuration={snap.wasmCheck.markupDurationSec}
             wasmCheckLed={wasmCheckLed}
             showTableHtml
-            tableHtmlDuration={snap.tableHtml.htmlDurationSec}
+            tableHtmlDuration={snap.paneDurations.tableHtml}
             showText
-            textDuration={snap.text.textDurationSec}
+            textDuration={snap.paneDurations.text}
             showXmlNiso
-            xmlNisoDuration={snap.xmlNiso.xmlDurationSec}
+            xmlNisoDuration={snap.paneDurations.xmlNiso}
             showXmlNisoEs
-            xmlNisoEsDuration={snap.xmlNisoEs.xmlDurationSec}
+            xmlNisoEsDuration={snap.paneDurations.xmlNisoEs}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -179,7 +168,6 @@ function App() {
     </Flex>
   );
 
-  // @awa-impl: PLAN-005-Step4 (wire state data to diff panels)
   const bottomPanels = (
     <Flex sx={{ flexDirection: 'row', flexGrow: 1, minHeight: 0 }}>
       <OutputPanel
@@ -191,9 +179,9 @@ function App() {
         language="bitmark"
         lexerOutput={snap.wasm.lexerOutput}
         showInfo
-        infoOutput={snap.info.outputErrorAsString ?? snap.info.output}
+        infoPane={<SessionPaneTab tab="info" />}
         showMappings
-        mappingsOutput={snap.mappings.reportErrorAsString ?? snap.mappings.report}
+        mappingsPane={<SessionPaneTab tab="mappings" />}
       />
       <OutputPanel
         label="JSON"
@@ -213,54 +201,48 @@ function App() {
         <BitmarkParserProvider>
           <WasmCheckRunner />
           <JsRoundTripRunner />
-          <TableHtmlRunner />
-          <TextRunner />
-          <MappingsRunner />
-          <InfoRunner />
-          <XmlRunner variant="xmlNiso" />
-          <XmlRunner variant="xmlNisoEs" />
-          <SemanticTokensRunner />
-          <EditorServicesRunner />
-          <Flex
-            sx={{
-              flexDirection: 'column',
-              height: '100vh',
-              width: '100vw',
-              backgroundColor: 'background',
-            }}
-          >
-            {/* Always render ResizableLayout so the editor panels keep a stable
-                tree position — toggling the Diff/Lex panels must not remount the
-                editors (which would reset their content). */}
-            <ResizableLayout
-              top={editorPanels}
-              bottom={bottomPanels}
-              showBottom={uiSnap.showDiffLex}
-              bottomHeight={uiSnap.bottomPanelHeight}
-              collapsed={uiSnap.bottomPanelCollapsed}
-              onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
-              onToggleCollapse={() =>
-                uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
-              }
-            />
+          <PlaygroundSession>
             <Flex
               sx={{
-                justifyContent: 'space-between',
-                flexShrink: 0,
+                flexDirection: 'column',
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: 'background',
               }}
             >
-              <Version
-                sx={{
-                  variant: 'text.copyright',
-                }}
+              {/* Always render ResizableLayout so the editor panels keep a stable
+                tree position — toggling the Diff/Lex panels must not remount the
+                editors (which would reset their content). */}
+              <ResizableLayout
+                top={editorPanels}
+                bottom={bottomPanels}
+                showBottom={uiSnap.showDiffLex}
+                bottomHeight={uiSnap.bottomPanelHeight}
+                collapsed={uiSnap.bottomPanelCollapsed}
+                onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
+                onToggleCollapse={() =>
+                  uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
+                }
               />
-              <Copyright
+              <Flex
                 sx={{
-                  variant: 'text.copyright',
+                  justifyContent: 'space-between',
+                  flexShrink: 0,
                 }}
-              />
+              >
+                <Version
+                  sx={{
+                    variant: 'text.copyright',
+                  }}
+                />
+                <Copyright
+                  sx={{
+                    variant: 'text.copyright',
+                  }}
+                />
+              </Flex>
             </Flex>
-          </Flex>
+          </PlaygroundSession>
         </BitmarkParserProvider>
       </BitmarkParserGeneratorProvider>
     </ThemeUIProvider>

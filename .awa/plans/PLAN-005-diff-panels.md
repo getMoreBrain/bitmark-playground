@@ -1,14 +1,14 @@
 # PLAN-005: Diff Panels — Coloured Diffs (Original vs WASM)
 
-**Status:** completed
-**Workflow direction:** top-down
-**Traceability:** Extends PLAN-003 (bottom output panels); consumes `bitmarkState` per-parser slices (PLAN-002).
+STATUS: completed
+DIRECTION: top-down
+TRACEABILITY: Extends PLAN-003 (bottom output panels); consumes `bitmarkState` per-parser slices (PLAN-002).
 
 ---
 
 ## Goal
 
-Populate the "Diff" tab in each bottom output panel with a coloured diff view using Monaco's built-in diff editor. The left panel shows the diff between the JS ("Original") and WASM parser **bitmark markup** outputs. The right panel shows the diff between the JS and WASM parser **JSON** outputs.
+Populate the "Diff" tab in each bottom output panel with a coloured diff view using Monaco's built-in diff editor. The left panel shows the diff between the JS ("Original") and WASM parser *bitmark markup* outputs. The right panel shows the diff between the JS and WASM parser *JSON* outputs.
 
 ## Context
 
@@ -24,7 +24,7 @@ Populate the "Diff" tab in each bottom output panel with a coloured diff view us
 | Left ("bitmark") | `bitmarkState.js.markup` | `bitmarkState.wasm.markup` | `bitmark` |
 | Right ("JSON") | `bitmarkState.js.jsonAsString` | `bitmarkState.wasm.jsonAsString` | `json` |
 
-The diff editors are **read-only** — users cannot edit content in these panels.
+The diff editors are *read-only* — users cannot edit content in these panels.
 
 ## Target Layout (bottom panel, "Diff" tab active)
 

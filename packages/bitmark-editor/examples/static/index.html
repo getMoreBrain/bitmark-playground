@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bitmark editor: static site example</title>
+    <style>
+      /* A docs site's own design tokens (as in the parser repo's docs-site). */
+      :root { --syntax-tag: #b5530b; --color-bg: #fff; --color-text: #24292f; }
+      :root[data-theme='dark'] { --syntax-tag: #ffd479; --color-bg: #0d1117; --color-text: #e6edf3; }
+      body { margin: 16px; font-family: system-ui, sans-serif; background: var(--color-bg); color: var(--color-text); }
+      /* Map the editor's token variables onto the site's (PLAN-022 D11, D12). */
+      bitmark-session { --bm-tok-bitSigil-color: var(--syntax-tag); --bm-tok-bitType-color: var(--syntax-tag); }
+      .try-it-editor { display: flex; gap: 8px; height: 320px; }
+      .try-it-editor > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .try-it-editor bitmark-pane { flex: 1; border: 1px solid #8884; }
+      .try-it-error { color: #cf222e; margin: 2px 0; font-size: 12px; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <button type="button" data-theme-toggle>Toggle theme</button>
+    <!-- The "Try it" box: a static example first; the editor replaces it on
+         idle; narrow touch screens keep the static example (D12). The parser
+         loads from the CDN at a pinned URL (D13). -->
+    <section>
+      <h2>Try it</h2>
+      <bitmark-session
+        id="try-it"
+        lazy="idle"
+        narrow="static"
+        theme="light"
+        debounce="300"
+        engine-url="http://localhost:4612/parser/dist/browser/bitmark-parser.min.js"
+        schema="http://localhost:4612/parser/schema/bitmark.schema.json"
+        value="[.article]
+Hello **World**!
+
+[.cloze]
+The capital of France is [_Paris]."
+      >
+        <pre data-bitmark-static><code>[.article]
+Hello **World**!</code></pre>
+        <div class="try-it-editor">
+          <div><bitmark-pane type="bitmark" label="bitmark"></bitmark-pane><p class="try-it-error" id="err-bitmark" hidden></p></div>
+          <div><bitmark-pane type="json" label="JSON"></bitmark-pane><p class="try-it-error" id="err-json" hidden></p></div>
+        </div>
+      </bitmark-session>
+      <button type="button" data-reset>Reset</button>
+    </section>
+    <script type="module">
+      const t = (window.__example = { start: performance.now() });
+      const session = document.getElementById('try-it');
+      session.addEventListener('ready', () => (t.ready = performance.now()));
+      session.addEventListener('error', (e) => (t.error = String(e.detail?.error?.message ?? e.detail?.error)));
+      document.querySelector('[data-reset]').addEventListener('click', () => {
+        session.value = '[.article]\nHello **World**!';
+      });
+      document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+        const dark = document.documentElement.dataset.theme !== 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        session.session?.setTheme(dark ? 'dark' : 'light');
+      });
+      // The editor bundle, from the CDN: one plain module import, no bundler.
+      import('http://localhost:4612/pkg/bundled/bundled.js').then(
+        (m) => (t.bundle = performance.now(), window.__bundle = m),
+        (e) => (t.error = String(e)),
+      );
+    </script>
+  </body>
+</html>

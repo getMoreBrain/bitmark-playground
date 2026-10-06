@@ -1,16 +1,13 @@
-// @awa-component: PLAN-006-WasmCheckPanel
 /** @jsxImportSource theme-ui */
-import { editor, IDisposable } from 'monaco-editor';
-import { useCallback, useRef } from 'react';
+import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { MONACO_THEME } from '@gmb/bitmark-editor';
+import { editor } from 'monaco-editor';
+import { useCallback } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 
-import {
-  attachBitmarkHighlighter,
-  BITMARK_LANGUAGE_ID,
-  MONACO_THEME,
-} from '../../monaco-bitmark/bitmarkLanguage';
 import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
 import { MonacoTextArea } from '../monaco/MonacoTextArea';
+import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
 
 const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
@@ -21,6 +18,9 @@ const READ_ONLY_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   insertSpaces: false,
 };
 
+/** A read-only view: highlighted, not validated. */
+const READ_ONLY_SERVICES = { diagnostics: false } as const;
+
 export interface WasmCheckPanelProps {
   /** Bitmark markup produced by feeding wasm.jsonAsString through the JS parser */
   markup: string;
@@ -28,26 +28,22 @@ export interface WasmCheckPanelProps {
   errorAsString?: string;
 }
 
-// @awa-impl: PLAN-006-Step5 (read-only round-trip bitmark view)
 const WasmCheckPanel = ({ markup, errorAsString }: WasmCheckPanelProps) => {
-  const highlighterRef = useRef<IDisposable>();
-  const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = useSplitScrollSync('output');
+  const { attach, detach } = useBitmarkEditorServices(READ_ONLY_SERVICES);
+  const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = useSplitScrollSync();
 
-  // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
-  // @awa-impl: PLAN-018-Step7 (and linked to the bitmark editor's scrolling)
   const editorDidMount = useCallback<EditorDidMount>(
     (editor) => {
-      highlighterRef.current = attachBitmarkHighlighter(editor);
+      attach(editor);
       scrollSyncMount(editor);
     },
-    [scrollSyncMount],
+    [attach, scrollSyncMount],
   );
 
   const editorWillUnmount = useCallback<EditorWillUnmount>(() => {
-    highlighterRef.current?.dispose();
-    highlighterRef.current = undefined;
+    detach();
     scrollSyncUnmount();
-  }, [scrollSyncUnmount]);
+  }, [detach, scrollSyncUnmount]);
 
   const value = errorAsString ?? markup;
 

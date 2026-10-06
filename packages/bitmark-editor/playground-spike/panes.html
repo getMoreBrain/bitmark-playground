@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Session and panes check</title>
+    <style>
+      body { margin: 8px; background: #1e1e1e; color: #ddd; font-family: system-ui; }
+      .row { display: flex; gap: 6px; height: 420px; }
+      .row > div { flex: 1; min-width: 0; border: 1px solid #444; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <!-- PLAN-023 Steps 7-8: a session and four panes placed freely, in a real Monaco. -->
+    <div class="row">
+      <div id="bitmark"></div>
+      <div id="json"></div>
+      <div id="html"></div>
+      <div id="text"></div>
+    </div>
+    <script type="module" src="./panes.ts"></script>
+  </body>
+</html>

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-004-SettingsPersistence
 import { subscribe } from 'valtio';
 
 import { bitmarkState } from '../state/bitmarkState';
@@ -8,7 +7,6 @@ import { CURRENT_VERSION, saveSettings } from './settingsStorage';
 
 const DEBOUNCE_MS = 300;
 
-// @awa-impl: PLAN-004-Step3 (persist on change)
 function collectSettings(): PersistedSettings {
   return {
     v: CURRENT_VERSION,
