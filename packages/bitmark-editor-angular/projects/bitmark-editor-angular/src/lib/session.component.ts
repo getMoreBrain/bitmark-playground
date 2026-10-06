@@ -84,7 +84,17 @@ export class BmSessionComponent implements OnInit, OnDestroy, ControlValueAccess
     });
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
+    // A failure (no Monaco, a loader that rejects) goes to `error`, not to an
+    // unhandled rejection.
+    this.start().catch((e: unknown) => {
+      const error = e instanceof Error ? e : new Error(String(e));
+      console.error('[bitmark-editor]', error);
+      this.error.emit({ error, pane: undefined });
+    });
+  }
+
+  private async start(): Promise<void> {
     const fromConfig = this.config.monaco;
     const monaco = this.monaco() ?? (typeof fromConfig === 'function' ? await fromConfig() : fromConfig);
     if (this.destroyed) return;
@@ -104,10 +114,15 @@ export class BmSessionComponent implements OnInit, OnDestroy, ControlValueAccess
         schema: this.schema() ?? this.config.schema,
       }),
     );
-    session.on('change', (e) => this.zone.run(() => {
-      this.onChange(e.bitmark);
-      this.change.emit(e);
-    }));
+    session.on('change', (e) => {
+      // A change with no source pane came from here (`writeValue`, the
+      // `[value]` input): not an edit, so not echoed back to the form.
+      if (!e.source) return;
+      this.zone.run(() => {
+        this.onChange(e.bitmark);
+        this.change.emit(e);
+      });
+    });
     session.on('error', (e) => this.zone.run(() => this.error.emit(e)));
     session.on('ready', (e) => this.zone.run(() => this.ready.emit(e)));
     this.session.set(session);

@@ -9,8 +9,9 @@ import type { EngineCapabilities, Feature } from '../types';
 /** The one side of a channel the engine talks over (a `Worker`, or a `MessagePort`). */
 export interface EnginePort {
   postMessage(message: unknown): void;
-  addEventListener(type: 'message', listener: (event: MessageEvent) => void): void;
-  removeEventListener(type: 'message', listener: (event: MessageEvent) => void): void;
+  /** `message`, plus `error` / `messageerror` (a worker that fails to load or dies). */
+  addEventListener(type: string, listener: (event: MessageEvent) => void): void;
+  removeEventListener(type: string, listener: (event: MessageEvent) => void): void;
   /** A `Worker` has it; a `MessagePort` has `close`. Either ends the channel. */
   terminate?(): void;
   close?(): void;

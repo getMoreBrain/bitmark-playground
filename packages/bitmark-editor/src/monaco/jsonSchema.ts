@@ -18,13 +18,17 @@ export const BITMARK_MODEL_SCHEME = 'bitmark-editor';
 export const BITMARK_MODEL_FILE_MATCH = `${BITMARK_MODEL_SCHEME}://**`;
 
 /** What the schema binding needs of Monaco's JSON language service. */
+interface JsonDiagnosticsOptions {
+  validate?: boolean;
+  allowComments?: boolean;
+  enableSchemaRequest?: boolean;
+  schemas?: { uri: string; fileMatch?: string[]; schema?: unknown }[];
+  [other: string]: unknown;
+}
 interface JsonDefaults {
-  setDiagnosticsOptions(options: {
-    validate?: boolean;
-    allowComments?: boolean;
-    enableSchemaRequest?: boolean;
-    schemas?: { uri: string; fileMatch?: string[]; schema?: unknown }[];
-  }): void;
+  /** The options in force (Monaco has it on every version 0.46+). */
+  readonly diagnosticsOptions?: JsonDiagnosticsOptions;
+  setDiagnosticsOptions(options: JsonDiagnosticsOptions): void;
 }
 
 /**
@@ -78,11 +82,14 @@ export const bindBitmarkJsonSchema = (
 ): boolean => {
   const jsonDefaults = jsonDefaultsOf(monaco);
   if (!jsonDefaults) return false;
+  // Merge, never replace (D5): the host's own schemas and settings stay; only
+  // the bitmark schema's entry is added or replaced.
+  const current = jsonDefaults.diagnosticsOptions ?? {};
   jsonDefaults.setDiagnosticsOptions({
-    validate: true,
-    allowComments: false,
-    enableSchemaRequest: false,
+    ...current,
+    validate: current.validate ?? true,
     schemas: [
+      ...(current.schemas ?? []).filter((entry) => entry.uri !== BITMARK_SCHEMA_URI),
       {
         uri: BITMARK_SCHEMA_URI,
         fileMatch: options.fileMatch ?? [BITMARK_MODEL_FILE_MATCH],

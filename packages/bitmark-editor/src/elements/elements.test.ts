@@ -257,3 +257,66 @@ describe('properties set before the elements are defined', () => {
     expect(Object.prototype.hasOwnProperty.call(real, 'engine')).toBe(false);
   });
 });
+
+describe('element lifecycle (PLAN-021 pass 1)', () => {
+  // @awa-test: PLAN-021-Step12 (a remove + re-insert during a pending start makes one session)
+  it('creates one session when removed and re-inserted while Monaco is still loading', async () => {
+    let release!: () => void;
+    setMonacoLoader(async () => {
+      await new Promise<void>((r) => (release = r));
+      return createFakeMonaco().monaco;
+    });
+    const host = document.createElement('div');
+    host.innerHTML = `<bitmark-session value="${DOC}" schema="off"></bitmark-session>`;
+    const session = host.querySelector('bitmark-session') as BitmarkSessionElementApi;
+    session.engine = engine;
+    // One `ready` event per session created.
+    const ready = vi.fn();
+    session.addEventListener('ready', ready);
+    document.body.append(host);
+    await Promise.resolve();
+    host.remove();
+    await Promise.resolve();
+    await Promise.resolve();
+    document.body.append(host);
+    await Promise.resolve();
+    release();
+    await vi.waitFor(() => expect(ready).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 20));
+    expect(ready).toHaveBeenCalledTimes(1);
+    setMonacoLoader(undefined as never);
+  });
+
+  // @awa-test: PLAN-021-Step12 (an id-bound pane remounts when its session restarts)
+  it('remounts a pane bound by id when its session is removed and comes back', async () => {
+    const { host } = mount(`<bitmark-pane type="json" session="doc2"></bitmark-pane>
+      <div id="wrap"><bitmark-session id="doc2" value="${DOC}" schema="off"></bitmark-session></div>`);
+    const pane = host.querySelector('bitmark-pane') as BitmarkPaneElementApi;
+    await vi.waitFor(() => expect(paneText(pane)).toContain('World'));
+    const session = host.querySelector('bitmark-session')!;
+    session.remove();
+    await vi.waitFor(() => expect(pane.pane).toBeUndefined());
+    host.querySelector('#wrap')!.append(session);
+    await vi.waitFor(() => expect(paneText(pane)).toContain('World'));
+  });
+
+  // @awa-test: PLAN-021-Step12 (the preset forwards attribute changes, and rebuilds its tabs)
+  it('forwards attribute changes from <bitmark-editor> and rebuilds its tabs on panes=', async () => {
+    const fake = createFakeMonaco();
+    const host = document.createElement('div');
+    host.innerHTML = `<bitmark-editor value="${DOC}" schema="off" panes="json"></bitmark-editor>`;
+    const editor = host.querySelector('bitmark-editor') as HTMLElement & {
+      monaco: unknown;
+      engine: unknown;
+    };
+    editor.monaco = fake.monaco;
+    editor.engine = engine;
+    document.body.append(host);
+    editor.setAttribute('theme', 'light');
+    expect(host.querySelector('bitmark-session')!.getAttribute('theme')).toBe('light');
+    editor.setAttribute('panes', 'html,text');
+    expect(
+      [...host.querySelectorAll('bitmark-tabs > bitmark-pane')].map((p) => p.getAttribute('type')),
+    ).toEqual(['html', 'text']);
+  });
+});

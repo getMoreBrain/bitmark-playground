@@ -43,9 +43,19 @@ test('bm-session and bm-panes on Monaco 0.46 AMD with the injected parser', asyn
   await page.locator('.bm-pane-bitmark .bm-tok-bitType').first().hover();
   await expect(page.locator('.monaco-hover:not(.hidden)').first()).toBeVisible({ timeout: 10_000 });
 
-  // Setting the form value replaces the document.
-  await page.evaluate(() => window.__example.form.setValue('[.article]\nFrom the form'));
+  // Setting the form value replaces the document, without echoing back as
+  // an edit: no (change), no second valueChanges (review fix #8).
+  const changesBeforeSet = await page.locator('#changes').textContent();
+  const valueChanges = await page.evaluate(() => {
+    window.__example.vc = 0;
+    window.__example.form.valueChanges.subscribe(() => window.__example.vc++);
+    window.__example.form.setValue('[.article]\nFrom the form');
+    return 0;
+  });
   await expect.poll(() => paneValue(page, 'json')).toContain('From the form');
+  await page.waitForTimeout(300);
+  expect(await page.locator('#changes').textContent()).toBe(changesBeforeSet);
+  expect(await page.evaluate(() => window.__example.vc)).toBe(1 + valueChanges);
 
   // The second tab mounts when chosen, and the first unmounts.
   await page.getByRole('tab', { name: 'Text' }).click();

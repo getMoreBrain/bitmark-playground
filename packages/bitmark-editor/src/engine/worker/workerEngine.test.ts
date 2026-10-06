@@ -144,3 +144,85 @@ describe('worker engine (PLAN-020 D14)', () => {
     expect(closed).toHaveLength(2);
   });
 });
+
+describe('worker failures (PLAN-021 pass 1)', () => {
+  /** A port whose worker never answers, and can fail. */
+  const silentPort = () => {
+    const listeners = new Map<string, ((e: MessageEvent) => void)[]>();
+    const port: EnginePort & {
+      fail(type: string): void;
+      fireMessage(data: unknown): void;
+      posted: unknown[];
+    } = {
+      posted: [],
+      fireMessage: (data) =>
+        (listeners.get('message') ?? []).forEach((l) => l({ data } as MessageEvent)),
+      postMessage: (m: unknown) => port.posted.push(m),
+      addEventListener: (type, l) => listeners.set(type, [...(listeners.get(type) ?? []), l]),
+      removeEventListener: () => {},
+      terminate: () => {},
+      fail: (type) =>
+        (listeners.get(type) ?? []).forEach((l) => l(new Event(type) as MessageEvent)),
+    };
+    return port;
+  };
+
+  // @awa-test: PLAN-021-Step1a (a worker that fails to load rejects, not hangs)
+  it('rejects when a worker errors before it is ready', async () => {
+    const ports = [silentPort(), silentPort()];
+    let i = 0;
+    const pending = createBitmarkWorkerEngine({ createPort: () => ports[i++]!, url: 'x' });
+    ports[0]!.fail('error');
+    await expect(pending).rejects.toBeInstanceOf(BitmarkEngineError);
+  });
+
+  /** A port that answers init (ready) but never answers a call. */
+  const readyPort = () => {
+    const port = silentPort();
+    const post = port.postMessage;
+    port.postMessage = (m: unknown) => {
+      post(m);
+      if ((m as { type: string }).type === 'init') {
+        queueMicrotask(() =>
+          port.fireMessage({
+            type: 'ready',
+            version: '1',
+            feature: 'full',
+            capabilities: {
+              bitPositions: true,
+              diagnostics: true,
+              complete: true,
+              resolve: true,
+              hover: true,
+              info: true,
+            },
+          }),
+        );
+      }
+    };
+    return port;
+  };
+
+  // @awa-test: PLAN-021-Step1a (a worker that dies rejects its pending and later calls)
+  it('rejects pending and later calls when a worker dies', async () => {
+    const ports = [readyPort(), readyPort()];
+    let i = 0;
+    const worker = await createBitmarkWorkerEngine({ createPort: () => ports[i++]!, url: 'x' });
+    const stuck = worker.convert('[.article]', { outputFormat: 'json' });
+    ports[1]!.fail('messageerror');
+    await expect(stuck).rejects.toBeInstanceOf(BitmarkEngineError);
+    await expect(worker.convert('x', { outputFormat: 'json' })).rejects.toBeInstanceOf(
+      BitmarkEngineError,
+    );
+  });
+
+  // @awa-test: PLAN-021-Step1a (dispose rejects what is still pending)
+  it('rejects pending calls on dispose', async () => {
+    const ports = [readyPort(), readyPort()];
+    let i = 0;
+    const worker = await createBitmarkWorkerEngine({ createPort: () => ports[i++]!, url: 'x' });
+    const stuck = worker.semanticTokens('[.article]');
+    worker.dispose();
+    await expect(stuck).rejects.toThrow('disposed');
+  });
+});

@@ -145,8 +145,13 @@ export interface PaneControl {
   readonly label: string;
   /** Text in this pane → bitmark. `undefined`: the pane is bitmark already. */
   toBitmark?(engine: BitmarkEngine, text: string): Promise<string>;
-  /** Regenerate from the session's bitmark. */
-  render(): void;
+  /**
+   * Regenerate from the session's bitmark. `force`: even if the user has
+   * focus here (an API change); otherwise a focused pane catches up on blur.
+   */
+  render(options?: { force?: boolean }): void;
+  /** The engine failed to load: say so in the pane. */
+  showEngineError(error: Error): void;
   /** Called when the engine arrives or changes variant. */
   engineChanged(): void;
   showSourceError(error: Error | undefined): void;

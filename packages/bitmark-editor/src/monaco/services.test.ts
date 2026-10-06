@@ -252,6 +252,29 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     expect(fake.setDiagnosticsOptions.mock.calls[1]![0].schemas[0].fileMatch).toEqual(['*']);
   });
 
+  // @awa-test: PLAN-021-Step3 (the host's own JSON settings and schemas are kept, D5)
+  it('merges into the host’s JSON options instead of replacing them', () => {
+    const fake = createFakeMonaco();
+    const set = vi.fn();
+    const hostSchema = {
+      uri: 'https://host/config.schema.json',
+      fileMatch: ['inmemory://host/**'],
+      schema: {},
+    };
+    (fake.monaco.languages as unknown as { json: unknown }).json = {
+      jsonDefaults: {
+        diagnosticsOptions: { validate: true, allowComments: true, schemas: [hostSchema] },
+        setDiagnosticsOptions: set,
+      },
+    };
+    bindBitmarkJsonSchema(fake.monaco, { type: 'array' });
+    const options = set.mock.calls[0]![0];
+    expect(options.allowComments).toBe(true);
+    expect(options.schemas).toHaveLength(2);
+    expect(options.schemas[0]).toBe(hostSchema);
+    expect(options.schemas[1].fileMatch).toEqual([BITMARK_MODEL_FILE_MATCH]);
+  });
+
   // @awa-test: PLAN-021-Step3 (Monaco 0.55+: the top-level monaco.json; languages.json a stub)
   it('binds through the top-level monaco.json when languages.json is only a stub', () => {
     const fake = createFakeMonaco();

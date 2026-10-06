@@ -3,8 +3,8 @@ import {
   BitmarkEngine,
   createBitmarkEngine,
   createLatestRunner,
-  loadBitmarkEngine,
   LoadBitmarkEngineOptions,
+  loadBitmarkModule,
   parserCdnUrl,
   SUPERSEDED,
 } from '../engine';
@@ -41,7 +41,13 @@ const isRaw = (s: EngineSource): s is Extract<EngineSource, { module: unknown }>
 /** The engine for `source`, whether the session loads it, and the URL it came from. */
 const resolveEngine = (
   source: EngineSource | undefined,
-): { engine: Promise<BitmarkEngine>; loading: boolean; url?: string } => {
+): {
+  engine: Promise<BitmarkEngine>;
+  loading: boolean;
+  url?: string;
+  /** The load path's stage 2: settles when the full variant lands, or fails. */
+  stage2?: Promise<unknown>;
+} => {
   if (source && isEngine(source)) return { engine: Promise.resolve(source), loading: false };
   if (source && isPromise(source)) return { engine: source, loading: false };
   if (source && isRaw(source)) {
@@ -53,7 +59,20 @@ const resolveEngine = (
   }
   const options = (source ?? {}) as LoadBitmarkEngineOptions;
   const url = options.url ?? parserCdnUrl(options.version);
-  return { engine: loadBitmarkEngine({ ...options, url }), loading: true, url };
+  // The load path (D2): two stages, the second followed here so that a
+  // failure ends "loading" (the markup panes then say they need the full parser).
+  const loaded = loadBitmarkModule(url, options);
+  const engine = loaded.then(({ module, stage2 }) => {
+    const e = createBitmarkEngine(module, { feature: 'bitmark-json' });
+    stage2.then(
+      (feature) => e.setFeature(feature),
+      () => undefined,
+    );
+    return e;
+  });
+  const stage2 = loaded.then(({ stage2 }) => stage2);
+  stage2.catch(() => undefined);
+  return { engine, loading: true, url, stage2 };
 };
 
 /**
@@ -87,6 +106,14 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
   let theme = options.theme;
   let disposed = false;
   let stage2Pending = false;
+  /**
+   * +1 per edit started and per commit: a conversion whose number is no
+   * longer the latest is dropped, result and error alike, so a slow
+   * conversion can never overwrite a newer edit (from any pane, or the API).
+   */
+  let editSeq = 0;
+  let offFeature: (() => void) | undefined;
+  let engineError: Error | undefined;
 
   const resolved = resolveEngine(options.engine);
   stage2Pending = resolved.loading;
@@ -99,11 +126,14 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       : undefined;
 
   const commit = (text: string, source: PaneControl | undefined, edit: Omit<LastEdit, 'count'>) => {
+    editSeq++;
     bitmark = text;
     version++;
     lastEdit = { ...edit, count: ++editCount };
     source?.showSourceError(undefined);
-    for (const c of controls) if (c !== source) c.render();
+    // An API change (no source pane) replaces the text even where the user
+    // has focus: it is the new document, not an echo of their typing.
+    for (const c of controls) if (c !== source) c.render({ force: !source });
     emit('change', { bitmark, source: source?.pane });
   };
 
@@ -118,13 +148,14 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       commit(text, c, { inputFormat: c.inputFormat, content: text, label: c.label });
       return;
     }
+    const seq = ++editSeq;
     convert(c, text).then(
       (out) => {
-        if (disposed || out === SUPERSEDED) return;
+        if (disposed || out === SUPERSEDED || seq !== editSeq) return;
         commit(out, c, { inputFormat: c.inputFormat, content: text, label: c.label });
       },
       (err: unknown) => {
-        if (disposed) return;
+        if (disposed || seq !== editSeq) return;
         const error = err instanceof Error ? err : new Error(String(err));
         c.showSourceError(error);
         for (const other of controls) if (other !== c) other.setStale(true);
@@ -184,6 +215,8 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       controls.push(c);
       c.applyTheme(theme);
       if (engine) c.engineChanged();
+      else if (engineError) c.showEngineError(engineError);
+      else c.render();
       return () => {
         const i = controls.indexOf(c);
         if (i !== -1) controls.splice(i, 1);
@@ -197,6 +230,7 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
     dispose: () => {
       disposed = true;
       flush.cancel();
+      offFeature?.();
       for (const c of [...controls]) c.pane.dispose();
       monacoTheme?.dispose();
       for (const set of Object.values(listeners)) set.clear();
@@ -208,7 +242,7 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       if (disposed) return;
       engine = e;
       stage2Pending = resolved.loading && !e.markupFormats;
-      e.onFeatureChange(() => {
+      offFeature = e.onFeatureChange(() => {
         stage2Pending = false;
         for (const c of controls) c.engineChanged();
       });
@@ -218,13 +252,20 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
     },
     (err: unknown) => {
       stage2Pending = false;
+      if (disposed) return;
+      const error = err instanceof Error ? err : new Error(String(err));
+      engineError = error;
       log.error('the bitmark engine failed to load', err);
-      emit('error', {
-        error: err instanceof Error ? err : new Error(String(err)),
-        pane: undefined,
-      });
+      for (const c of controls) c.showEngineError(error);
+      emit('error', { error, pane: undefined });
     },
   );
+  // A stage-2 failure ends "loading": the markup panes say they need the full parser.
+  resolved.stage2?.catch(() => {
+    if (disposed || !stage2Pending) return;
+    stage2Pending = false;
+    for (const c of controls) c.engineChanged();
+  });
 
   // The JSON schema for the session's JSON panes (D2): the host's, or the
   // one the engine's own version publishes.

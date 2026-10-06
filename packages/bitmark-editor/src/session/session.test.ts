@@ -330,3 +330,111 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await expect(session.getJson()).resolves.toContain('"type": "article"');
   });
 });
+
+describe('review fixes (PLAN-021 pass 1)', () => {
+  /** The fake editor state behind a pane. */
+  const stateOf = (fake: ReturnType<typeof createFakeMonaco>, pane: BitmarkPane) =>
+    fake.editors.find((e) => e.options['model'] === pane.textEditor.model)!;
+
+  // @awa-test: PLAN-021-Step7 (a slow conversion never overwrites a newer edit)
+  it('drops a conversion that a newer edit superseded, result and error alike', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const slow: BitmarkEngine = Object.assign(Object.create(engine), {
+      convert: async (...args: Parameters<BitmarkEngine['convert']>) => {
+        await gate;
+        return engine.convert(...args);
+      },
+    });
+    const { session, el } = setup({ engine: slow });
+    const bitmark = createBitmarkPane(el(), session);
+    const json = createJsonPane(el(), session);
+    const html = createHtmlPane(el(), session);
+    await vi.waitFor(() => expect(text(json)).toContain('World'));
+    type(json, text(json).replace('World', 'Old'));
+    // Let the JSON conversion start (edits in one tick merge into one).
+    await new Promise((r) => setTimeout(r, 0));
+    type(bitmark, '[.article]\nNewer');
+    release();
+    await new Promise((r) => setTimeout(r, 30));
+    expect(session.getBitmark()).toBe('[.article]\nNewer');
+    expect(text(bitmark)).toBe('[.article]\nNewer');
+    expect(banner(html)).toBe('');
+  });
+
+  // @awa-test: PLAN-021-Step8 (an applied regeneration clears the pane's old source error)
+  it('clears a pane’s error once it shows the document again', async () => {
+    const { session, el, fake } = setup();
+    const bitmark = createBitmarkPane(el(), session);
+    const json = createJsonPane(el(), session);
+    await vi.waitFor(() => expect(text(json)).toContain('World'));
+    type(json, '[{"bit": {"type": "article", "body": 5}}');
+    await vi.waitFor(() => expect(banner(json)).toMatch(/^Error: /));
+    type(bitmark, '[.article]\nRepaired');
+    await vi.waitFor(() => expect(text(json)).toContain('Repaired'));
+    expect(banner(json)).toBe('');
+    expect(fake.markersOf(json.textEditor.model, 'bitmark-convert')).toEqual([]);
+  });
+
+  // @awa-test: PLAN-021-Step8 (an API change reaches a focused pane)
+  it('applies setBitmark to a focused pane', async () => {
+    const { session, el, fake } = setup();
+    const bitmark = createBitmarkPane(el(), session);
+    stateOf(fake, bitmark).focused = true;
+    session.setBitmark('[.article]\nFrom the API');
+    expect(text(bitmark)).toBe('[.article]\nFrom the API');
+  });
+
+  // @awa-test: PLAN-021-Step8 (a focused pane catches up on blur)
+  it('catches a focused pane up on blur when it could not regenerate', async () => {
+    const injected = createBitmarkEngine(parser as unknown as RawParserModule);
+    const { session, el, fake } = setup({ engine: injected });
+    const html = createHtmlPane(el(), session);
+    await vi.waitFor(() => expect(banner(html)).toBe(session.messages.needsFullParser));
+    stateOf(fake, html).focused = true;
+    injected.setFeature('full');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(text(html)).toBe('');
+    stateOf(fake, html).blur();
+    await vi.waitFor(() => expect(text(html)).toContain('World'));
+  });
+
+  // @awa-test: PLAN-021-Step8 (a stage-2 failure ends "loading")
+  it('says "needs the full parser" when stage 2 fails on the load path', async () => {
+    const failing = {
+      ...(parser as unknown as RawParserModule),
+      init: async ({ feature }: { feature: string }) => {
+        if (feature !== 'bitmark-json') throw new Error('no full variant');
+      },
+    };
+    const { session, el } = setup({
+      engine: { url: 'stage2-fails', importModule: async () => failing },
+    });
+    const html = createHtmlPane(el(), session);
+    await vi.waitFor(() => expect(banner(html)).toBe(session.messages.needsFullParser));
+  });
+
+  // @awa-test: PLAN-021-Step7 (a failed engine load shows in the panes)
+  it('shows a failed engine load in every pane', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { session, el } = setup({ engine: Promise.reject(new Error('engine unreachable')) });
+    const json = createJsonPane(el(), session);
+    await vi.waitFor(() => expect(banner(json)).toBe('Error: engine unreachable'));
+    const late = createHtmlPane(el(), session);
+    expect(banner(late)).toBe('Error: engine unreachable');
+    vi.restoreAllMocks();
+  });
+
+  // @awa-test: PLAN-021-Step7 (dispose releases the feature subscription)
+  it('releases its feature-change subscription on dispose', async () => {
+    const shared = createBitmarkEngine(parser as unknown as RawParserModule, { feature: 'full' });
+    const spy = vi.spyOn(shared, 'onFeatureChange');
+    const { session } = setup({ engine: shared });
+    await session.ready;
+    await Promise.resolve();
+    const off = spy.mock.results[0]!.value as () => boolean;
+    session.dispose();
+    sessions.splice(sessions.indexOf(session), 1);
+    expect(off()).toBe(false); // already removed by dispose
+  });
+});

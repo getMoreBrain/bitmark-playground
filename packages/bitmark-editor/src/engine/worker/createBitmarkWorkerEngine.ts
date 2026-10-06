@@ -29,6 +29,8 @@ export interface CreateBitmarkWorkerEngineOptions {
 interface Lane {
   port: EnginePort;
   feature: Feature;
+  /** Reject `ready` and every pending call; later calls reject at once. */
+  fail(error: Error): void;
   call(method: EngineMethod, args: unknown[]): Promise<unknown>;
   ready: Promise<{ version: string; feature: Feature; capabilities: EngineCapabilities }>;
 }
@@ -51,11 +53,20 @@ const openLane = (
     resolveReady = res;
     rejectReady = rej;
   });
+  let dead: Error | undefined;
   const lane: Lane = {
     port,
     feature: 'bitmark-json',
     ready,
+    fail(error) {
+      if (dead) return;
+      dead = error;
+      rejectReady(error);
+      for (const p of pending.values()) p.reject(error);
+      pending.clear();
+    },
     call(method, args) {
+      if (dead) return Promise.reject(dead);
       const id = ++nextId;
       return new Promise((resolve, reject) => {
         pending.set(id, { resolve, reject });
@@ -86,6 +97,15 @@ const openLane = (
       }
     }
   });
+  // A worker script that 404s, a CSP block, or a crash (out of memory on a
+  // huge document): fail the lane, so nothing waits for ever.
+  const onError = (event: Event) => {
+    const message =
+      (event as ErrorEvent).message || `the bitmark engine worker failed (${event.type})`;
+    lane.fail(new BitmarkEngineError(message));
+  };
+  port.addEventListener('error', onError as (e: MessageEvent) => void);
+  port.addEventListener('messageerror', onError as (e: MessageEvent) => void);
   port.postMessage({ type: 'init', url, feature });
   return lane;
 };
@@ -124,6 +144,7 @@ export const createBitmarkWorkerEngine = async (
 
   const end = () => {
     for (const lane of lanes) {
+      lane.fail(new BitmarkEngineError('the bitmark engine was disposed'));
       lane.port.terminate?.();
       lane.port.close?.();
     }

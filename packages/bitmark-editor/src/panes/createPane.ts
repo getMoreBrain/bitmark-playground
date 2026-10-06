@@ -155,9 +155,31 @@ export const createPane = (
 
   const regenerate = createLatestRunner((engine: BitmarkEngine) => spec.fromSession!(engine, s));
 
-  const render = () => {
+  /**
+   * This pane made the document's current text (it was the last edit's
+   * source): it keeps the user's text verbatim and does not catch up later.
+   */
+  let isSource = false;
+  /** A regeneration the focused editor could not take: applied on blur. */
+  let pending = false;
+
+  /** Show regenerated `text`; true when the editor took it. */
+  const show = (text: string, force: boolean): boolean => {
+    const applied = textEditor.setValue(text, { force });
+    if (applied) {
+      isSource = false;
+      // The text is now the document's again: any earlier error is gone (D15).
+      if (state.sourceError !== undefined) clearSourceError();
+    } else if (!isSource) {
+      pending = true;
+    }
+    return applied;
+  };
+
+  const render = (opts?: { force?: boolean }) => {
+    const force = !!opts?.force;
     if (spec.type === 'bitmark') {
-      textEditor.setValue(s.getBitmark());
+      show(s.getBitmark(), force);
       state.stale = false;
       showBanner();
       return;
@@ -180,7 +202,7 @@ export const createPane = (
         state.notice = undefined;
         state.renderError = undefined;
         state.stale = false;
-        if (textEditor.setValue(out.text)) markers?.pin(out.text, out.bitStarts);
+        if (show(out.text, force)) markers?.pin(out.text, out.bitStarts);
         showBanner();
       },
       (err: unknown) => {
@@ -198,6 +220,17 @@ export const createPane = (
 
   let theme: AppliedTheme | undefined;
   let disposed = false;
+
+  const blurListener = editor.onDidBlurEditorText?.(() => {
+    if (!pending || disposed) return;
+    pending = false;
+    render();
+  });
+
+  const clearSourceError = () => {
+    state.sourceError = undefined;
+    monaco.editor.setModelMarkers(model, CONVERT_MARKER_OWNER, []);
+  };
 
   const pane: BitmarkPane = {
     type: spec.type,
@@ -219,6 +252,7 @@ export const createPane = (
       if (disposed) return;
       disposed = true;
       unregister();
+      blurListener?.dispose();
       services?.dispose();
       split?.dispose();
       markers?.dispose();
@@ -240,7 +274,13 @@ export const createPane = (
       split?.refresh();
       render();
     },
+    showEngineError: (error: Error) => {
+      state.notice = `${messages.errorPrefix}${error.message}`;
+      showBanner();
+    },
     showSourceError: (error: Error | undefined) => {
+      // A committed edit (no error) makes this pane the document's source.
+      if (!error) isSource = true;
       state.sourceError = error?.message;
       // A JSON syntax error is marked by Monaco's JSON language already.
       const convertMarkers =
@@ -272,8 +312,8 @@ export const createPane = (
     },
   } satisfies PaneControl);
 
+  // The session sets the first state: rendered, its engine error, or loading.
   const unregister = s.register(control);
-  if (spec.type !== 'bitmark' && !s.engine) render();
   return pane;
 };
 

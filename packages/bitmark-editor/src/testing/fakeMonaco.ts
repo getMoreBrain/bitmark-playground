@@ -118,6 +118,7 @@ export const createFakeMonaco = () => {
     disposed: boolean;
     scrollTop: number;
     decorations: unknown[];
+    blur: () => void;
   }[] = [];
   const monaco = {
     Range: FakeRange,
@@ -137,11 +138,18 @@ export const createFakeMonaco = () => {
           disposed: false,
           scrollTop: 0,
           decorations: [] as unknown[],
+          /** The user leaves the editor. */
+          blur: () => {},
         };
         editors.push(state);
         const model = options['model'] as FakeModel;
         const noop = () => ({ dispose: () => {} });
         const scroll = emitter<{ scrollTopChanged: boolean; scrollHeightChanged: boolean }>();
+        const blur = emitter();
+        state.blur = () => {
+          state.focused = false;
+          blur.fire();
+        };
         return {
           getModel: () => model,
           hasTextFocus: () => state.focused,
@@ -155,6 +163,7 @@ export const createFakeMonaco = () => {
           onDidContentSizeChange: noop,
           onDidLayoutChange: noop,
           onDidScrollChange: scroll.on,
+          onDidBlurEditorText: blur.on,
           getContribution: () => ({}),
           createDecorationsCollection: () => {
             let ranges: { range: FakeRange }[] = [];

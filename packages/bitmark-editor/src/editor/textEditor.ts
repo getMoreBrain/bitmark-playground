@@ -67,9 +67,10 @@ export interface TextEditor extends MonacoApi.IDisposable {
   getValue(): string;
   /**
    * Show `text`, unless the user is typing here (the editor has focus): a
-   * focused editor is never overwritten. Returns whether it was applied.
+   * focused editor is not overwritten unless `force`. Returns whether it was
+   * applied.
    */
-  setValue(text: string): boolean;
+  setValue(text: string, options?: { force?: boolean }): boolean;
   setReadOnly(readOnly: boolean): void;
   layout(): void;
 }
@@ -108,8 +109,8 @@ export const createTextEditor = (element: HTMLElement, options: TextEditorOption
     editor,
     model,
     getValue: () => model.getValue(),
-    setValue: (text) => {
-      if (editor.hasTextFocus()) return false;
+    setValue: (text, opts) => {
+      if (editor.hasTextFocus() && !opts?.force) return false;
       programmatic = true;
       try {
         replaceAllKeepingUndo(model, text);

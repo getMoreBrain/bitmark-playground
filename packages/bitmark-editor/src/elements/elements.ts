@@ -18,6 +18,8 @@ import { getDefaultEngine, loadDefaultMonaco } from './defaults';
 
 /** Fired on a session element when its session exists, for its panes (bubbles). */
 const SESSION_READY = 'bitmark-session-connected';
+/** Fired on `document` when a session element's session is disposed (detail: the element). */
+const SESSION_DISPOSED = 'bitmark-session-disposed';
 
 export const ELEMENTS_CSS = `
 bitmark-session,bitmark-editor{display:block}
@@ -86,6 +88,8 @@ export const defineBitmarkElements = (): void => {
     static observedAttributes = ['value', 'theme'];
     #session: BitmarkSession | undefined;
     #starting = false;
+    /** +1 per start and per removal: a start that is no longer current gives up (no second session). */
+    #generation = 0;
     #monaco: Monaco | undefined;
     #engine: EngineSource | undefined;
     #pendingValue: string | undefined;
@@ -137,11 +141,15 @@ export const defineBitmarkElements = (): void => {
 
     disconnectedCallback() {
       afterDisconnect(this, () => {
+        this.#generation++;
         for (const c of this.#cleanups.splice(0)) c();
+        const had = !!this.#session;
         this.#session?.dispose();
         this.#session = undefined;
         this.#starting = false;
         delete this.dataset.state;
+        // Panes bound to this session by id (elsewhere in the page) forget it.
+        if (had) document.dispatchEvent(new CustomEvent(SESSION_DISPOSED, { detail: this }));
       });
     }
 
@@ -190,15 +198,17 @@ export const defineBitmarkElements = (): void => {
     async #start() {
       if (this.#session || this.#starting) return;
       this.#starting = true;
+      const generation = ++this.#generation;
+      const current = () => generation === this.#generation && this.isConnected && !this.#session;
       this.dataset.state = 'loading';
       try {
         const monaco = this.#monaco ?? (await loadDefaultMonaco());
+        if (!current()) return;
         if (!monaco) {
           throw new Error(
             'no Monaco: set the element’s `monaco` property, or import @gmb/bitmark-editor/bundled',
           );
         }
-        if (!this.isConnected || !this.#starting) return;
         const session = createBitmarkSession({
           monaco,
           engine: this.#engineSource(),
@@ -226,6 +236,7 @@ export const defineBitmarkElements = (): void => {
         this.dataset.state = 'ready';
         this.dispatchEvent(new CustomEvent(SESSION_READY, { bubbles: true }));
       } catch (e) {
+        if (generation !== this.#generation) return;
         this.#starting = false;
         // Progressive enhancement: the static content stays (D12).
         delete this.dataset.state;
@@ -265,6 +276,12 @@ export const defineBitmarkElements = (): void => {
       const target = e.target as BitmarkSessionElement;
       if (this.#findSession() === target) this.#mount();
     };
+    /** The session went away (and disposed this pane): mount again when it restarts. */
+    #onDisposed = (e: Event) => {
+      if ((e as CustomEvent).detail !== this.#sessionEl) return;
+      this.#pane = undefined;
+      this.#sessionEl = undefined;
+    };
 
     get pane(): BitmarkPane | undefined {
       return this.#pane;
@@ -276,6 +293,7 @@ export const defineBitmarkElements = (): void => {
       if (!this.#listening) {
         // Late binding: the session may start (or appear) after this pane.
         document.addEventListener(SESSION_READY, this.#onReady);
+        document.addEventListener(SESSION_DISPOSED, this.#onDisposed);
         this.#listening = true;
       }
     }
@@ -283,6 +301,7 @@ export const defineBitmarkElements = (): void => {
     disconnectedCallback() {
       afterDisconnect(this, () => {
         document.removeEventListener(SESSION_READY, this.#onReady);
+        document.removeEventListener(SESSION_DISPOSED, this.#onDisposed);
         this.#listening = false;
         this.#unmount();
       });
@@ -493,7 +512,6 @@ export const defineBitmarkElements = (): void => {
    * `panes="json,html,xml:xml-niso-iec,text"`.
    */
   class BitmarkEditorElement extends HTMLElement {
-    #session: BitmarkSessionElement | undefined;
     static FORWARDED = [
       'value',
       'engine-url',
@@ -506,41 +524,64 @@ export const defineBitmarkElements = (): void => {
       'schema',
       'apply-monaco-theme',
     ];
+    static observedAttributes = [...BitmarkEditorElement.FORWARDED, 'panes'];
+    #session: BitmarkSessionElement | undefined;
+    #tabs: HTMLElement | undefined;
+    /** Properties set before the parts exist; handed over when they are built. */
+    #props: { monaco?: Monaco; engine?: EngineSource; value?: string } = {};
 
     get sessionElement(): BitmarkSessionElement | undefined {
       return this.#session;
     }
+    get monaco(): Monaco | undefined {
+      return this.#session?.monaco ?? this.#props.monaco;
+    }
     set monaco(m: Monaco | undefined) {
-      this.#build().monaco = m;
+      if (this.#session) this.#session.monaco = m;
+      else this.#props.monaco = m;
+    }
+    get engine(): EngineSource | undefined {
+      return this.#session?.engine ?? this.#props.engine;
     }
     set engine(e: EngineSource | undefined) {
-      this.#build().engine = e;
+      if (this.#session) this.#session.engine = e;
+      else this.#props.engine = e;
     }
     get value(): string {
-      return this.#build().value;
+      return this.#session?.value ?? this.#props.value ?? this.getAttribute('value') ?? '';
     }
     set value(v: string) {
-      this.#build().value = v;
+      if (this.#session) this.#session.value = v;
+      else this.#props.value = v;
     }
 
     connectedCallback() {
       injectElementsCss();
       upgradeProperties(this, ['monaco', 'engine', 'value']);
-      this.#build();
+      // Defined before the page finished parsing: wait for the children (the
+      // static content) to exist before taking them in.
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.isConnected && this.#build(), {
+          once: true,
+        });
+      } else {
+        this.#build();
+      }
     }
 
-    #build(): BitmarkSessionElement {
-      if (this.#session) return this.#session;
-      const session = document.createElement('bitmark-session') as BitmarkSessionElement;
-      for (const name of BitmarkEditorElement.FORWARDED) {
-        const v = this.getAttribute(name);
-        if (v !== null) session.setAttribute(name, v);
+    attributeChangedCallback(name: string, old: string | null, value: string | null) {
+      if (old === value || !this.#session) return;
+      if (name === 'panes') {
+        this.#fillTabs();
+        return;
       }
-      session.style.height = '100%';
-      const split = document.createElement('bitmark-split');
-      const bitmark = document.createElement('bitmark-pane');
-      bitmark.setAttribute('type', 'bitmark');
-      const tabs = document.createElement('bitmark-tabs');
+      if (value === null) this.#session.removeAttribute(name);
+      else this.#session.setAttribute(name, value);
+    }
+
+    #fillTabs() {
+      const tabs = this.#tabs!;
+      tabs.querySelectorAll(':scope > bitmark-pane').forEach((p) => p.remove());
       for (const spec of (this.getAttribute('panes') ?? 'json')
         .split(',')
         .map((p) => p.trim())
@@ -552,7 +593,24 @@ export const defineBitmarkElements = (): void => {
         if (type === 'json' && arg) pane.setAttribute('mode', arg);
         tabs.append(pane);
       }
-      split.append(bitmark, tabs);
+    }
+
+    #build(): void {
+      if (this.#session) return;
+      const session = document.createElement('bitmark-session') as BitmarkSessionElement;
+      for (const name of BitmarkEditorElement.FORWARDED) {
+        const v = this.getAttribute(name);
+        if (v !== null) session.setAttribute(name, v);
+      }
+      if (this.#props.monaco) session.monaco = this.#props.monaco;
+      if (this.#props.engine) session.engine = this.#props.engine;
+      if (this.#props.value !== undefined) session.value = this.#props.value;
+      session.style.height = '100%';
+      const split = document.createElement('bitmark-split');
+      const bitmark = document.createElement('bitmark-pane');
+      bitmark.setAttribute('type', 'bitmark');
+      this.#tabs = document.createElement('bitmark-tabs');
+      split.append(bitmark, this.#tabs);
       // Static content the host put inside stays as the pre-load view (D12).
       for (const child of [...this.children]) {
         child.setAttribute('data-bitmark-static', '');
@@ -560,8 +618,8 @@ export const defineBitmarkElements = (): void => {
       }
       session.append(split);
       this.#session = session;
+      this.#fillTabs();
       this.append(session);
-      return session;
     }
   }
 
