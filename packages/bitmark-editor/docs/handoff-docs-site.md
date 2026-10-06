@@ -1,8 +1,9 @@
 # Hand-off: the docs site switches to the package (PLAN-023 Step 18)
 
-For a branch in the parser repo (`docs-site/`, Eleventy). Not started: it
-is work in another repository, and it needs the package on jsDelivr (a
-published prerelease).
+For a branch in the parser repo (`docs-site/`, Eleventy). Done on branch
+`docs-site/bitmark-editor` (the parser repo's PLAN-227), with the package
+vendored until it is on jsDelivr; this brief is kept for the switch to the
+CDN URL.
 
 ## What to do
 

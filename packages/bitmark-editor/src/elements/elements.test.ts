@@ -138,6 +138,37 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     await vi.waitFor(() => expect(paneText(host.querySelector('bitmark-pane'))).toContain('World'));
   });
 
+  // @awa-test: PLAN-023-Step15b (/bundled's own Monaco follows the session's theme; a host's does not)
+  it('sets the theme of its own Monaco, at start and on a theme change, and never a host one', async () => {
+    const own = createFakeMonaco();
+    setMonacoLoader(async () => own.monaco, { own: true });
+    const host = document.createElement('div');
+    host.innerHTML = `<bitmark-session theme="light" value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`;
+    const session = host.querySelector('bitmark-session') as BitmarkSessionElementApi;
+    session.engine = engine;
+    document.body.append(host);
+    await vi.waitFor(() => expect(session.dataset.state).toBe('ready'));
+    expect(own.setTheme).toHaveBeenCalled();
+    const before = own.setTheme.mock.calls.length;
+    session.setAttribute('theme', 'dark');
+    expect(own.setTheme.mock.calls.length).toBeGreaterThan(before);
+    expect(own.setTheme.mock.calls.at(-1)![0]).not.toBe(own.setTheme.mock.calls[before - 1]![0]);
+    host.remove();
+
+    const hostMonaco = createFakeMonaco();
+    setMonacoLoader(async () => hostMonaco.monaco);
+    const other = document.createElement('div');
+    other.innerHTML = `<bitmark-session theme="light" value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`;
+    const second = other.querySelector('bitmark-session') as BitmarkSessionElementApi;
+    second.engine = engine;
+    document.body.append(other);
+    await vi.waitFor(() => expect(second.dataset.state).toBe('ready'));
+    second.setAttribute('theme', 'dark');
+    expect(hostMonaco.setTheme).not.toHaveBeenCalled();
+    other.remove();
+    setMonacoLoader(undefined as never);
+  });
+
   // @awa-test: PLAN-023-Step15b (no Monaco: an error, and the static content stays)
   it('reports a missing Monaco and stays static', async () => {
     setMonacoLoader(undefined as never);

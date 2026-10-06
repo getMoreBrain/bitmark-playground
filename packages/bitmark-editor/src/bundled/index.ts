@@ -95,7 +95,7 @@ export const createBundledWorkerEngine = (
     createPort: () => moduleWorker(asset('engineWorker.js')) as unknown as EnginePort,
   });
 
-setMonacoLoader(loadBundledMonaco);
+setMonacoLoader(loadBundledMonaco, { own: true });
 defineBitmarkElements();
 
 export { setDefaultEngine, setMonacoLoader } from '../elements/defaults';

@@ -381,7 +381,7 @@ and to the package in Phase 2.
     `theme: 'dark'` on a host left on Monaco's default `vs` makes bold text
     unreadable. cosmic sets `vs-dark`, as its reader does. Follow-up for the
     package: warn, or pick the token theme from the host's Monaco theme.
-- [ ] Step 18 — Docs site switch (D12), on a branch in the parser repo
+- [x] Step 18 — Docs site switch (D12), on a branch in the parser repo
   (`docs-site`), after the `0.x` prerelease:
   - `live-examples.js` mounts a `<bitmark-session lazy="idle"
     narrow="static">` with bitmark and JSON panes from the version-pinned
@@ -398,6 +398,20 @@ and to the package in Phase 2.
   and every bit page still degrades to the static example when the CDN is
   blocked. The parser repo has its own plan process, so this step is a
   hand-off brief there, not an in-repo plan.
+  - Done: parser repo branch `docs-site/bitmark-editor`, its PLAN-227. Not
+    yet on npm, so the package is vendored in `docs-site/vendor/` and its
+    `/bundled` build self-hosted under `assets/bitmark-editor/<version>/`
+    (the CDN URL once published); the parser is pinned to the documented
+    version (built from `packages/bitmark-parser`, no workflow step). The
+    editor appears on the session's `ready`, so a blocked parser CDN, a
+    blocked bundle, no JS and phones all keep the static example (e2e for
+    each). Theme toggle, i18n strings and `--syntax-*` colours carry over.
+    The docs site's `npm test` (55 unit + 115 static) and production e2e
+    (46) pass.
+  - Package changes it needed: `<bitmark-session>` takes `messages`; and
+    `/bundled` now really applies the session's theme to its own Monaco
+    (the README said so, the code did not: the panes stayed light on the
+    dark site). `setMonacoLoader(loader, { own: true })`.
 
 ### Testing
 

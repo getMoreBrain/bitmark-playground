@@ -21,7 +21,7 @@ import type {
   PaneType,
 } from '../session/types';
 import type { BitmarkTheme } from '../theme/applyTheme';
-import { getDefaultEngine, loadDefaultMonaco } from './defaults';
+import { defaultMonacoIsOwn, getDefaultEngine, loadDefaultMonaco } from './defaults';
 
 /** Fired on a session element when its session exists, for its panes (bubbles). */
 const SESSION_READY = 'bitmark-session-connected';
@@ -237,7 +237,9 @@ export const defineBitmarkElements = (): void => {
           value: this.#pendingValue ?? this.getAttribute('value') ?? '',
           debounceMs: Number(this.getAttribute('debounce') ?? 0) || 0,
           theme: (this.getAttribute('theme') as BitmarkTheme | null) ?? undefined,
-          applyMonacoTheme: this.hasAttribute('apply-monaco-theme'),
+          // The package's own Monaco (`/bundled`) takes the session's theme.
+          applyMonacoTheme:
+            this.hasAttribute('apply-monaco-theme') || (!this.#monaco && defaultMonacoIsOwn()),
           messages: this.#messages,
           schema:
             this.getAttribute('schema') === 'off'

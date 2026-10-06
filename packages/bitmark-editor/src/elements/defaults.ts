@@ -8,13 +8,25 @@ import type { EngineSource } from '../session/types';
  * the Monaco loader to its own lazily-loaded copy (PLAN-022 D4, D12).
  */
 let monacoLoader: (() => Promise<Monaco>) | undefined;
+let monacoIsOwn = false;
 let defaultEngine: (() => EngineSource) | undefined;
 
-/** Register how the elements get Monaco (called on first use, once). */
-export const setMonacoLoader = (loader: () => Promise<Monaco>): void => {
+/**
+ * Register how the elements get Monaco (called on first use, once). `own`:
+ * this Monaco is the package's (`/bundled`), so sessions on it set its theme
+ * too (PLAN-022 D11); a host's Monaco keeps the host's theme.
+ */
+export const setMonacoLoader = (
+  loader: () => Promise<Monaco>,
+  options?: { own?: boolean },
+): void => {
   monacoLoader = loader;
+  monacoIsOwn = options?.own ?? false;
   monacoPromise = undefined;
 };
+
+/** Whether the registered Monaco is the package's own (see `setMonacoLoader`). */
+export const defaultMonacoIsOwn = (): boolean => monacoIsOwn;
 
 let monacoPromise: Promise<Monaco> | undefined;
 
