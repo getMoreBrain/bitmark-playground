@@ -8,7 +8,12 @@ import {
   BITMARK_MODEL_FILE_MATCH,
   loadBitmarkJsonSchema,
 } from './jsonSchema';
-import { bindModelEngine, BITMARK_LANGUAGE_ID, setupBitmarkMonaco } from './setup';
+import {
+  bindModelEngine,
+  BITMARK_LANGUAGE_CONFIGURATION,
+  BITMARK_LANGUAGE_ID,
+  setupBitmarkMonaco,
+} from './setup';
 
 /** Tokens: `[.` then the rest of the first line as a bit type. */
 const tokensFor = (input: string) => ({
@@ -91,6 +96,28 @@ describe('setupBitmarkMonaco (PLAN-022 D8)', () => {
     expect(b.providers.completion).toHaveLength(1);
   });
 
+  // @awa-test: PLAN-023-Step4 (the `[` `]` pair auto-closes, as main's PLAN-021 D4)
+  it('declares the bracket pair on the language it registers, and only that one', () => {
+    const a = createFakeMonaco();
+    setupBitmarkMonaco({ monaco: a.monaco });
+    setupBitmarkMonaco({ monaco: a.monaco });
+    expect(a.setLanguageConfiguration).toHaveBeenCalledTimes(1);
+    expect(a.setLanguageConfiguration).toHaveBeenCalledWith(
+      BITMARK_LANGUAGE_ID,
+      BITMARK_LANGUAGE_CONFIGURATION,
+    );
+    expect(BITMARK_LANGUAGE_CONFIGURATION).toEqual({
+      brackets: [['[', ']']],
+      autoClosingPairs: [{ open: '[', close: ']' }],
+      surroundingPairs: [{ open: '[', close: ']' }],
+    });
+    // A host that registered bitmark itself keeps its own configuration.
+    const host = createFakeMonaco();
+    host.monaco.languages.register({ id: BITMARK_LANGUAGE_ID });
+    setupBitmarkMonaco({ monaco: host.monaco });
+    expect(host.setLanguageConfiguration).not.toHaveBeenCalled();
+  });
+
   // @awa-test: PLAN-023-Step2 (providers answer only for models bound to an engine)
   it('answers completion and hover only for a model bound to an engine, with that engine', async () => {
     const { monaco, providers } = createFakeMonaco();
@@ -118,11 +145,18 @@ describe('setupBitmarkMonaco (PLAN-022 D8)', () => {
     expect(engine.complete).toHaveBeenCalledWith(
       '[.art',
       { line: 0, character: 5 },
-      { triggerCharacter: undefined },
+      // A bit type completes to its template (parser PLAN-225 D9).
+      { triggerCharacter: undefined, bitTemplate: true },
     );
-    // `resolve` goes to the engine that answered the list.
+    // `resolve` goes to the engine that answered the list, with the same options.
     const resolved = await complete.resolveCompletionItem(list.suggestions[0]);
     expect(resolved.documentation?.value).toBe('docs');
+    expect(engine.resolve).toHaveBeenCalledWith(
+      '[.art',
+      { line: 0, character: 5 },
+      expect.anything(),
+      { bitTemplate: true },
+    );
     expect(await hover.provideHover(ours, position)).toMatchObject({
       contents: [{ value: '**article**', isTrusted: false }],
     });

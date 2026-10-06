@@ -10,6 +10,7 @@ export {
 } from './loadBitmarkEngine';
 export type {
   BitmarkEngine,
+  CompletionOptions,
   EngineCapabilities,
   Feature,
   JsonText,

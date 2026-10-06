@@ -60,6 +60,18 @@ export interface EngineCapabilities {
   readonly info: boolean;
 }
 
+/** Options for `complete` and `resolve`. */
+export interface CompletionOptions {
+  /** The character that opened the list (LSP); omit when invoked explicitly. */
+  triggerCharacter?: string;
+  /**
+   * A bit-type item inserts the bit's template as a snippet
+   * (`name]⏎[@id:…]…`) instead of the name alone (parser 7.9+; an older
+   * parser ignores it).
+   */
+  bitTemplate?: boolean;
+}
+
 /**
  * The parser, as the editor uses it (PLAN-022 D2, D7, D14).
  *
@@ -92,12 +104,14 @@ export interface BitmarkEngine {
   complete(
     input: string,
     position: Position,
-    options?: { triggerCharacter?: string },
+    options?: CompletionOptions,
   ): Promise<CompletionList | undefined>;
+  /** Pass the same options as the `complete` call that offered `item`. */
   resolve(
     input: string,
     position: Position,
     item: CompletionItem,
+    options?: CompletionOptions,
   ): Promise<CompletionItem | undefined>;
   hover(input: string, position: Position): Promise<Hover | null | undefined>;
   info(options: InfoOptions): Promise<string | undefined>;

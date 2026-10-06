@@ -7,6 +7,7 @@ import { log } from '../log';
 import { buildBitmarkHighlightCss } from '../theme/tokens';
 import {
   BitmarkSuggestion,
+  COMPLETE_OPTIONS,
   COMPLETION_TRIGGER_CHARACTERS,
   CompletionQuery,
   toMonacoCompletionList,
@@ -65,6 +66,19 @@ const injectHighlightCss = (): void => {
   document.head.appendChild(style);
 };
 
+/**
+ * The language's bracket pair, as the VS Code extension's
+ * `language-configuration.json` declares it: typing `[` auto-closes to
+ * `[]`, and a selection can be surrounded. Monaco only auto-closes what the
+ * language declares; a bit template then replaces that `]`
+ * (`replacedSuffixLength`).
+ */
+export const BITMARK_LANGUAGE_CONFIGURATION: MonacoApi.languages.LanguageConfiguration = {
+  brackets: [['[', ']']],
+  autoClosingPairs: [{ open: '[', close: ']' }],
+  surroundingPairs: [{ open: '[', close: ']' }],
+};
+
 export interface SetupBitmarkMonacoOptions {
   monaco: Monaco;
 }
@@ -86,6 +100,9 @@ export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void 
 
   if (!monaco.languages.getLanguages?.().some((l) => l.id === BITMARK_LANGUAGE_ID)) {
     monaco.languages.register({ id: BITMARK_LANGUAGE_ID });
+    // Only on a language we registered: a host's own bitmark language keeps
+    // its configuration.
+    monaco.languages.setLanguageConfiguration(BITMARK_LANGUAGE_ID, BITMARK_LANGUAGE_CONFIGURATION);
   }
   injectHighlightCss();
 
@@ -108,7 +125,10 @@ export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void 
           position: { line: position.lineNumber - 1, character: position.column - 1 },
         };
         const triggerCharacter = triggerCharacterOf(monaco, context);
-        const list = await engine.complete(query.input, query.position, { triggerCharacter });
+        const list = await engine.complete(query.input, query.position, {
+          triggerCharacter,
+          ...COMPLETE_OPTIONS,
+        });
         if (!list) return { suggestions: [] };
         const lineBeforeCursor = model.getValueInRange({
           startLineNumber: position.lineNumber,
@@ -116,7 +136,20 @@ export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void 
           endLineNumber: position.lineNumber,
           endColumn: position.column,
         });
-        const result = toMonacoCompletionList(monaco, list, position, lineBeforeCursor, query);
+        const lineAfterCursor = model.getValueInRange({
+          startLineNumber: position.lineNumber,
+          startColumn: position.column,
+          endLineNumber: position.lineNumber,
+          endColumn: model.getLineMaxColumn(position.lineNumber),
+        });
+        const result = toMonacoCompletionList(
+          monaco,
+          list,
+          position,
+          lineBeforeCursor,
+          query,
+          lineAfterCursor,
+        );
         // Monaco hands this object back to `resolveCompletionItem`: the
         // engine that answered travels with it.
         for (const s of result.suggestions as BitmarkSuggestion[]) {
@@ -141,6 +174,7 @@ export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void 
           bitmark.query.input,
           bitmark.query.position,
           bitmark.item,
+          COMPLETE_OPTIONS,
         );
         if (!resolved?.documentation) return suggestion;
         return {

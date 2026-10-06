@@ -58,6 +58,27 @@ export const replacedPrefixLength = (before: string, label: string): number => {
   return 0;
 };
 
+/**
+ * The options every completion query carries (parser PLAN-225 D9): a
+ * bit-type item inserts the bit's template (its usual tags, body and card
+ * structure) as a snippet, from the name onward, instead of the name alone.
+ * A parser older than 7.9 ignores it.
+ */
+export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
+
+/**
+ * The text after the cursor an item replaces as well: the `]` Monaco
+ * auto-closed when a bit-type snippet carries its own (`article]⏎…`), so
+ * the bracket is not doubled.
+ */
+export const replacedSuffixLength = (after: string, item: CompletionItem): number =>
+  item.kind === LSP.Class &&
+  item.insertTextFormat === 2 &&
+  (item.insertText ?? '').includes(']') &&
+  after.startsWith(']')
+    ? 1
+    : 0;
+
 /** The query a suggestion came from — what the parser's `resolve` needs. */
 export interface CompletionQuery {
   input: string;
@@ -80,8 +101,10 @@ export const toMonacoSuggestion = (
   position: MonacoApi.IPosition,
   lineBeforeCursor: string,
   query?: CompletionQuery,
+  lineAfterCursor = '',
 ): BitmarkSuggestion => {
   const replaced = replacedPrefixLength(lineBeforeCursor, item.label);
+  const replacedAfter = replacedSuffixLength(lineAfterCursor, item);
   return {
     bitmark: query ? { query, item } : undefined,
     label: item.label,
@@ -104,7 +127,7 @@ export const toMonacoSuggestion = (
       startLineNumber: position.lineNumber,
       endLineNumber: position.lineNumber,
       startColumn: position.column - replaced,
-      endColumn: position.column,
+      endColumn: position.column + replacedAfter,
     },
   };
 };
@@ -116,10 +139,11 @@ export const toMonacoCompletionList = (
   position: MonacoApi.IPosition,
   lineBeforeCursor: string,
   query: CompletionQuery,
+  lineAfterCursor = '',
 ): MonacoApi.languages.CompletionList => ({
   incomplete: list.isIncomplete,
   suggestions: list.items.map((i) =>
-    toMonacoSuggestion(monaco, i, position, lineBeforeCursor, query),
+    toMonacoSuggestion(monaco, i, position, lineBeforeCursor, query, lineAfterCursor),
   ),
 });
 

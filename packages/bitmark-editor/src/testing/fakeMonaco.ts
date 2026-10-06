@@ -112,6 +112,7 @@ export const createFakeMonaco = () => {
   const languages: { id: string }[] = [];
   const setDiagnosticsOptions = vi.fn();
   const setTheme = vi.fn();
+  const setLanguageConfiguration = vi.fn();
   const editors: {
     focused: boolean;
     options: Record<string, unknown>;
@@ -199,6 +200,7 @@ export const createFakeMonaco = () => {
     languages: {
       getLanguages: () => languages,
       register: (l: { id: string }) => languages.push(l),
+      setLanguageConfiguration,
       registerCompletionItemProvider: (language: string, provider: never) => {
         providers.completion.push({ language, provider });
         return { dispose: () => {} };
@@ -230,6 +232,7 @@ export const createFakeMonaco = () => {
     providers,
     setDiagnosticsOptions,
     setTheme,
+    setLanguageConfiguration,
     /** The markers `owner` set on `model`. */
     markersOf: (model: TextModel, owner = 'bitmark') =>
       (markers.get(model) ?? []).find((m) => m.owner === owner)?.markers ?? [],

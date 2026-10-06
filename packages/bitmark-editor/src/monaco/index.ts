@@ -2,9 +2,11 @@ export type { AttachBitmarkEditorOptions, BitmarkEditorServices } from './attach
 export { attachBitmarkEditor } from './attach';
 export type { BitmarkSuggestion, CompletionQuery } from './completion';
 export {
+  COMPLETE_OPTIONS,
   COMPLETION_TRIGGER_CHARACTERS,
   monacoKind,
   replacedPrefixLength,
+  replacedSuffixLength,
   toMonacoSuggestion,
   triggerCharacterOf,
 } from './completion';
@@ -32,6 +34,7 @@ export {
 export type { SetupBitmarkMonacoOptions } from './setup';
 export {
   bindModelEngine,
+  BITMARK_LANGUAGE_CONFIGURATION,
   BITMARK_LANGUAGE_ID,
   engineForModel,
   setupBitmarkMonaco,

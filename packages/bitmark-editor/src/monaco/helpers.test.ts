@@ -5,9 +5,11 @@ import { describe, expect, it } from 'vitest';
 
 import { createFakeMonaco, FakeRange } from '../testing/fakeMonaco';
 import {
+  COMPLETE_OPTIONS,
   COMPLETION_TRIGGER_CHARACTERS,
   monacoKind,
   replacedPrefixLength,
+  replacedSuffixLength,
   toMonacoSuggestion,
   triggerCharacterOf,
 } from './completion';
@@ -106,6 +108,46 @@ describe('toMonacoSuggestion', () => {
     );
     expect(s.insertText).toBe('color:');
     expect(s.filterText).toBe('color');
+  });
+});
+
+// @awa-test: PLAN-023-Step2 (bit templates: the auto-closed `]`, as main's PLAN-021)
+describe('bit templates', () => {
+  const at = { lineNumber: 1, column: 6 };
+  const bit = item({
+    label: 'article',
+    kind: LSP.Class as CompletionItem['kind'],
+    insertText: 'article]\n[#${1}]\n${2:body}\n$0',
+    insertTextFormat: 2,
+  });
+
+  it('replaces an auto-closed `]` after the cursor when a bit-type snippet carries its own', () => {
+    expect(toMonacoSuggestion(monaco, bit, at, '[.art', undefined, ']').range).toEqual({
+      startLineNumber: 1,
+      endLineNumber: 1,
+      startColumn: 3,
+      endColumn: 7,
+    });
+    // Nothing after the cursor, a plain name, or a non-bit snippet: the range ends at the cursor.
+    expect(toMonacoSuggestion(monaco, bit, at, '[.art', undefined, '').range).toMatchObject({
+      endColumn: 6,
+    });
+    expect(
+      replacedSuffixLength(
+        ']',
+        item({ label: 'article', kind: LSP.Class as CompletionItem['kind'] }),
+      ),
+    ).toBe(0);
+    expect(
+      replacedSuffixLength(
+        ']',
+        item({ label: '==', insertText: '==${1:text}==|${2:bold}|', insertTextFormat: 2 }),
+      ),
+    ).toBe(0);
+  });
+
+  it('asks the parser for bit templates on every query', () => {
+    expect(COMPLETE_OPTIONS.bitTemplate).toBe(true);
   });
 });
 

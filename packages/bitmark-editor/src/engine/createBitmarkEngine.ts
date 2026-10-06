@@ -106,7 +106,8 @@ export const createBitmarkEngine = (
     diagnostics: (input) => call(() => module.diagnostics?.(input, UTF16)),
     complete: (input, position, opts) =>
       call(() => module.complete?.(input, position, { ...UTF16, ...opts })),
-    resolve: (input, position, item) => call(() => module.resolve?.(input, position, item, UTF16)),
+    resolve: (input, position, item, opts) =>
+      call(() => module.resolve?.(input, position, item, { ...UTF16, ...opts })),
     hover: (input, position) => call(() => module.hover?.(input, position, UTF16)),
     info: (opts) => call(() => (module.info ? throwIfParserError(module.info(opts)) : undefined)),
     dispose: () => listeners.clear(),
