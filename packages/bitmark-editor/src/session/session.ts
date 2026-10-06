@@ -196,14 +196,19 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       return lastEdit;
     },
     getBitmark: () => bitmark,
-    setBitmark: (text, origin) =>
+    setBitmark: (text, origin) => {
+      // The new document replaces an edit still waiting out the debounce,
+      // as it replaces one in flight (commit's editSeq).
+      flush.cancel();
+      pending = undefined;
       commit(
         text,
         undefined,
         origin === false
           ? undefined
           : (origin ?? { inputFormat: 'bitmark', content: text, label: 'API' }),
-      ),
+      );
+    },
     getJson: async (opts) => {
       const e = engine ?? (await ready);
       return (await e.bitmarkToJsonText(bitmark, { mode: opts?.mode })).text;

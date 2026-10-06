@@ -260,6 +260,20 @@ describe('createBitmarkSession and its panes (PLAN-022 D9)', () => {
     spy.mockRestore();
   });
 
+  // @awa-test: PLAN-023-Step7 (setBitmark replaces an edit still waiting out the debounce)
+  it('drops a debounced edit when setBitmark sets the document', async () => {
+    const { session, el } = setup({ debounceMs: 30 });
+    const bitmark = createBitmarkPane(el(), session);
+    const json = createJsonPane(el(), session);
+    await vi.waitFor(() => expect(text(json)).toContain('World'));
+    type(json, text(json).replace('World', 'Typed'));
+    session.setBitmark('[.article]\nReset');
+    await new Promise((r) => setTimeout(r, 80));
+    expect(session.getBitmark()).toBe('[.article]\nReset');
+    await vi.waitFor(() => expect(text(json)).toContain('Reset'));
+    expect(text(bitmark)).toBe('[.article]\nReset');
+  });
+
   // @awa-test: PLAN-023-Step7 (scroll membership per pane)
   it('links exactly the panes given to setScrollSync', () => {
     const { session, el } = setup();
