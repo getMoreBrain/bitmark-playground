@@ -39,10 +39,20 @@ await build({
 // /bundled: the loader and Monaco as separate entries, so a lazy page loads
 // Monaco only on its trigger (D12); the workers as classic scripts for the
 // blob-URL trampoline; the engine worker as a module.
+// The package's own code keeps its source maps; Monaco's (third-party,
+// ~20 MB of maps) do not ship.
 await build({
   ...common,
   minify: true,
-  entryPoints: { bundled: src('bundled/index.ts'), monaco: src('bundled/monaco.ts') },
+  entryPoints: { bundled: src('bundled/index.ts') },
+  outdir: path.join(dist, 'bundled'),
+  format: 'esm',
+});
+await build({
+  ...common,
+  minify: true,
+  sourcemap: false,
+  entryPoints: { monaco: src('bundled/monaco.ts') },
   outdir: path.join(dist, 'bundled'),
   format: 'esm',
   loader: { '.ttf': 'file' },
@@ -51,6 +61,7 @@ await build({
 await build({
   ...common,
   minify: true,
+  sourcemap: false,
   entryPoints: {
     'editor.worker': 'monaco-editor/editor/editor.worker',
     'json.worker': 'monaco-editor/language/json/json.worker',

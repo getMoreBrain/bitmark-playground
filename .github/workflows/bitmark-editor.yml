@@ -1,0 +1,109 @@
+# CI for @gmb/bitmark-editor and @gmb/bitmark-editor-angular (PLAN-021 Step 16).
+# Publishing runs only for a release tag (bitmark-editor-v*), and needs the
+# NPM_TOKEN secret.
+name: bitmark-editor
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["bitmark-editor-v*"]
+    paths:
+      - "packages/bitmark-editor/**"
+      - "packages/bitmark-editor-angular/**"
+      - ".github/workflows/bitmark-editor.yml"
+  pull_request:
+    paths:
+      - "packages/bitmark-editor/**"
+      - "packages/bitmark-editor-angular/**"
+      - ".github/workflows/bitmark-editor.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/bitmark-editor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+      - name: Install (workspace)
+        working-directory: .
+        run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run build
+      - name: Examples (static site on Monaco 0.57, /esm consumer)
+        working-directory: packages/bitmark-editor/examples
+        run: |
+          bun install
+          npx playwright install --with-deps chromium
+          bun run test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bitmark-editor-dist
+          path: packages/bitmark-editor/dist
+
+  angular:
+    needs: core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/bitmark-editor-angular
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+      - uses: actions/download-artifact@v4
+        with:
+          name: bitmark-editor-dist
+          path: packages/bitmark-editor/dist
+      - run: npm ci
+      - run: npx ng build bitmark-editor-angular
+      - run: npx ng build example
+      - name: "Example (cosmic-shaped: zones, Monaco 0.46 AMD, injected parser)"
+        working-directory: packages/bitmark-editor-angular/e2e
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test -c playwright.config.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bitmark-editor-angular-dist
+          path: packages/bitmark-editor-angular/dist/bitmark-editor-angular
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/bitmark-editor-v')
+    needs: [core, angular]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+          registry-url: "https://registry.npmjs.org"
+      - uses: actions/download-artifact@v4
+        with:
+          name: bitmark-editor-dist
+          path: packages/bitmark-editor/dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: bitmark-editor-angular-dist
+          path: packages/bitmark-editor-angular/dist/bitmark-editor-angular
+      - name: Publish @gmb/bitmark-editor
+        working-directory: packages/bitmark-editor
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish @gmb/bitmark-editor-angular
+        working-directory: packages/bitmark-editor-angular/dist/bitmark-editor-angular
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -92,5 +92,12 @@
     "bitmark",
     "monaco",
     "editor"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/getMoreBrain/bitmark-playground/tree/main/packages/bitmark-editor#readme",
+  "engines": {
+    "node": ">=20"
+  }
 }

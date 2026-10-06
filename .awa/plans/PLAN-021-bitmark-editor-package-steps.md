@@ -279,7 +279,7 @@ and to the package in Phase 2.
   `messages`, the error slot, CDN-safe workers):
   - `lazy`, `narrow`, `debounceMs`, `messages`, the per-pane error slot;
   - CDN-safe workers in `/bundled`.
-- [ ] Step 16 — Publish config, for both packages (`@gmb/bitmark-editor`,
+- [x] Step 16 — Publish config, for both packages (`@gmb/bitmark-editor`,
   `@gmb/bitmark-editor-angular`):
   - `files`, `sideEffects` (the CSS and the element entries only), `exports`
     conditions, `publishConfig`;
@@ -287,6 +287,21 @@ and to the package in Phase 2.
   - prerelease version `0.1.0`.
   - the pinned default parser version (D13) as a single constant, with a
     bot PR that bumps it and runs the full suite.
+
+  Done (nothing published):
+  - `.github/workflows/bitmark-editor.yml` runs lint, typecheck, tests,
+    the build and the static and `/esm` examples for the core. It then
+    builds the Angular library and example and runs the Angular e2e. It
+    publishes both packages only for a `bitmark-editor-v*` tag, with the
+    `NPM_TOKEN` secret.
+  - `bitmark-editor-parser-bump.yml` runs weekly, using
+    `scripts/bump-parser.mjs`, and opens the D13 bump PR. Run locally, it
+    finds 7.9.0 newer than the pinned 7.7.0.
+  - `npm pack --dry-run`: `@gmb/bitmark-editor` is 1.6 MB packed, 70
+    files. Monaco's third-party source maps (~20 MB) are not shipped; the
+    package's own are. `@gmb/bitmark-editor-angular` is 13 kB.
+  - The workflow YAML parses (js-yaml), but it has not run on GitHub
+    yet.
 - [ ] Step 17 — cosmic proof of concept, on a branch in `getMoreBrain/cosmic`.
   It is the last step, after the `0.x` prerelease (Step 16); a local
   `npm pack` tarball is enough before that.
