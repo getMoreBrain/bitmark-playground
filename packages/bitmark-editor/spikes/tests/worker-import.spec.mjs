@@ -1,6 +1,6 @@
 // The README's worker-engine recipe under Vite: `?worker` on the package's
 // `./worker` export (needs the playground Vite dev server on :4604 and the
-// examples server on :4612).
+// spikes server on :4602).
 import { expect, test } from '@playwright/test';
 
 test('README worker recipe works under Vite', async ({ page }) => {
