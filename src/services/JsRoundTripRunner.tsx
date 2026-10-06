@@ -1,4 +1,3 @@
-// @awa-component: PLAN-012-JsRoundTripRunner
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
@@ -8,7 +7,6 @@ import { StringUtils } from '../utils/StringUtils';
 import { JS_JSON_TO_MARKUP_OPTIONS, JS_MARKUP_TO_JSON_OPTIONS } from './BitmarkConverter';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
-// @awa-impl: PLAN-012-Step2 (round-trip js.jsonAsString through bpg: json -> bitmark -> json)
 const useJsRoundTripRunner = (): void => {
   const { bitmarkParserGenerator, loadSuccess } = useBitmarkParserGenerator();
 

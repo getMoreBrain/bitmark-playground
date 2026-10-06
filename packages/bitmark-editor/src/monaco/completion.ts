@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import type { CompletionItem, CompletionList, Position } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 
@@ -65,7 +64,6 @@ export const replacedPrefixLength = (before: string, label: string): number => {
  * A parser older than 7.9.0 (the first published release with templates)
  * ignores it.
  */
-// @awa-impl: PLAN-021-Step1 (bit templates on every query)
 export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
 
 /**
@@ -73,7 +71,6 @@ export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
  * auto-closed when a bit-type snippet carries its own (`article]⏎…`), so
  * the bracket is not doubled.
  */
-// @awa-impl: PLAN-021-Step1 (the replaced-suffix rule, D2)
 export const replacedSuffixLength = (after: string, item: CompletionItem): number =>
   item.kind === LSP.Class &&
   item.insertTextFormat === 2 &&

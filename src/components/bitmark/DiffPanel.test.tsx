@@ -1,5 +1,3 @@
-// @awa-test: PLAN-005-Step2 (DiffPanel renders diff editor)
-// @awa-test: PLAN-005-Step3 (OutputPanel renders DiffPanel for diff tab)
 /** @jsxImportSource theme-ui */
 import { render, screen } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';

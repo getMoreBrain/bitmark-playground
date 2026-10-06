@@ -17,7 +17,6 @@ beforeAll(async () => {
 const DOC = '[.article]\nHello **World**!';
 
 describe('React adapter (PLAN-022 D3)', () => {
-  // @awa-test: PLAN-023-Step13 (session in context; panes mount and sync; onChange)
   it('mounts panes under a session, keeps them in sync, and reports changes', async () => {
     const { monaco } = createFakeMonaco();
     const panes: Record<string, Pane | undefined> = {};
@@ -62,7 +61,6 @@ describe('React adapter (PLAN-022 D3)', () => {
 });
 
 describe('React adapter: controlled value (second review)', () => {
-  // @awa-test: PLAN-023-Step13 (a lagging controlled value is not set back over the user's edit)
   it('does not roll the document back to its own lagging value', async () => {
     const { monaco } = createFakeMonaco();
     let bitmarkPane: Pane | undefined;

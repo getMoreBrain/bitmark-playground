@@ -38,7 +38,6 @@ const type = (el: Element | null, value: string) =>
   ((el as BitmarkPaneElementApi).pane!.textEditor.model as FakeModel).setText(value);
 
 describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
-  // @awa-test: PLAN-023-Step12 (panes bind to their nearest session and mount)
   it('mounts panes inside their session and keeps them in sync', async () => {
     const { host } = mount(`<bitmark-session value="${DOC}" schema="off">
       <bitmark-pane type="bitmark"></bitmark-pane><bitmark-pane type="json"></bitmark-pane></bitmark-session>`);
@@ -55,7 +54,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     );
   });
 
-  // @awa-test: PLAN-023-Step12 (binding by id, and late binding)
   it('binds a pane elsewhere in the page by session id, even before the session starts', async () => {
     const { host } = mount(`<bitmark-pane type="json" session="doc"></bitmark-pane>
       <div><bitmark-session id="doc" value="${DOC}" schema="off" lazy="click"></bitmark-session></div>`);
@@ -65,7 +63,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     await vi.waitFor(() => expect(paneText(pane)).toContain('World'));
   });
 
-  // @awa-test: PLAN-023-Step12 (attributes map to options and toggle at runtime)
   it('switches readonly and scroll-sync at runtime, and remounts on a type change', async () => {
     const { host } = mount(`<bitmark-session value="${DOC}" schema="off">
       <bitmark-pane type="bitmark"></bitmark-pane><bitmark-pane type="json" readonly scroll-sync="off"></bitmark-pane></bitmark-session>`);
@@ -82,7 +79,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     await vi.waitFor(() => expect(paneText(json)).toContain('Hello World!'));
   });
 
-  // @awa-test: PLAN-023-Step12 (disconnect disposes; a DOM move does not)
   it('disposes on removal, but survives a move in the DOM', async () => {
     const { host } = mount(
       `<bitmark-session value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`,
@@ -103,7 +99,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     expect(pane.pane).toBeUndefined();
   });
 
-  // @awa-test: PLAN-023-Step12 (the events fire: ready, change, error)
   it('fires ready, change and error', async () => {
     const { host } = mount(`<bitmark-session value="${DOC}" schema="off">
       <bitmark-pane type="bitmark"></bitmark-pane><bitmark-pane type="json"></bitmark-pane></bitmark-session>`);
@@ -119,7 +114,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     await vi.waitFor(() => expect(error).toHaveBeenCalled());
   });
 
-  // @awa-test: PLAN-023-Step15b (lazy: nothing before the trigger; static content until mount)
   it('loads nothing before its lazy trigger, and shows the static content until then', async () => {
     const loader = vi.fn(async () => createFakeMonaco().monaco);
     setMonacoLoader(loader);
@@ -138,7 +132,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     await vi.waitFor(() => expect(paneText(host.querySelector('bitmark-pane'))).toContain('World'));
   });
 
-  // @awa-test: PLAN-023-Step15b (/bundled's own Monaco follows the session's theme; a host's does not)
   it('sets the theme of its own Monaco, at start and on a theme change, and never a host one', async () => {
     const own = createFakeMonaco();
     setMonacoLoader(async () => own.monaco, { own: true });
@@ -183,7 +176,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     setMonacoLoader(undefined as never);
   });
 
-  // @awa-test: PLAN-023-Step15b (no Monaco: an error, and the static content stays)
   it('reports a missing Monaco and stays static', async () => {
     setMonacoLoader(undefined as never);
     const host = document.createElement('div');
@@ -198,7 +190,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     vi.restoreAllMocks();
   });
 
-  // @awa-test: PLAN-023-Step15b (narrow="static" on a coarse pointer and narrow viewport)
   it('stays static on a narrow touch screen with narrow="static", and goes read-only with "readonly"', async () => {
     // jsdom has no matchMedia: a coarse pointer and a narrow viewport.
     const original = window.matchMedia;
@@ -220,7 +211,6 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
 });
 
 describe('<bitmark-tabs>, <bitmark-split> and <bitmark-editor>', () => {
-  // @awa-test: PLAN-023-Step12 (tabs mount only the active pane; WAI-ARIA keys)
   it('mounts only the active tab, switches on click and arrow keys', async () => {
     const { host } = mount(`<bitmark-session value="${DOC}" schema="off"><bitmark-tabs>
       <bitmark-pane type="json"></bitmark-pane><bitmark-pane type="text"></bitmark-pane></bitmark-tabs></bitmark-session>`);
@@ -239,7 +229,6 @@ describe('<bitmark-tabs>, <bitmark-split> and <bitmark-editor>', () => {
     await vi.waitFor(() => expect(json!.pane).toBeDefined());
   });
 
-  // @awa-test: PLAN-023-Step12 (the preset builds the playground arrangement)
   it('builds session, split, bitmark pane and tabs from <bitmark-editor panes="…">', async () => {
     const fake = createFakeMonaco();
     const host = document.createElement('div');
@@ -278,7 +267,6 @@ describe('<bitmark-tabs>, <bitmark-split> and <bitmark-editor>', () => {
 });
 
 describe('properties set before the elements are defined', () => {
-  // @awa-test: PLAN-023-Step12 (the upgrade pattern: engine / monaco set first)
   it('takes over engine and monaco set on an element before its upgrade', async () => {
     const { monaco } = createFakeMonaco();
     const host = document.createElement('div');
@@ -302,7 +290,6 @@ describe('properties set before the elements are defined', () => {
     expect(Object.prototype.hasOwnProperty.call(real, 'engine')).toBe(false);
   });
 
-  // @awa-test: PLAN-023-Step12 (UI strings from the host, e.g. a site's i18n)
   it('passes messages set before its upgrade to the session', async () => {
     const { monaco } = createFakeMonaco();
     const host = document.createElement('div');
@@ -328,7 +315,6 @@ describe('properties set before the elements are defined', () => {
 });
 
 describe('element lifecycle (PLAN-023 pass 1)', () => {
-  // @awa-test: PLAN-023-Step12 (a remove + re-insert during a pending start makes one session)
   it('creates one session when removed and re-inserted while Monaco is still loading', async () => {
     let release!: () => void;
     setMonacoLoader(async () => {
@@ -356,7 +342,6 @@ describe('element lifecycle (PLAN-023 pass 1)', () => {
     setMonacoLoader(undefined as never);
   });
 
-  // @awa-test: PLAN-023-Step12 (an id-bound pane remounts when its session restarts)
   it('remounts a pane bound by id when its session is removed and comes back', async () => {
     const { host } = mount(`<bitmark-pane type="json" session="doc2"></bitmark-pane>
       <div id="wrap"><bitmark-session id="doc2" value="${DOC}" schema="off"></bitmark-session></div>`);
@@ -369,7 +354,6 @@ describe('element lifecycle (PLAN-023 pass 1)', () => {
     await vi.waitFor(() => expect(paneText(pane)).toContain('World'));
   });
 
-  // @awa-test: PLAN-023-Step12 (the preset forwards attribute changes, and rebuilds its tabs)
   it('forwards attribute changes from <bitmark-editor> and rebuilds its tabs on panes=', async () => {
     const fake = createFakeMonaco();
     const host = document.createElement('div');

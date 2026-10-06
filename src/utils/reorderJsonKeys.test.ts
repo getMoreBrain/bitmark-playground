@@ -1,4 +1,3 @@
-// @awa-test: PLAN-010 (reorder WASM JSON keys to match Original before diff)
 import { describe, expect, it } from 'vitest';
 
 import { reorderJsonStringToReference, reorderKeysToReference } from './reorderJsonKeys';

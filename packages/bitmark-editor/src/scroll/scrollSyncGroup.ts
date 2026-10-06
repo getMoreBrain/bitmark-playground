@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-ScrollSyncGroup
 import type * as MonacoApi from 'monaco-editor';
 
 import { mapScrollTop, ScrollGeometry } from './mapScrollTop';
@@ -63,7 +62,6 @@ interface Pane {
  *   the others re-sync;
  * - with no leader yet, the first linked member leads.
  */
-// @awa-impl: PLAN-023-Step5 (the N-way scroll group)
 export const createScrollSyncGroup = (): ScrollSyncGroup => {
   const panes: Pane[] = [];
   let leader: Pane | undefined;

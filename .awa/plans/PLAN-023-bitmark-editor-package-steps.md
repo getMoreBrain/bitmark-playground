@@ -568,4 +568,4 @@ Two independent code reviews, then the full matrix again.
   browser.
 - [x] The docs site runs its "Try it" editor on the package (Step 18).
 - [x] The package README documents both engine paths and the host recipes.
-- [ ] `awa check` passes.
+- [x] `awa check` passes (the plan-step code markers, which awa cannot trace to a spec, were removed).

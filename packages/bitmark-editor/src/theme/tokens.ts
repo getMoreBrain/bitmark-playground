@@ -1,5 +1,3 @@
-// @awa-component: PLAN-016-BitmarkTheme
-// @awa-component: PLAN-023-Theme
 import type { SemanticTokenModifier, SemanticTokenType } from '@gmb/bitmark-parser';
 
 /** Monaco theme name used by every editor in the playground. */

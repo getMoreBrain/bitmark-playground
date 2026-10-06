@@ -1,5 +1,3 @@
-// @awa-component: PLAN-023-Log
-
 /** The package's console output, prefixed so a host can tell it apart. */
 const PREFIX = '[bitmark-editor]';
 const warned = new Set<string>();

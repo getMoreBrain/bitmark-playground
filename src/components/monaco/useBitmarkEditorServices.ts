@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-UseBitmarkEditorServices
 import type { AttachBitmarkEditorOptions, CodeEditor } from '@gmb/bitmark-editor';
 import { attachBitmarkEditor, BitmarkEditorServices, Monaco } from '@gmb/bitmark-editor';
 import * as monaco from 'monaco-editor';
@@ -12,7 +11,6 @@ import { useBitmarkParser } from '../../services/BitmarkParser';
  * arrives, dispose on unmount. Several editors may attach (a diff editor's
  * two sides).
  */
-// @awa-impl: PLAN-023-Step2 (the playground attaches the lib services)
 export const useBitmarkEditorServices = (options?: AttachBitmarkEditorOptions) => {
   const { engine } = useBitmarkParser();
   const handles = useRef<BitmarkEditorServices[]>([]);

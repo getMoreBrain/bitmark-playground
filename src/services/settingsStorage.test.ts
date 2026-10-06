@@ -1,4 +1,3 @@
-// @awa-test: PLAN-004-Step1 (settingsStorage utility)
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -66,7 +65,6 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v1Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
-    // @awa-test: PLAN-006-Step7 (v2 → v3 migration preserves prior values)
     it('migrates v2 settings to current version', () => {
       const v2Settings = {
         v: 2,
@@ -87,7 +85,6 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-006-Step7 ('wasmCheck' accepted as activeJsonTab at v3)
     it('accepts wasmCheck as valid activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'wasmCheck' })).toEqual({
         ...validSettings,
@@ -95,17 +92,14 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-006-Step7 ('wasmCheck' rejected as activeMarkupTab)
     it('rejects wasmCheck as activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'wasmCheck' })).toBeNull();
     });
 
-    // @awa-test: PLAN-006-Step7 ('wasmCheck' rejected as OutputTab)
     it('rejects wasmCheck as leftOutputTab', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'wasmCheck' })).toBeNull();
     });
 
-    // @awa-test: PLAN-007-Step7 (v3 settings migrate to current version)
     it('migrates v3 settings to current version', () => {
       const v3Settings = {
         v: 3,
@@ -119,7 +113,6 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v3Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
-    // @awa-test: PLAN-007-Step7 ('tableHtml' accepted as activeJsonTab at v4)
     it('accepts tableHtml as valid activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'tableHtml' })).toEqual({
         ...validSettings,
@@ -127,17 +120,14 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-007-Step7 ('tableHtml' rejected as activeMarkupTab)
     it('rejects tableHtml as activeMarkupTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'tableHtml' })).toBeNull();
     });
 
-    // @awa-test: PLAN-007-Step7 ('tableHtml' rejected as OutputTab)
     it('rejects tableHtml as leftOutputTab', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'tableHtml' })).toBeNull();
     });
 
-    // @awa-test: PLAN-011-Step7 (v4 settings migrate to current version)
     it('migrates v4 settings to current version', () => {
       const v4Settings = {
         v: 4,
@@ -151,7 +141,6 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v4Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
-    // @awa-test: PLAN-011-Step7 ('text' accepted as activeJsonTab at v5)
     it('accepts text as valid activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'text' })).toEqual({
         ...validSettings,
@@ -159,13 +148,11 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-011-Step7 ('text' rejected as activeMarkupTab / OutputTab)
     it('rejects text as activeMarkupTab and leftOutputTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'text' })).toBeNull();
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'text' })).toBeNull();
     });
 
-    // @awa-test: PLAN-013-Step7 ('xmlNiso' accepted as activeJsonTab at v6)
     it('accepts xmlNiso as valid activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'xmlNiso' })).toEqual({
         ...validSettings,
@@ -173,13 +160,11 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-013-Step7 ('xmlNiso' rejected as activeMarkupTab / OutputTab)
     it('rejects xmlNiso as activeMarkupTab and leftOutputTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'xmlNiso' })).toBeNull();
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'xmlNiso' })).toBeNull();
     });
 
-    // @awa-test: PLAN-013-Step7 (v5 settings migrate to current version)
     it('migrates v5 settings to current version', () => {
       const v5Settings = {
         v: 5,
@@ -193,7 +178,6 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v5Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
-    // @awa-test: PLAN-013-Step7 ('xmlNisoEs' accepted as activeJsonTab at v7)
     it('accepts xmlNisoEs as valid activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'xmlNisoEs' })).toEqual({
         ...validSettings,
@@ -201,13 +185,11 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-013-Step7 ('xmlNisoEs' rejected as activeMarkupTab / OutputTab)
     it('rejects xmlNisoEs as activeMarkupTab and leftOutputTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'xmlNisoEs' })).toBeNull();
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'xmlNisoEs' })).toBeNull();
     });
 
-    // @awa-test: PLAN-013-Step7 (v6 settings migrate to current version)
     it('migrates v6 settings to current version', () => {
       const v6Settings = {
         v: 6,
@@ -221,7 +203,6 @@ describe('settingsStorage', () => {
       expect(result).toEqual({ ...v6Settings, v: CURRENT_VERSION, linkScroll: true });
     });
 
-    // @awa-test: PLAN-014-Step5 ('mappings' accepted as an output tab at v8)
     it('accepts mappings as a valid output tab', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'mappings' })).toEqual({
         ...validSettings,
@@ -229,13 +210,11 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-014-Step5 ('mappings' rejected as a parser/JSON tab)
     it('rejects mappings as activeMarkupTab and activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'mappings' })).toBeNull();
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'mappings' })).toBeNull();
     });
 
-    // @awa-test: PLAN-014-Step5 (v7 settings migrate to current version)
     it('migrates v7 settings to current version', () => {
       const v7Settings = {
         v: 7,
@@ -252,7 +231,6 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-015-Step4 ('info' accepted as an output tab at v9)
     it('accepts info as a valid output tab', () => {
       expect(migrateSettings({ ...validSettings, leftOutputTab: 'info' })).toEqual({
         ...validSettings,
@@ -260,13 +238,11 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-015-Step4 ('info' rejected as a parser/JSON tab)
     it('rejects info as activeMarkupTab and activeJsonTab', () => {
       expect(migrateSettings({ ...validSettings, activeMarkupTab: 'info' })).toBeNull();
       expect(migrateSettings({ ...validSettings, activeJsonTab: 'info' })).toBeNull();
     });
 
-    // @awa-test: PLAN-015-Step4 (v8 settings migrate to current version)
     it('migrates v8 settings to current version', () => {
       const v8Settings = {
         v: 8,
@@ -283,7 +259,6 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-018-Step8 (v9 settings migrate with linking on)
     it('migrates v9 settings to current version with linkScroll on', () => {
       const v9Settings = {
         v: 9,
@@ -300,7 +275,6 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-018-Step8 (a stored linkScroll: false is kept)
     it('keeps linkScroll off', () => {
       expect(migrateSettings({ ...validSettings, linkScroll: false })).toEqual({
         ...validSettings,
@@ -308,7 +282,6 @@ describe('settingsStorage', () => {
       });
     });
 
-    // @awa-test: PLAN-018-Step8 (an invalid linkScroll is rejected)
     it('returns null for invalid linkScroll', () => {
       expect(migrateSettings({ ...validSettings, linkScroll: 'yes' })).toBeNull();
       const { linkScroll: _omit, ...missing } = validSettings;

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-018-BitMarkers
 import type { CodeEditor, IDisposable, Monaco } from '../monaco/types';
 
 /** An output pane's bit starts, pinned in its editor so they follow every edit. */
@@ -22,7 +21,6 @@ export interface BitMarkers extends IDisposable {
  * markers are pinned or cleared. Monaco moves them through edits by itself
  * (PLAN-018 D3), which the pane reports as a content change.
  */
-// @awa-impl: PLAN-018-Step4 (pin bit starts as decorations; read them back)
 export const attachBitMarkers = (
   monaco: Monaco,
   editor: CodeEditor,

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-018-UseScrollSync
 import type { Monaco } from '@gmb/bitmark-editor';
 import {
   attachBitMarkers,
@@ -24,7 +23,6 @@ export interface ScrollSyncCallbacks {
  * starts are split from its own text by the engine (PLAN-018 D1, PLAN-023
  * Step 5), asynchronously.
  */
-// @awa-impl: PLAN-018-Step7 (split panes)
 export const useSplitScrollSync = (): ScrollSyncCallbacks => {
   const { engine } = useBitmarkParser();
   const engineRef = useRef(engine);
@@ -62,7 +60,6 @@ export const useSplitScrollSync = (): ScrollSyncCallbacks => {
  * D4). Re-pins after mount and whenever `text` / `bitStarts` change: the
  * parent's effect runs after `MonacoTextArea` has applied the new value.
  */
-// @awa-impl: PLAN-018-Step7 (pinned panes)
 export const usePinnedScrollSync = (
   text: string,
   bitStarts: readonly number[] | undefined,

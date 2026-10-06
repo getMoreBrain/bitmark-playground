@@ -1,6 +1,3 @@
-// @awa-component: PLAN-002-BitmarkState
-// @awa-component: PLAN-008-BitmarkState
-// @awa-component: PLAN-011-BitmarkState
 import { jsonWithBitStarts } from '@gmb/bitmark-editor';
 import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
 import { proxy } from 'valtio';
@@ -53,7 +50,6 @@ export interface WasmCheckSlice {
   readonly markupUpdates: number;
 }
 
-// @awa-component: PLAN-012-JsRoundTripSlice
 /**
  * The Original (bpg) JSON after a full round trip through bpg
  * (`json -> bitmark -> json`). Used as the WASM Check LED reference, so the Rust
@@ -68,7 +64,6 @@ export interface JsRoundTripSlice {
   readonly updates: number;
 }
 
-// @awa-component: PLAN-014-LastEditSlice
 /**
  * The window the user last edited — the input to the mapping report.
  *
@@ -166,7 +161,6 @@ const createParserSlice = (): ParserSlice => ({
   lexerOutput: '',
 });
 
-// @awa-component: PLAN-006-WasmCheckSlice
 const createWasmCheckSlice = (): WasmCheckSlice => ({
   markup: '',
   markupError: undefined,
@@ -175,7 +169,6 @@ const createWasmCheckSlice = (): WasmCheckSlice => ({
   markupUpdates: 0,
 });
 
-// @awa-component: PLAN-012-JsRoundTripSlice
 const createJsRoundTripSlice = (): JsRoundTripSlice => ({
   json: [],
   sourceJsonAsString: '',
@@ -184,8 +177,6 @@ const createJsRoundTripSlice = (): JsRoundTripSlice => ({
   updates: 0,
 });
 
-// @awa-impl: PLAN-002-Step9 (tab query param)
-// @awa-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
 const getTabFromUrl = (): ParserType | null => {
   const searchParams = new URLSearchParams(window.location.search);
   const tab = searchParams.get('tab');
@@ -214,7 +205,6 @@ const bitmarkState = proxy<BitmarkState>({
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
 
-  // @awa-impl: PLAN-008-Step1 (setJson sets only the JSON side — no cross-write)
   setJson: (
     parser: ParserType,
     json: BitWrapperJson[] | undefined,
@@ -237,7 +227,6 @@ const bitmarkState = proxy<BitmarkState>({
     } else {
       slice.json = json ?? [];
       try {
-        // @awa-impl: PLAN-018-Step2 (the JSON text with each bit's start)
         const { text, bitStarts } = jsonWithBitStarts(slice.json);
         slice.jsonAsString = text;
         slice.jsonBitStarts = bitStarts;
@@ -252,7 +241,6 @@ const bitmarkState = proxy<BitmarkState>({
     slice.jsonUpdates += 1;
   },
 
-  // @awa-impl: PLAN-008-Step1 (setMarkup sets only the markup side — no cross-write)
   setMarkup: (
     parser: ParserType,
     markup: string | undefined,
@@ -286,7 +274,6 @@ const bitmarkState = proxy<BitmarkState>({
     slice.lexerOutput = output;
   },
 
-  // @awa-impl: PLAN-006-Step1 (setWasmCheck setter)
   setWasmCheck: (
     markup: string | undefined,
     markupError: Error | undefined,
@@ -314,7 +301,6 @@ const bitmarkState = proxy<BitmarkState>({
     slice.markupUpdates += 1;
   },
 
-  // @awa-impl: PLAN-012-Step1 (setJsRoundTrip setter)
   // `sourceJsonAsString` is always stored, including on error, so consumers can
   // tell "reference failed for the current JSON" from "reference is stale".
   setJsRoundTrip: (
@@ -344,7 +330,6 @@ const bitmarkState = proxy<BitmarkState>({
     (bitmarkState as Writable<BitmarkState>).activeJsonTab = tab;
   },
 
-  // @awa-impl: PLAN-008-Step1 (edited tab keeps the user input verbatim — no copy to others)
   setEditedMarkup: (parser: ParserType, markup: string) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     slice.markup = markup;
@@ -355,14 +340,12 @@ const bitmarkState = proxy<BitmarkState>({
   setEditedJson: (parser: ParserType, json: string) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     slice.jsonAsString = json;
-    // @awa-impl: PLAN-018-Step2 (typed text: no known positions until its
-    // conversion reads them — PLAN-020)
+    // Typed text: no known positions until its conversion reads them (PLAN-020).
     slice.jsonBitStarts = undefined;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
   },
 
-  // @awa-impl: PLAN-020-Step2 (the typed JSON's positions, from its conversion)
   setEditedJsonBitStarts: (parser: ParserType, json: string, bitStarts: readonly number[]) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     // A later edit has replaced the text these positions describe.
@@ -370,7 +353,6 @@ const bitmarkState = proxy<BitmarkState>({
     slice.jsonBitStarts = bitStarts;
   },
 
-  // @awa-impl: PLAN-014-Step1 (record the last edited window)
   setLastEdit: (
     inputFormat: string,
     content: string,

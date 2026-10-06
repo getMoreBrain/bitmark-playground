@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Panes
 import type { OutputMode } from '@gmb/bitmark-parser';
 
 import type { BitmarkEngine } from '../engine/types';
@@ -7,7 +6,6 @@ import type { BitmarkPane, BitmarkSession } from '../session/types';
 import { createPane, PaneOptions, PaneSpec } from './createPane';
 
 /** The bitmark pane: the document itself, with the editor services (D1). */
-// @awa-impl: PLAN-023-Step8 (bitmark pane)
 export const createBitmarkPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -40,7 +38,6 @@ export const createBitmarkPane = (
   );
 
 /** The JSON pane (D1): `mode` `optimized` (default) or `full`. */
-// @awa-impl: PLAN-023-Step8 (JSON pane)
 export const createJsonPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -56,8 +53,6 @@ export const createJsonPane = (
       inputFormat: 'json',
       editable: true,
       scroll: 'pinned',
-      // @awa-impl: PLAN-020-Step2 (typed JSON: the positions its conversion read)
-      // @awa-impl: PLAN-020-Step3 (typed HTML and XML: the positions their conversion read)
       toBitmark: async (engine, text) => {
         // The engine recovers leniently from malformed JSON: check the
         // syntax first, so the user sees the real error (a SyntaxError).
@@ -106,7 +101,6 @@ const mappingSpec = (type: 'html' | 'xml', mapping: string, language: string): P
  * mapping (the core's `<bitmark-bit>` envelope markup). The host's Monaco
  * needs the HTML language for highlighting; without it the text is plain.
  */
-// @awa-impl: PLAN-023-Step8 (HTML pane)
 export const createHtmlPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -114,7 +108,6 @@ export const createHtmlPane = (
 ): BitmarkPane => createPane(element, session, mappingSpec('html', 'html', 'html'), options);
 
 /** An XML pane over a mapping id, e.g. `xml-niso-iec` or `xml-niso-iec-es` (D1). */
-// @awa-impl: PLAN-023-Step8 (XML pane)
 export const createXmlPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -126,7 +119,6 @@ export const createXmlPane = (
   });
 
 /** The Text pane (D1): the document's plain text. Read-only: there is no text → bitmark. */
-// @awa-impl: PLAN-023-Step8 (Text pane)
 export const createTextPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -186,7 +178,6 @@ const infoFor = async (engine: BitmarkEngine, bitmark: string): Promise<string> 
  * document. Read-only; not in scroll sync (one section per type, not per
  * bit).
  */
-// @awa-impl: PLAN-023-Step8 (Info pane)
 export const createInfoPane = (
   element: HTMLElement,
   session: BitmarkSession,
@@ -217,7 +208,6 @@ export const reportTargetFor = (inputFormat: string): string =>
  * how the edited pane's format mapped. Read-only; not in scroll sync;
  * re-made on every edit, even back to an earlier text.
  */
-// @awa-impl: PLAN-023-Step8 (Mappings pane)
 export const createMappingsPane = (
   element: HTMLElement,
   session: BitmarkSession,

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Engine
 import type * as Parser from '@gmb/bitmark-parser';
 import type {
   BitEntry,

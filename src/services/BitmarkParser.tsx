@@ -1,5 +1,3 @@
-// @awa-component: PLAN-002-BitmarkParser
-
 import type { BitmarkEngine } from '@gmb/bitmark-editor';
 import { createBitmarkEngine, loadBitmarkModule, throwIfParserError } from '@gmb/bitmark-editor';
 import {
@@ -144,7 +142,6 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const moduleUrl = engineUrl(window.location.search, import.meta.env.BASE_URL, _cacheBuster);
 
-    // @awa-impl: PLAN-023-Step1 (the provider loads through the lib's load path)
     const load = async () => {
       try {
         // Stage 1: the smallest variant, so the editor is live as soon as
@@ -160,8 +157,8 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         const module = loadedModule as BitmarkParserModule;
         const engine = createBitmarkEngine(loadedModule, { feature: 'bitmark-json' });
 
-        // @awa-impl: PLAN-017-Step5 (the JSON pane validates against the
-        // schema the SAME parser version publishes). Independent of the
+        // The JSON pane validates against the schema the SAME parser
+        // version publishes (PLAN-017). Independent of the
         // engine: a failure leaves JSON syntax checking as it was.
         // Every JSON model in the playground holds a bitmark document (the
         // JSON tabs and the JSON diff), so the schema applies to all of them.

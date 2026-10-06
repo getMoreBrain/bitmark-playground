@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Session
 import type { TextEditor } from '../editor/textEditor';
 import type { BitmarkEngine, Feature, LoadBitmarkEngineOptions, RawParserModule } from '../engine';
 import type { Monaco } from '../monaco/types';

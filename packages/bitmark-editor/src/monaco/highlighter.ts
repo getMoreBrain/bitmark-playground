@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import type { SemanticToken } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 
@@ -30,7 +29,6 @@ export const buildBitmarkDecorations = (
  * change (debounced) the whole document is tokenised and the tokens applied
  * as inline decorations. A result for an older text is dropped.
  */
-// @awa-impl: PLAN-023-Step2 (per-editor highlighter on the injected Monaco, async)
 export const attachBitmarkHighlighter = (
   monaco: Monaco,
   editor: CodeEditor,

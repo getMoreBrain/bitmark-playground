@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Elements
 import type { Feature } from '../engine/types';
 import { log } from '../log';
 import type { Monaco } from '../monaco/types';
@@ -85,7 +84,6 @@ export type NarrowMode = 'edit' | 'readonly' | 'static';
  * Define the elements (idempotent). Kept in a function so that importing
  * the module never touches `HTMLElement` during server rendering.
  */
-// @awa-impl: PLAN-023-Step12 (the custom elements)
 export const defineBitmarkElements = (): void => {
   if (typeof window === 'undefined' || typeof customElements === 'undefined') return;
   if (customElements.get('bitmark-session')) return;

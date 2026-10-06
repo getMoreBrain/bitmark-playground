@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Engine
 import type { Feature } from '@gmb/bitmark-parser';
 
 import { createBitmarkEngine } from './createBitmarkEngine';
@@ -32,7 +31,6 @@ const modules = new Map<string, Promise<LoadedParserModule>>();
  *
  * This is the load path, where the package owns the module (PLAN-022 D7).
  */
-// @awa-impl: PLAN-023-Step1 (two-stage load, per-URL cache)
 export const loadBitmarkModule = (
   url: string,
   options: { feature?: Feature; importModule?: (url: string) => Promise<unknown> } = {},
@@ -74,7 +72,6 @@ export interface LoadBitmarkEngineOptions {
  * Load the parser and wrap it as an engine. The engine is ready after stage
  * 1 (`bitmark-json`) and switches its `feature` when stage 2 lands.
  */
-// @awa-impl: PLAN-023-Step1 (the load path)
 export const loadBitmarkEngine = async (
   options: LoadBitmarkEngineOptions = {},
 ): Promise<BitmarkEngine> => {

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-TextEditor
 import type * as MonacoApi from 'monaco-editor';
 
 import { BITMARK_MODEL_SCHEME } from '../monaco/jsonSchema';
@@ -32,7 +31,6 @@ export const createChangeFilter = (initial: string) => {
  * pane's undo stack survives regeneration (PLAN-022 D16). The cursor is
  * clamped by Monaco; scroll is left where it was.
  */
-// @awa-impl: PLAN-023-Step6 (regeneration keeps undo)
 export const replaceAllKeepingUndo = (model: TextModel, text: string): void => {
   if (model.getValue() === text) return;
   model.pushStackElement();
@@ -82,7 +80,6 @@ export interface TextEditor extends MonacoApi.IDisposable {
  * as input, a focused editor is never overwritten, regeneration keeps undo,
  * and the editor lays itself out as its element resizes.
  */
-// @awa-impl: PLAN-023-Step6 (createTextEditor)
 export const createTextEditor = (element: HTMLElement, options: TextEditorOptions): TextEditor => {
   const { monaco } = options;
   const model = monaco.editor.createModel(

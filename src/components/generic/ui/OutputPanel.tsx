@@ -1,5 +1,3 @@
-// @awa-component: PLAN-003-OutputPanel
-// @awa-component: PLAN-005-OutputPanel
 /** @jsxImportSource theme-ui */
 import { ReactNode } from 'react';
 import { Flex } from 'theme-ui';
@@ -13,8 +11,6 @@ const OUTPUT_TABS = [
   { id: 'lexer', label: 'Lexer' },
 ];
 
-// @awa-impl: PLAN-014-Step5 (optional Mappings tab — bottom-left panel only)
-// @awa-impl: PLAN-015-Step4 (optional Info tab — bottom-left only, before Mappings)
 const outputTabs = (showInfo: boolean, showMappings: boolean) => [
   ...OUTPUT_TABS,
   ...(showInfo ? [{ id: 'info', label: 'Info' }] : []),
@@ -43,8 +39,6 @@ export interface OutputPanelProps {
   mappingsPane?: ReactNode;
 }
 
-// @awa-impl: PLAN-003-Step5 (output panel)
-// @awa-impl: PLAN-005-Step3 (wire DiffPanel into OutputPanel)
 const OutputPanel = ({
   label,
   activeTab,

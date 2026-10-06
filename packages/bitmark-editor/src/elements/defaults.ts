@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Elements
 import type { Monaco } from '../monaco/types';
 import type { EngineSource } from '../session/types';
 

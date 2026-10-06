@@ -49,7 +49,6 @@ describe('worker engine (PLAN-022 D14)', () => {
   });
   const loadReal = async () => main;
 
-  // @awa-test: PLAN-023-Step1a (same output as the main-thread engine on the fixtures)
   it('gives the same results as the main-thread engine on the book fixture', async () => {
     const worker = await createBitmarkWorkerEngine({
       createPort: inProcessWorker(loadReal),
@@ -74,7 +73,6 @@ describe('worker engine (PLAN-022 D14)', () => {
     worker.dispose();
   });
 
-  // @awa-test: PLAN-023-Step1a (fast lane: editor services never queue behind conversions)
   it('routes editor services to the fast lane and conversions to the other', async () => {
     const seen: string[] = [];
     const worker = await createBitmarkWorkerEngine({
@@ -96,7 +94,6 @@ describe('worker engine (PLAN-022 D14)', () => {
     worker.dispose();
   });
 
-  // @awa-test: PLAN-023-Step1a (parser errors cross the worker boundary)
   it('rejects with BitmarkEngineError and the parser message', async () => {
     const worker = await createBitmarkWorkerEngine({
       createPort: inProcessWorker(loadReal),
@@ -108,7 +105,6 @@ describe('worker engine (PLAN-022 D14)', () => {
     worker.dispose();
   });
 
-  // @awa-test: PLAN-023-Step1a (feature follows stage 2 once both lanes have it)
   it('switches feature once both lanes report stage 2', async () => {
     const engines: BitmarkEngine[] = [];
     const load = async () => {
@@ -131,7 +127,6 @@ describe('worker engine (PLAN-022 D14)', () => {
     worker.dispose();
   });
 
-  // @awa-test: PLAN-023-Step1a (a failed load rejects and ends the workers)
   it('rejects when a worker cannot load the parser, and closes both ports', async () => {
     const closed: string[] = [];
     const base = inProcessWorker(async () => {
@@ -171,7 +166,6 @@ describe('worker failures (PLAN-023 pass 1)', () => {
     return port;
   };
 
-  // @awa-test: PLAN-023-Step1a (a worker that fails to load rejects, not hangs)
   it('rejects when a worker errors before it is ready', async () => {
     const ports = [silentPort(), silentPort()];
     let i = 0;
@@ -207,7 +201,6 @@ describe('worker failures (PLAN-023 pass 1)', () => {
     return port;
   };
 
-  // @awa-test: PLAN-023-Step1a (an error after ready rejects the calls in flight, not the lane)
   it('rejects the calls in flight on a worker error after ready, and keeps the lane', async () => {
     const ports = [readyPort(), readyPort()];
     let i = 0;
@@ -222,7 +215,6 @@ describe('worker failures (PLAN-023 pass 1)', () => {
     worker.dispose();
   });
 
-  // @awa-test: PLAN-023-Step1a (dispose rejects what is still pending)
   it('rejects pending calls on dispose', async () => {
     const ports = [readyPort(), readyPort()];
     let i = 0;

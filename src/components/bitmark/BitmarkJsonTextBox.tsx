@@ -1,8 +1,3 @@
-// @awa-component: PLAN-002-BitmarkJsonTextBox
-// @awa-component: PLAN-006-BitmarkJsonTextBox
-// @awa-component: PLAN-007-BitmarkJsonTextBox
-// @awa-component: PLAN-011-BitmarkJsonTextBox
-// @awa-component: PLAN-013-BitmarkJsonTextBox
 import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback } from 'react';
@@ -24,7 +19,6 @@ export interface BitmarkJsonTextBoxProps extends MonacoTextAreaUncontrolledProps
   //
 }
 
-// @awa-impl: PLAN-002-Step6 (editor reads from active tab)
 const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const { options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
@@ -33,7 +27,6 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
 
   const activeTab = bitmarkStateSnap.activeJsonTab;
 
-  // @awa-impl: PLAN-018-Step7 (the Original JSON tab links to the bitmark editor's scrolling)
   // Hooks run on every render; the session panes link themselves.
   const { onMount, onUnmount } = usePinnedScrollSync(
     bitmarkStateSnap.js.jsonAsString,
@@ -44,17 +37,14 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
   const allLoadError = jsLoadError && wasmLoadError;
 
-  // @awa-impl: PLAN-008-Step3 (the Original JSON tab; the WASM JSON tabs are session panes)
   const onInput = useCallback(
     async (json: string) => {
-      // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
       bitmarkState.setLastEdit('json', json, `${TAB_LABEL.js} JSON`);
       await jsonToMarkup('js', json);
     },
     [jsonToMarkup],
   );
 
-  // @awa-impl: PLAN-023-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
   // The timed ones stay mounted (hidden when inactive), so each tab's duration stays current.
   const sessionPanes = RIGHT_SESSION_TABS.filter(
     (tab) => tab === activeTab || keepsMounted(tab),
@@ -76,7 +66,6 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
 
   /** The tabs the playground renders itself. */
   function ownTab() {
-    // @awa-impl: PLAN-006-Step4 (render WasmCheckPanel when wasmCheck tab is active)
     if (activeTab === 'wasmCheck') {
       return (
         <WasmCheckPanel

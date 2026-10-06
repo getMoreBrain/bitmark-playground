@@ -1,4 +1,3 @@
-// @awa-component: PLAN-009-ParserJsonMatch
 import isEqual from 'lodash/isEqual';
 
 /** LED status for the WASM Check tab. */

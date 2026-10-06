@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-AngularWrapper
 import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '@angular/core';
 import type { BitmarkSessionOptions, BitmarkTheme, EngineSource, Monaco } from '@gmb/bitmark-editor';
 
@@ -19,6 +18,5 @@ export interface BitmarkEditorConfig {
 export const BITMARK_EDITOR_CONFIG = new InjectionToken<BitmarkEditorConfig>('BITMARK_EDITOR_CONFIG');
 
 /** Provide defaults for every `bm-session` in the app. */
-// @awa-impl: PLAN-023-Step13a (provideBitmarkEditor)
 export const provideBitmarkEditor = (config: BitmarkEditorConfig): EnvironmentProviders =>
   makeEnvironmentProviders([{ provide: BITMARK_EDITOR_CONFIG, useValue: config }]);

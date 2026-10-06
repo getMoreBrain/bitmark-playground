@@ -1,5 +1,3 @@
-// @awa-component: PLAN-023-Session
-
 /**
  * Tells a host's own lagging `value` apart from a new document (for
  * controlled bindings: React `value`, Angular `[value]`, the element's

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Bundled
 // The Monaco half of `/bundled` (PLAN-022 D4): loaded only when a session
 // starts, so a lazy page pays nothing before its trigger (D12).
 // Monaco 0.57 module paths (its "exports" map `monaco-editor/*` to `esm/vs/*`).

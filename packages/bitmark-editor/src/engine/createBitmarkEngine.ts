@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Engine
 import type { ConvertOptions, Feature } from '@gmb/bitmark-parser';
 
 import { jsonWithBitStarts } from '../json/jsonText';
@@ -53,7 +52,6 @@ export interface CreateBitmarkEngineOptions {
  * An engine over a parser module that runs on the main thread. The module's
  * synchronous calls are wrapped as promises (PLAN-022 D14).
  */
-// @awa-impl: PLAN-023-Step1 (main-thread engine over a raw module)
 export const createBitmarkEngine = (
   module: RawParserModule,
   options: CreateBitmarkEngineOptions = {},
@@ -106,7 +104,6 @@ export const createBitmarkEngine = (
         return {
           output: throwIfParserError(output),
           bitStarts: bitSpans?.spans.map(spanOutputStart),
-          // @awa-impl: PLAN-020-Step1 (where each bit starts in the input)
           inputStarts: offsets(bitSpans?.spans.map((span) => span.inputStart)),
         };
       }),

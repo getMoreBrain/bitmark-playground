@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import type { Hover } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 
@@ -73,7 +72,6 @@ const injectHighlightCss = (): void => {
  * language declares; a bit template then replaces that `]`
  * (`replacedSuffixLength`).
  */
-// @awa-impl: PLAN-021-Step3 (the bracket pair, D4)
 export const BITMARK_LANGUAGE_CONFIGURATION: MonacoApi.languages.LanguageConfiguration = {
   brackets: [['[', ']']],
   autoClosingPairs: [{ open: '[', close: ']' }],
@@ -93,8 +91,6 @@ export interface SetupBitmarkMonacoOptions {
  * Workers and the suggest / hover contributions belong to whoever owns this
  * Monaco: the host for `/esm`, the package for `/bundled`.
  */
-// @awa-impl: PLAN-023-Step4 (setupBitmarkMonaco on the injected instance)
-// @awa-impl: PLAN-023-Step2 (providers find the engine through the model)
 export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void => {
   if (setUp.has(monaco)) return;
   setUp.add(monaco);

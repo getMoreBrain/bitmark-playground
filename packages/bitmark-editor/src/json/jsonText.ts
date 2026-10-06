@@ -1,5 +1,3 @@
-// @awa-component: PLAN-018-JsonText
-
 const INDENT = '  ';
 
 /**
@@ -10,7 +8,6 @@ const INDENT = '  ';
  * its own and indented one level. Newlines inside JSON strings are escaped,
  * so indenting at every raw newline is exact.
  */
-// @awa-impl: PLAN-018-Step2 (JSON writer records each bit's start)
 export const jsonWithBitStarts = (
   bits: readonly unknown[],
 ): { text: string; bitStarts: number[] } => {

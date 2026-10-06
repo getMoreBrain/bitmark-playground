@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import { createLatestRunner, SUPERSEDED } from '../engine/latest';
 import type { CodeEditor, IDisposable, TextModel } from './types';
 

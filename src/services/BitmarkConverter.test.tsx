@@ -1,4 +1,3 @@
-// @awa-test: PLAN-008-Step2 (round-trip recalculation: forward + per-tab back-fill, keep-last-good)
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -120,7 +119,6 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     expect(bitmarkState.js.markup.startsWith('js<<')).toBe(true);
   });
 
-  // @awa-test: PLAN-019-Step1 (a burst runs the old parser once, on the last input)
   it('runs the old parser once for a burst of edits, and the WASM parsers for each', async () => {
     const { result } = renderHook(() => useBitmarkConverter(), { wrapper });
     bpgCalls.length = 0;
@@ -209,7 +207,6 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
   });
 });
 
-// @awa-test: PLAN-020-Step2 (typed JSON: its bits are pinned in its own pane)
 describe('useBitmarkConverter — positions in typed JSON', () => {
   beforeEach(reset);
 

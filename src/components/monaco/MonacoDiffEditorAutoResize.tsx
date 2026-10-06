@@ -1,4 +1,3 @@
-// @awa-component: PLAN-005-MonacoDiffEditorAutoResize
 import React, { createRef } from 'react';
 import { MonacoDiffEditor, MonacoDiffEditorProps } from 'react-monaco-editor';
 
@@ -11,7 +10,6 @@ interface State {
   height: number;
 }
 
-// @awa-impl: PLAN-005-Step1 (auto-resizing diff editor wrapper)
 // Mirrors MonacoEditorAutoResize pattern for consistent resize behaviour
 class MonacoDiffEditorAutoResize extends React.Component<MonacoDiffEditorAutoResizeProps, State> {
   private divRef = createRef<HTMLDivElement>();

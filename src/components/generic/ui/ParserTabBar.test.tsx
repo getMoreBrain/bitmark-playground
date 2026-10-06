@@ -1,4 +1,3 @@
-// @awa-test: PLAN-006-Step3 (ParserTabBar WASM Check tab opt-in)
 /** @jsxImportSource theme-ui */
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';
@@ -44,7 +43,6 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/^Original/)).toHaveAttribute('aria-selected', 'false');
   });
 
-  // @awa-test: PLAN-007-Step4 (HTML tab opt-in)
   it('does not render the HTML tab by default', () => {
     render(<ParserTabBar {...baseProps} />, { wrapper });
     expect(screen.queryByText(/^HTML/)).not.toBeInTheDocument();
@@ -68,7 +66,6 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/^Original/)).toHaveAttribute('aria-selected', 'false');
   });
 
-  // @awa-test: PLAN-014-Step7 (HTML sits after Text on the JSON bar)
   it('renders the HTML tab after the Text tab', () => {
     render(<ParserTabBar {...baseProps} showText showTableHtml showXmlNiso />, { wrapper });
     const labels = screen.getAllByRole('tab').map((el) => el.textContent);
@@ -76,7 +73,6 @@ describe('ParserTabBar', () => {
     expect(labels.indexOf('HTML')).toBeLessThan(labels.indexOf('XML (NISO-IEC)'));
   });
 
-  // @awa-test: PLAN-009-Step2 (WASM Check match LED)
   it('renders the match LED on the WASM Check tab with the given status', () => {
     render(<ParserTabBar {...baseProps} showWasmCheck wasmCheckLed="match" />, { wrapper });
     expect(screen.getByLabelText('wasm-check-led-match')).toBeInTheDocument();
@@ -102,7 +98,6 @@ describe('ParserTabBar', () => {
     expect(screen.queryByLabelText(/wasm-check-led/)).not.toBeInTheDocument();
   });
 
-  // @awa-test: PLAN-011-Step4 (Text tab opt-in)
   it('does not render the Text tab by default', () => {
     render(<ParserTabBar {...baseProps} />, { wrapper });
     expect(screen.queryByText(/^Text/)).not.toBeInTheDocument();
@@ -125,7 +120,6 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/^Text/)).toHaveAttribute('aria-selected', 'true');
   });
 
-  // @awa-test: PLAN-013-Step4 (ParserTabBar XML (NISO-IEC) tab opt-in)
   it('does not render the XML (NISO-IEC) tab by default', () => {
     render(<ParserTabBar {...baseProps} />, { wrapper });
     expect(screen.queryByText(/XML \(NISO-IEC\)/)).not.toBeInTheDocument();
@@ -148,7 +142,6 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/XML \(NISO-IEC\)$/)).toHaveAttribute('aria-selected', 'true');
   });
 
-  // @awa-test: PLAN-013-Step4 (ParserTabBar XML (NISO-IEC-ES) tab opt-in)
   it('does not render the XML (NISO-IEC-ES) tab by default', () => {
     render(<ParserTabBar {...baseProps} />, { wrapper });
     expect(screen.queryByText(/XML \(NISO-IEC-ES\)/)).not.toBeInTheDocument();
@@ -171,7 +164,6 @@ describe('ParserTabBar', () => {
     expect(screen.getByText(/XML \(NISO-IEC-ES\)/)).toHaveAttribute('aria-selected', 'true');
   });
 
-  // @awa-test: PLAN-013-Step4 (both XML tabs render side by side)
   it('renders both XML tabs when both are enabled', () => {
     render(<ParserTabBar {...baseProps} showXmlNiso showXmlNisoEs />, { wrapper });
     expect(screen.getByText(/XML \(NISO-IEC\)$/)).toBeInTheDocument();

@@ -18,12 +18,10 @@ const CASES: Record<string, unknown[]> = {
 };
 
 describe('jsonWithBitStarts', () => {
-  // @awa-test: PLAN-018-Step2 (identical to JSON.stringify(…, 2))
   it.each(Object.entries(CASES))('writes what JSON.stringify writes: %s', (_name, bits) => {
     expect(jsonWithBitStarts(bits).text).toBe(JSON.stringify(bits, undefined, 2));
   });
 
-  // @awa-test: PLAN-018-Step2 (each start is where that bit is written)
   it.each(Object.entries(CASES))('records where each bit starts: %s', (_name, bits) => {
     const { text, bitStarts } = jsonWithBitStarts(bits);
     expect(bitStarts).toHaveLength(bits.length);

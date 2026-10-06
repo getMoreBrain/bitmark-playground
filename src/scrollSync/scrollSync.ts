@@ -1,4 +1,3 @@
-// @awa-component: PLAN-018-ScrollSync
 import {
   createScrollSyncGroup,
   ScrollSyncEditor,
@@ -17,13 +16,11 @@ import { uiState } from '../state/uiState';
 let group: ScrollSyncGroup = createScrollSyncGroup();
 
 /** Add a pane to the playground's group, linked as the toggle says. */
-// @awa-impl: PLAN-023-Step5 (the playground's panes join one group)
 export const joinScrollSync = (
   editor: ScrollSyncEditor,
   bitStarts: () => readonly number[],
 ): ScrollSyncMember => group.join(editor, bitStarts, { linked: uiState.linkScroll });
 
-// @awa-impl: PLAN-018-Step6 (the toggle links / unlinks; linking re-syncs)
 subscribeKey(uiState, 'linkScroll', (on) => {
   for (const member of group.members()) member.setLinked(on);
 });

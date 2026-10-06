@@ -19,7 +19,6 @@ const flush = async () => {
 };
 
 describe('createSplitBitStarts (PLAN-022 D14)', () => {
-  // @awa-test: PLAN-023-Step5 (no starts until an engine is there)
   it('has no starts without an engine', async () => {
     const split = createSplitBitStarts(
       createFakeEditor('[.article]').editor,
@@ -30,7 +29,6 @@ describe('createSplitBitStarts (PLAN-022 D14)', () => {
     expect(split.bitStarts()).toEqual([]);
   });
 
-  // @awa-test: PLAN-023-Step5 (each slice's start, after each change; onChange fires)
   it("takes each slice's start, re-splits after a change and reports it", async () => {
     const engine = engineWith(async (text) =>
       text.includes('\n') ? [slice(0), slice(12)] : [slice(0)],
@@ -46,7 +44,6 @@ describe('createSplitBitStarts (PLAN-022 D14)', () => {
     expect(onChange).toHaveBeenCalledTimes(2);
   });
 
-  // @awa-test: PLAN-023-Step5 (a split for an older text is dropped)
   it('drops a split that lands after the text changed', async () => {
     let release!: (v: unknown) => void;
     const engine = engineWith(() => new Promise((r) => (release = r)));

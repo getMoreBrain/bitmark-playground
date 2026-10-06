@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import { DEFAULT_PARSER_VERSION } from '../engine/loadBitmarkEngine';
 import { log } from '../log';
 import type { Monaco } from './types';
@@ -74,7 +73,6 @@ export const loadBitmarkJsonSchema = async (url: string): Promise<unknown | unde
  * host whose every JSON model is bitmark JSON (the playground) may widen
  * `fileMatch`. Returns false when this Monaco has no JSON language.
  */
-// @awa-impl: PLAN-023-Step3 (the schema scoped to the package's model URIs)
 export const bindBitmarkJsonSchema = (
   monaco: Monaco,
   schema: unknown,

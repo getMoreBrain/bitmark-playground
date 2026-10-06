@@ -1,5 +1,3 @@
-// @awa-component: PLAN-023-Panes
-
 /**
  * The panes' own layout and banner styles, once per document. Colours come
  * from CSS custom properties a host can set (`--bm-banner-*`).

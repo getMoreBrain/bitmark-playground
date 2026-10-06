@@ -1,5 +1,3 @@
-// @awa-component: PLAN-018-MapScrollTop
-
 /** One pane's scroll geometry: where each bit's top is, and how far it scrolls. */
 export interface ScrollGeometry {
   /** Pixel top of each bit, in bit order. */
@@ -14,7 +12,6 @@ export interface ScrollGeometry {
  * so bits past the end of a short document collapse onto the end of the
  * scroll range instead of breaking the mapping.
  */
-// @awa-impl: PLAN-018-Step5 (knot construction)
 export const buildKnots = (geometry: ScrollGeometry, pairs: number): number[] => {
   const max = Math.max(0, geometry.maxScrollTop);
   const knots = [0];
@@ -32,7 +29,6 @@ export const buildKnots = (geometry: ScrollGeometry, pairs: number): number[] =>
  * other. Bits pair by position, up to the shorter list; with no bits on one
  * side the mapping is proportional.
  */
-// @awa-impl: PLAN-018-Step5 (piecewise-linear interpolation)
 export const mapScrollTop = (
   src: ScrollGeometry,
   dst: ScrollGeometry,

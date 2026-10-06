@@ -1,8 +1,3 @@
-// @awa-component: PLAN-002-ParserTabBar
-// @awa-component: PLAN-006-ParserTabBar
-// @awa-component: PLAN-007-ParserTabBar
-// @awa-component: PLAN-009-ParserTabBar
-// @awa-component: PLAN-013-ParserTabBar
 /** @jsxImportSource theme-ui */
 import { Box, Flex, Text } from 'theme-ui';
 
@@ -46,12 +41,6 @@ export interface ParserTabBarProps {
   xmlNisoEsDuration?: number | undefined;
 }
 
-// @awa-impl: PLAN-002-Step4 (tab bar UI)
-// @awa-impl: PLAN-006-Step3 (optional WASM Check tab)
-// @awa-impl: PLAN-007-Step4 (optional HTML tab)
-// @awa-impl: PLAN-009-Step2 (WASM Check match LED)
-// @awa-impl: PLAN-011-Step4 (optional Text tab)
-// @awa-impl: PLAN-013-Step4 (optional XML (NISO-IEC) tab)
 const ParserTabBar = (props: ParserTabBarProps) => {
   const {
     label,

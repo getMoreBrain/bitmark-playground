@@ -1,4 +1,3 @@
-// @awa-component: PLAN-003-SettingsMenu
 /** @jsxImportSource theme-ui */
 import { useCallback, useEffect, useRef } from 'react';
 import { Box, Flex, Label, Text } from 'theme-ui';
@@ -6,7 +5,6 @@ import { useSnapshot } from 'valtio';
 
 import { uiState } from '../../../state/uiState';
 
-// @awa-impl: PLAN-003-Step2 (settings menu)
 const SettingsMenu = () => {
   const snap = useSnapshot(uiState);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -106,7 +104,6 @@ const SettingsMenu = () => {
             </Label>
           </Flex>
 
-          {/* @awa-impl: PLAN-018-Step8 (link scrolling toggle) */}
           <Flex sx={{ alignItems: 'center', gap: 2, mt: 1 }}>
             <Label
               sx={{

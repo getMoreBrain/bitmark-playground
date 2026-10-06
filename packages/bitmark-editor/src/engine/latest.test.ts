@@ -13,7 +13,6 @@ const controlled = () => {
 };
 
 describe('createLatestRunner (PLAN-022 D14)', () => {
-  // @awa-test: PLAN-023-Step1a (one in flight; only the newest waits)
   it('runs one at a time, and only the newest of a burst runs next', async () => {
     const { runs, run } = controlled();
     const latest = createLatestRunner(run);
@@ -30,7 +29,6 @@ describe('createLatestRunner (PLAN-022 D14)', () => {
     await expect(c).resolves.toBe('r3');
   });
 
-  // @awa-test: PLAN-023-Step1a (a failure does not block the queue)
   it('starts the waiting run even when the one in flight fails', async () => {
     const { runs, run } = controlled();
     const latest = createLatestRunner(run);
@@ -43,7 +41,6 @@ describe('createLatestRunner (PLAN-022 D14)', () => {
     await expect(b).resolves.toBe('r2');
   });
 
-  // @awa-test: PLAN-023-Step1a (property: bursts never run more than first + last)
   it.each([1, 2, 5, 20])('a burst of %i calls runs at most twice', async (n) => {
     const { runs, run } = controlled();
     const latest = createLatestRunner(run);

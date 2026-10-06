@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-MonacoServices
 import type { Diagnostic } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 
@@ -63,7 +62,6 @@ export const buildBitmarkMarkers = (
  * (debounced) the whole document is validated and the issues set as
  * markers. A result for an older text is dropped.
  */
-// @awa-impl: PLAN-023-Step2 (per-editor diagnostics on the injected Monaco, async)
 export const attachBitmarkDiagnostics = (
   monaco: Monaco,
   editor: CodeEditor,

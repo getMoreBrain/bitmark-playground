@@ -42,7 +42,6 @@ const item = (over: Partial<CompletionItem> = {}): CompletionItem =>
   }) as CompletionItem;
 
 describe('monacoKind', () => {
-  // @awa-test: PLAN-023-Step2 (LSP kinds onto Monaco's)
   it('maps the LSP numbering onto Monaco’s own', () => {
     expect(monacoKind(monaco, LSP.Class)).toBe(K.Class);
     expect(monacoKind(monaco, LSP.Property)).toBe(K.Property);
@@ -111,8 +110,6 @@ describe('toMonacoSuggestion', () => {
   });
 });
 
-// @awa-test: PLAN-023-Step2 (bit templates: the auto-closed `]`)
-// @awa-test: PLAN-021-Step1 (COMPLETE_OPTIONS, replacedSuffixLength)
 describe('bit templates', () => {
   const at = { lineNumber: 1, column: 6 };
   const bit = item({

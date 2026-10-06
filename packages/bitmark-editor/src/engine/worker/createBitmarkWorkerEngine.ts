@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-WorkerEngine
 import { parserCdnUrl } from '../loadBitmarkEngine';
 import { BitmarkEngine, BitmarkEngineError, EngineCapabilities, Feature } from '../types';
 import { EngineMethod, EnginePort, FromWorker, ResultMessage } from './protocol';
@@ -130,7 +129,6 @@ const openLane = (
  * Calls are not coalesced here: one engine can serve several documents, so
  * "the latest call" is the caller's to decide (`createLatestRunner`).
  */
-// @awa-impl: PLAN-023-Step1a (the worker engine)
 export const createBitmarkWorkerEngine = async (
   options: CreateBitmarkWorkerEngineOptions,
 ): Promise<BitmarkEngine> => {

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-005-DiffPanel
 /** @jsxImportSource theme-ui */
 import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
 import { MONACO_THEME } from '@gmb/bitmark-editor';
@@ -20,11 +19,9 @@ export interface DiffPanelProps {
   language: string;
 }
 
-// @awa-impl: PLAN-005-Step2 (read-only inline diff viewer)
 const DiffPanel = ({ original, modified, language }: DiffPanelProps) => {
   const { attach, detach } = useBitmarkEditorServices(READ_ONLY_SERVICES);
 
-  // @awa-impl: PLAN-016-Step5 (bitmark diff highlighted from parser semantic tokens)
   const editorDidMount = useCallback<DiffEditorDidMount>(
     (diffEditor) => {
       if (language !== BITMARK_LANGUAGE_ID) return;

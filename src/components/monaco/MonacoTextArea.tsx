@@ -97,7 +97,6 @@ const MonacoTextArea = memo((props: MonacoTextAreaUncontrolledProps) => {
       const currentValue = monacoEditor.getValue();
       if (!hasFocus && currentValue !== value) {
         ref.current.isProgrammaticChange = true;
-        // @awa-impl: PLAN-023-Step6 (regeneration keeps the pane's undo, D16)
         const model = monacoEditor.getModel();
         if (model) replaceAllKeepingUndo(model, value ?? '');
         else monacoEditor.setValue(value ?? '');

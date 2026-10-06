@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-WorkerEngine
 import type { BitmarkEngine, Feature } from '../types';
 import {
   CallRequest,
@@ -15,7 +14,6 @@ import {
  * call at a time, so the fast lane (tokens, diagnostics) is a second worker
  * (PLAN-022 D14).
  */
-// @awa-impl: PLAN-023-Step1a (the worker side)
 export const serveBitmarkEngine = (
   port: EnginePort,
   load: (url: string, feature: Feature | undefined) => Promise<BitmarkEngine>,

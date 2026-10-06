@@ -11,8 +11,6 @@
 
 // Import only the JSON language contribution (worker + language features)
 import 'monaco-editor/esm/vs/language/json/monaco.contribution';
-// @awa-impl: PLAN-017-Step4 (the two editor CONTRIBUTIONS the services need)
-//
 // The bare 'monaco-editor' alias resolves to `editor.api`, which carries the
 // API but none of the editor's feature contributions — a registered
 // completion or hover provider would be asked nothing, because neither the
@@ -40,7 +38,4 @@ self.MonacoEnvironment = {
   },
 };
 
-// @awa-impl: PLAN-016-Step5 (bitmark language + token stylesheet registered before any editor mounts)
-// @awa-impl: PLAN-023-Step4 (on the playground's own Monaco, injected; the
-// providers answer for each editor's model with that editor's engine)
 setupBitmarkMonaco({ monaco: monaco as unknown as Monaco });

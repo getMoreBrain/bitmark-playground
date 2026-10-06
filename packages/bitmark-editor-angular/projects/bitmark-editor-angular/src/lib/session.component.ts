@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-AngularWrapper
 import {
   Component,
   effect,
@@ -36,7 +35,6 @@ import { BITMARK_EDITOR_CONFIG } from './config';
  * change detection (0 against 122 turns per 21 keystrokes in PLAN-023
  * Phase 0); the outputs re-enter it.
  */
-// @awa-impl: PLAN-023-Step13a (bm-session, ControlValueAccessor, zone handling)
 @Component({
   selector: 'bm-session',
   standalone: true,

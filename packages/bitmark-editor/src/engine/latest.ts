@@ -1,5 +1,3 @@
-// @awa-component: PLAN-023-Engine
-
 /** The result of a run that a newer one replaced before it started. */
 export const SUPERSEDED: unique symbol = Symbol('superseded');
 
@@ -12,7 +10,6 @@ export const SUPERSEDED: unique symbol = Symbol('superseded');
  * Results that arrive for an older input are the caller's to drop (tag them
  * with the model version).
  */
-// @awa-impl: PLAN-023-Step1a (latest-wins coalescing per caller)
 export const createLatestRunner = <A extends unknown[], R>(run: (...args: A) => Promise<R>) => {
   let inFlight: Promise<unknown> | undefined;
   let waiting:

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-006-WasmCheckPanel
 /** @jsxImportSource theme-ui */
 import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
 import { MONACO_THEME } from '@gmb/bitmark-editor';
@@ -29,13 +28,10 @@ export interface WasmCheckPanelProps {
   errorAsString?: string;
 }
 
-// @awa-impl: PLAN-006-Step5 (read-only round-trip bitmark view)
 const WasmCheckPanel = ({ markup, errorAsString }: WasmCheckPanelProps) => {
   const { attach, detach } = useBitmarkEditorServices(READ_ONLY_SERVICES);
   const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = useSplitScrollSync();
 
-  // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
-  // @awa-impl: PLAN-018-Step7 (and linked to the bitmark editor's scrolling)
   const editorDidMount = useCallback<EditorDidMount>(
     (editor) => {
       attach(editor);

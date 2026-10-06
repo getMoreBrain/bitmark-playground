@@ -1,6 +1,3 @@
-// @awa-test: PLAN-003-Step2 (settings menu rendering)
-// @awa-test: PLAN-003-Step4 (output tab bar rendering)
-// @awa-test: PLAN-003-Step5 (output panel rendering)
 /** @jsxImportSource theme-ui */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';
@@ -48,7 +45,6 @@ describe('SettingsMenu', () => {
     });
   });
 
-  // @awa-test: PLAN-018-Step8 (link scrolling toggle)
   it('toggles linkScroll on checkbox change', async () => {
     uiState.setSettingsOpen(true);
     uiState.setLinkScroll(true);
@@ -118,7 +114,6 @@ describe('OutputPanel', () => {
     expect(onTabChange).toHaveBeenCalledWith('lexer');
   });
 
-  // @awa-test: PLAN-014-Step5 (Mappings tab is opt-in, bottom-left panel only)
   it('does not render the Mappings tab by default', () => {
     render(<OutputPanel label="JSON" activeTab="diff" onTabChange={() => {}} />, { wrapper });
     expect(screen.queryByText('Mappings')).not.toBeInTheDocument();
@@ -141,7 +136,6 @@ describe('OutputPanel', () => {
     expect(onTabChange).toHaveBeenCalledWith('mappings');
   });
 
-  // @awa-test: PLAN-015-Step4 (Info tab is opt-in, bottom-left panel only)
   it('does not render the Info tab by default', () => {
     render(<OutputPanel label="JSON" activeTab="diff" onTabChange={() => {}} />, { wrapper });
     expect(screen.queryByText('Info')).not.toBeInTheDocument();
@@ -154,7 +148,6 @@ describe('OutputPanel', () => {
     expect(screen.getByText('Info')).toBeInTheDocument();
   });
 
-  // @awa-test: PLAN-015-Step4 (Info sits between Lexer and Mappings)
   it('renders the Info tab immediately left of Mappings', () => {
     render(
       <OutputPanel label="bitmark" activeTab="diff" onTabChange={() => {}} showInfo showMappings />,

@@ -10,7 +10,6 @@ const parser = createRequire(import.meta.url)('../../../../node_modules/@gmb/bit
 // would let its auto-closing brackets rewrite it.
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
-// @awa-test: PLAN-020-Step2 (pasted JSON scrolls in step with its bitmark, by bit)
 test('typed JSON keeps linked scrolling by bit', async ({ page }) => {
   await parser.init?.();
   const bits = 40;
@@ -51,7 +50,6 @@ test('typed JSON keeps linked scrolling by bit', async ({ page }) => {
   expect(Math.abs(Math.min(...left) - top)).toBeLessThanOrEqual(1);
 });
 
-// @awa-test: PLAN-020-Step3 (pasted HTML scrolls in step with its bitmark, by bit)
 test('typed HTML keeps linked scrolling by bit', async ({ page }) => {
   await parser.init?.();
   const bits = 40;

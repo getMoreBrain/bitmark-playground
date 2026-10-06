@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-ReactAdapter
 // The React adapter (PLAN-022 D3): a session in context, panes as components.
 import type * as MonacoApi from 'monaco-editor';
 import {
@@ -55,7 +54,6 @@ export interface BitmarkSessionProps extends Omit<
 }
 
 /** One document (PLAN-022 D9). Created once; `monaco` and `engine` are read at creation. */
-// @awa-impl: PLAN-023-Step13 (React: the session)
 export const BitmarkSession = (props: BitmarkSessionProps): ReactElement => {
   const { children, value, theme, onChange, onError, onReady } = props;
   const [session, setSession] = useState<Session>();
@@ -123,7 +121,6 @@ export interface BitmarkPaneProps {
 }
 
 /** One pane of the nearest `<BitmarkSession>`, in a `<div>` the host sizes. */
-// @awa-impl: PLAN-023-Step13 (React: a pane)
 export const BitmarkPane = (props: BitmarkPaneProps): ReactElement => {
   const {
     type,

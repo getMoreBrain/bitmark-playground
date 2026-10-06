@@ -1,4 +1,3 @@
-// @awa-component: PLAN-006-WasmCheckRunner
 import debounce from 'lodash/debounce';
 import { useEffect } from 'react';
 import { subscribe } from 'valtio';
@@ -8,7 +7,6 @@ import { StringUtils } from '../utils/StringUtils';
 import { OLD_PARSER_DEBOUNCE_MS } from './BitmarkConverter';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
-// @awa-impl: PLAN-006-Step2 (round-trip wasm.jsonAsString through JS parser)
 const useWasmCheckRunner = (): void => {
   const { bitmarkParserGenerator, loadSuccess } = useBitmarkParserGenerator();
 
@@ -62,7 +60,6 @@ const useWasmCheckRunner = (): void => {
       bitmarkState.setWasmCheck(markup as string | undefined, markupError, convertTimeSecs);
     };
 
-    // @awa-impl: PLAN-019-Step2 (the old parser converts after a pause, on the latest JSON)
     const runAfterPause = debounce((json: string) => void run(json), OLD_PARSER_DEBOUNCE_MS);
 
     const evaluate = () => {

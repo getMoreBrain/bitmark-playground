@@ -31,7 +31,6 @@ const fakeMedia = (dark: boolean) => {
 describe('the theme stylesheet (PLAN-022 D11)', () => {
   const css = buildBitmarkHighlightCss();
 
-  // @awa-test: PLAN-023-Step5a (every token type and modifier, both palettes)
   it('has variables for every token type and modifier in both theme classes', () => {
     const light = css.match(/\.bm-theme-light\{([^}]*)\}/)![1]!;
     const dark = css.match(/\.bm-theme-dark\{([^}]*)\}/)![1]!;
@@ -46,7 +45,6 @@ describe('the theme stylesheet (PLAN-022 D11)', () => {
     }
   });
 
-  // @awa-test: PLAN-023-Step5a (dark is the fallback: no theme class needed)
   it('falls back to the dark palette when no theme class applies', () => {
     expect(css).toContain(
       `.monaco-editor .bm-tok-bitType{color:var(--bm-tok-bitType-color,var(--bm-theme-tok-bitType-color,${TOKEN_STYLES.bitType.color}));`,
@@ -60,7 +58,6 @@ describe('the theme stylesheet (PLAN-022 D11)', () => {
 });
 
 describe('applyBitmarkTheme (PLAN-022 D11)', () => {
-  // @awa-test: PLAN-023-Step5a (dark and light classes)
   it('puts the theme class on the element, and switches it', () => {
     const el = document.createElement('div');
     const theme = applyBitmarkTheme(el, 'light');
@@ -72,7 +69,6 @@ describe('applyBitmarkTheme (PLAN-022 D11)', () => {
     expect(el.className).toBe('');
   });
 
-  // @awa-test: PLAN-023-Step5a (auto follows prefers-color-scheme live)
   it('follows prefers-color-scheme with auto, live', () => {
     const el = document.createElement('div');
     const media = fakeMedia(true);
@@ -85,7 +81,6 @@ describe('applyBitmarkTheme (PLAN-022 D11)', () => {
     expect(media.listeners.size).toBe(0);
   });
 
-  // @awa-test: PLAN-023-Step5a (an injected Monaco's theme is not touched unless asked)
   it('sets the Monaco theme only with applyMonacoTheme', () => {
     const fake = createFakeMonaco();
     applyBitmarkTheme(document.createElement('div'), 'light', { monaco: fake.monaco });
@@ -103,7 +98,6 @@ describe('applyBitmarkTheme (PLAN-022 D11)', () => {
     expect(fake.setTheme).toHaveBeenLastCalledWith('site-dark');
   });
 
-  // @awa-test: PLAN-023-Step5a (a custom token override wins)
   it('puts a custom theme’s token overrides on the element, and removes them on change', () => {
     const el = document.createElement('div');
     const theme = applyBitmarkTheme(el, {

@@ -1,4 +1,3 @@
-// @awa-component: PLAN-004-SettingsStorage
 import { log } from '../logging/log';
 import type { JsonTabType, ParserType } from '../state/bitmarkState';
 import type { OutputTab } from '../state/uiState';
@@ -30,14 +29,6 @@ const VALID_JSON_TABS: readonly string[] = [
 ];
 const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer', 'info', 'mappings'];
 
-// @awa-impl: PLAN-004-Step1 (migrateSettings)
-// @awa-impl: PLAN-006-Step7 (v2 → v3 migration)
-// @awa-impl: PLAN-007-Step7 (v3 → v4 migration)
-// @awa-impl: PLAN-011-Step7 (v4 → v5 migration)
-// @awa-impl: PLAN-013-Step7 (v5 → v6 migration)
-// @awa-impl: PLAN-014-Step5 (v7 → v8 migration)
-// @awa-impl: PLAN-015-Step4 (v8 → v9 migration)
-// @awa-impl: PLAN-018-Step8 (v9 → v10 migration)
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
 
@@ -122,7 +113,6 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
   return null;
 }
 
-// @awa-impl: PLAN-004-Step1 (loadSettings)
 function loadSettings(): PersistedSettings | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -135,7 +125,6 @@ function loadSettings(): PersistedSettings | null {
   }
 }
 
-// @awa-impl: PLAN-004-Step1 (saveSettings)
 function saveSettings(settings: PersistedSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));

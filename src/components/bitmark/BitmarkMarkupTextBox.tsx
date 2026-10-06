@@ -1,4 +1,3 @@
-// @awa-component: PLAN-002-BitmarkMarkupTextBox
 import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
 import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
@@ -26,7 +25,6 @@ export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledPro
   initialMarkup?: string;
 }
 
-// @awa-impl: PLAN-002-Step6 (editor reads from active tab)
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { initialMarkup, options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
@@ -42,21 +40,15 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
   const allLoadError = jsLoadError && wasmLoadError;
 
-  // @awa-impl: PLAN-008-Step3 (edited tab = active markup tab)
   const onInput = useCallback(
     async (markup: string) => {
       const tab = bitmarkState.activeMarkupTab;
-      // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
       bitmarkState.setLastEdit('bitmark', markup, `${TAB_LABEL[tab]} bitmark`);
       await markupToJson(tab, markup);
     },
     [markupToJson],
   );
 
-  // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
-  // @awa-impl: PLAN-017-Step3 (and marked from parser diagnostics)
-  // @awa-impl: PLAN-018-Step7 (and linked to the output pane's scrolling)
-  // @awa-impl: PLAN-023-Step2 (through the lib's per-editor services)
   const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = scrollSync;
   const { attach, detach } = services;
   const editorDidMount = useCallback<EditorDidMount>(

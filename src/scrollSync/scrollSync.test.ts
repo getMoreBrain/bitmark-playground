@@ -28,14 +28,12 @@ describe('joinScrollSync (the playground group)', () => {
   });
   afterEach(() => uiState.setLinkScroll(true));
 
-  // @awa-test: PLAN-018-Step6 (the follower follows the leader, by bit)
   it('links the bitmark editor and the output pane by bit', () => {
     const { bitmark, output } = setup();
     bitmark.userScroll(10 * LINE_HEIGHT);
     expect(output.editor.getScrollTop()).toBe(20 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-018-Step6 (nothing happens with linking off)
   it('joins unlinked while "Link scrolling" is off', () => {
     uiState.setLinkScroll(false);
     const { bitmark, output } = setup();
@@ -43,7 +41,6 @@ describe('joinScrollSync (the playground group)', () => {
     expect(output.editor.getScrollTop()).toBe(0);
   });
 
-  // @awa-test: PLAN-018-Step6 (turning linking off unlinks; on re-syncs)
   it('unlinks every member when switched off, and re-syncs when switched on', async () => {
     const { bitmark, output } = setup();
     uiState.setLinkScroll(false);

@@ -34,7 +34,6 @@ const setup = () => {
 };
 
 describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
-  // @awa-test: PLAN-023-Step5 (the follower follows the leader, by bit)
   it('keeps the same bit at the top of the follower', () => {
     const { bitmark, output } = setup();
     bitmark.userScroll(10 * LINE_HEIGHT);
@@ -43,7 +42,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(output.editor.getScrollTop()).toBe(70 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (the echo does not bounce back)
   it('does not take its own scroll of a follower as the user', () => {
     const { bitmark, output } = setup();
     const setBitmarkTop = vi.spyOn(bitmark.editor, 'setScrollTop');
@@ -52,7 +50,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(setBitmarkTop).toHaveBeenCalledTimes(1);
   });
 
-  // @awa-test: PLAN-023-Step5 (a user scroll on a follower makes it lead)
   it('lets the follower lead when the user scrolls it', () => {
     const { bitmark, output } = setup();
     bitmark.userScroll(10 * LINE_HEIGHT);
@@ -60,7 +57,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(bitmark.editor.getScrollTop()).toBe(20 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (a follower content change re-syncs it)
   it('re-syncs the follower when its content changes', () => {
     const { bitmark, output, setOutputStarts } = setup();
     bitmark.userScroll(10 * LINE_HEIGHT);
@@ -70,7 +66,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(bitmark.editor.getScrollTop()).toBe(10 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (the pane being typed in leads)
   it('keeps the pane being typed in as the leader', () => {
     const { bitmark, output } = setup();
     output.userScroll(40 * LINE_HEIGHT);
@@ -81,7 +76,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(output.editor.getScrollTop()).toBe(60 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (a joining member lands on the matching bit)
   it('syncs a member as it joins (a tab switch)', () => {
     const group = createScrollSyncGroup();
     const bitmark = createFakeEditor(textOf(100));
@@ -92,7 +86,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
     expect(output.editor.getScrollTop()).toBe(100 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (dispose detaches)
   it('detaches on dispose', () => {
     const { group, bitmark, output, outputMember } = setup();
     outputMember.dispose();
@@ -114,7 +107,6 @@ describe('createScrollSyncGroup (PLAN-018 rules, two members)', () => {
 });
 
 describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', () => {
-  // @awa-test: PLAN-023-Step5 (three or more: the scrolled one leads, all others follow)
   it('makes every linked member follow the one the user scrolls', () => {
     const { group, bitmark, output } = setup();
     const third = createFakeEditor(textOf(400));
@@ -127,7 +119,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(output.editor.getScrollTop()).toBe(40 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (a member out of the linking scrolls alone, both ways)
   it('leaves an unlinked member alone, and it does not lead', () => {
     const { bitmark, output, outputMember } = setup();
     outputMember.setLinked(false);
@@ -137,7 +128,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(bitmark.editor.getScrollTop()).toBe(10 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (re-linking follows the leader)
   it('re-syncs a member as it is linked again', () => {
     const { bitmark, output, outputMember } = setup();
     outputMember.setLinked(false);
@@ -146,7 +136,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(output.editor.getScrollTop()).toBe(20 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (a member can join unlinked)
   it('lets a member join unlinked', () => {
     const group = createScrollSyncGroup();
     const a = createFakeEditor(textOf(100));
@@ -158,7 +147,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(b.editor.getScrollTop()).toBe(0);
   });
 
-  // @awa-test: PLAN-023-Step5 (no members linked: nothing happens)
   it('does nothing when every member is unlinked', () => {
     const { bitmark, output, bitmarkMember, outputMember } = setup();
     bitmarkMember.setLinked(false);
@@ -168,7 +156,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(bitmark.editor.getScrollTop()).toBe(10 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (the leader leaving hands over)
   it('hands the lead on when the leader leaves', () => {
     const { group, bitmark, output, bitmarkMember } = setup();
     const third = createFakeEditor(textOf(400));
@@ -179,7 +166,6 @@ describe('createScrollSyncGroup (N members, per-member linking, PLAN-022 D9)', (
     expect(third.editor.getScrollTop()).toBe(80 * LINE_HEIGHT);
   });
 
-  // @awa-test: PLAN-023-Step5 (two groups are independent)
   it('keeps two groups independent', () => {
     const one = setup();
     const two = setup();

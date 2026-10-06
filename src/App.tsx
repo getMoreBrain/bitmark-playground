@@ -1,4 +1,3 @@
-// @awa-component: PLAN-002-App
 /** @jsxImportSource theme-ui */
 import './App.css';
 
@@ -27,17 +26,13 @@ import { reorderJsonStringToReference } from './utils/reorderJsonKeys';
 
 const initialMarkup = '[.article]\nHello World!';
 
-// @awa-impl: PLAN-002-Step5 (tab bar integration)
-// @awa-impl: PLAN-002-Step7 (provider nesting)
-// @awa-impl: PLAN-003-Step6 (App integration)
-// @awa-impl: PLAN-023-Step14 (the playground's session wraps the layout)
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
 
-  // @awa-impl: PLAN-012-Step4 (LED reference is the bpg round-trip JSON, not the raw
-  // bpg parse — bpg's own json -> bitmark -> json loses fields markup cannot express,
-  // which the Rust parser can never produce and must not be marked red for)
+  // The LED reference is the bpg round-trip JSON, not the raw bpg parse: bpg's own
+  // json -> bitmark -> json loses fields markup cannot express, which the Rust
+  // parser can never produce and must not be marked red for.
   const wasmCheckLed = useMemo<WasmCheckLed>(() => {
     if (snap.js.jsonError || snap.wasm.jsonError || snap.jsRoundTrip.error) return 'neutral';
     // Reference not yet recomputed for the current Original JSON — not comparable.
@@ -53,7 +48,6 @@ function App() {
     snap.wasm.jsonError,
   ]);
 
-  // @awa-impl: PLAN-010 (reorder WASM JSON keys to match Original before the JSON diff)
   const wasmJsonForDiff = useMemo(
     () => reorderJsonStringToReference(snap.js.jsonAsString, snap.wasm.jsonAsString),
     [snap.js.jsonAsString, snap.wasm.jsonAsString],
@@ -174,7 +168,6 @@ function App() {
     </Flex>
   );
 
-  // @awa-impl: PLAN-005-Step4 (wire state data to diff panels)
   const bottomPanels = (
     <Flex sx={{ flexDirection: 'row', flexGrow: 1, minHeight: 0 }}>
       <OutputPanel

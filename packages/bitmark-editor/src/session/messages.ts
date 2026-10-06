@@ -1,4 +1,3 @@
-// @awa-component: PLAN-023-Session
 import type { BitmarkEditorMessages, BitmarkSessionOptions } from './types';
 
 export const DEFAULT_MESSAGES: BitmarkEditorMessages = {

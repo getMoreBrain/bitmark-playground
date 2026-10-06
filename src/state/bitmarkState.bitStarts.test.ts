@@ -1,4 +1,3 @@
-// @awa-test: PLAN-018-Step2 (positions travel with their text)
 import { describe, expect, it } from 'vitest';
 
 import { bitmarkState } from './bitmarkState';
@@ -18,7 +17,6 @@ describe('bitmarkState bit starts', () => {
     expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
   });
 
-  // @awa-test: PLAN-020-Step2 (the typed JSON's positions, only for that text)
   it('stores the positions the typed JSON was read with, unless it has changed since', () => {
     bitmarkState.setEditedJson('wasm', '[{"bit": {}}]');
     bitmarkState.setEditedJsonBitStarts('wasm', '[{"bit": {}}]', [1]);
