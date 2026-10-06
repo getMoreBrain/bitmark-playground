@@ -256,6 +256,30 @@ describe('properties set before the elements are defined', () => {
     await vi.waitFor(() => expect(paneText(host.querySelector('bitmark-pane'))).toContain('World'));
     expect(Object.prototype.hasOwnProperty.call(real, 'engine')).toBe(false);
   });
+
+  // @awa-test: PLAN-023-Step12 (UI strings from the host, e.g. a site's i18n)
+  it('passes messages set before its upgrade to the session', async () => {
+    const { monaco } = createFakeMonaco();
+    const host = document.createElement('div');
+    host.innerHTML = `<bitmark-session value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`;
+    const real = host.querySelector('bitmark-session') as BitmarkSessionElementApi & {
+      messages?: unknown;
+    };
+    Object.defineProperty(real, 'messages', {
+      value: { errorPrefix: 'Fehler: ', labels: { json: 'JSON (de)' } },
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+    real.engine = engine;
+    real.monaco = monaco;
+    document.body.append(host);
+    await vi.waitFor(() => expect(real.session).toBeDefined());
+    expect(real.session!.messages.errorPrefix).toBe('Fehler: ');
+    expect(real.session!.messages.labels.json).toBe('JSON (de)');
+    // The rest keep their defaults.
+    expect(real.session!.messages.labels.bitmark).toBeTruthy();
+  });
 });
 
 describe('element lifecycle (PLAN-023 pass 1)', () => {

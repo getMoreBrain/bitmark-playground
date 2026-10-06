@@ -13,7 +13,13 @@ import {
 } from '../panes/panes';
 import { createEchoGuard } from '../session/echoGuard';
 import { createBitmarkSession } from '../session/session';
-import type { BitmarkPane, BitmarkSession, EngineSource, PaneType } from '../session/types';
+import type {
+  BitmarkPane,
+  BitmarkSession,
+  BitmarkSessionOptions,
+  EngineSource,
+  PaneType,
+} from '../session/types';
 import type { BitmarkTheme } from '../theme/applyTheme';
 import { getDefaultEngine, loadDefaultMonaco } from './defaults';
 
@@ -93,6 +99,7 @@ export const defineBitmarkElements = (): void => {
     #generation = 0;
     #monaco: Monaco | undefined;
     #engine: EngineSource | undefined;
+    #messages: BitmarkSessionOptions['messages'];
     #pendingValue: string | undefined;
     #cleanups: (() => void)[] = [];
     /** The session's recent reports: a `value` attribute among them is an echo. */
@@ -115,6 +122,13 @@ export const defineBitmarkElements = (): void => {
     set engine(e: EngineSource | undefined) {
       this.#engine = e;
     }
+    /** The UI strings (e.g. from a site's i18n); read when the session starts. */
+    get messages(): BitmarkSessionOptions['messages'] {
+      return this.#messages;
+    }
+    set messages(m: BitmarkSessionOptions['messages']) {
+      this.#messages = m;
+    }
     get value(): string {
       return this.#session?.getBitmark() ?? this.#pendingValue ?? this.getAttribute('value') ?? '';
     }
@@ -129,7 +143,7 @@ export const defineBitmarkElements = (): void => {
 
     connectedCallback() {
       injectElementsCss();
-      upgradeProperties(this, ['monaco', 'engine', 'value']);
+      upgradeProperties(this, ['monaco', 'engine', 'messages', 'value']);
       if (this.#session || this.#starting) return;
       const narrow = (this.getAttribute('narrow') ?? 'edit') as NarrowMode;
       if (narrow !== 'edit' && isNarrowTouch()) {
@@ -224,6 +238,7 @@ export const defineBitmarkElements = (): void => {
           debounceMs: Number(this.getAttribute('debounce') ?? 0) || 0,
           theme: (this.getAttribute('theme') as BitmarkTheme | null) ?? undefined,
           applyMonacoTheme: this.hasAttribute('apply-monaco-theme'),
+          messages: this.#messages,
           schema:
             this.getAttribute('schema') === 'off'
               ? false

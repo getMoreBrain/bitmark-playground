@@ -193,8 +193,9 @@ The names are `--bm-tok-<type>-color` (also `-weight`, `-style`,
   - attributes: `value`, `engine-url`, `engine-version`, `engine-feature`,
     `theme`, `lazy`, `narrow`, `debounce`, `schema` (a URL or `off`),
     `apply-monaco-theme`;
-  - properties: `monaco`, `engine`, `value`, `session`, `getJson()`,
-    `start()`;
+  - properties: `monaco`, `engine`, `messages` (UI strings, e.g. from your
+    site's i18n; read when the session starts), `value`, `session`,
+    `getJson()`, `start()`;
   - events: `change`, `ready`, `error`.
 - `<bitmark-pane>`: `type`, `mode`, `mapping`, `label`, `readonly`,
   `scroll-sync="off"`, `session="<id>"` (when it isn't inside its session).
