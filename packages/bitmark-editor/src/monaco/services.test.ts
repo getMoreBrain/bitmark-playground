@@ -257,7 +257,9 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     const fake = createFakeMonaco();
     const top = vi.fn();
     (fake.monaco.languages as unknown as { json: unknown }).json = { deprecated: true };
-    (fake.monaco as unknown as { json: unknown }).json = { jsonDefaults: { setDiagnosticsOptions: top } };
+    (fake.monaco as unknown as { json: unknown }).json = {
+      jsonDefaults: { setDiagnosticsOptions: top },
+    };
     expect(bindBitmarkJsonSchema(fake.monaco, {})).toBe(true);
     expect(top).toHaveBeenCalled();
   });

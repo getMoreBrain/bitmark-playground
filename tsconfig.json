@@ -23,7 +23,12 @@
     "jsx": "react-jsx",
     "types": ["vite/client", "vitest/globals"],
     // The workspace package, from source: no build step while developing.
-    "paths": { "@gmb/bitmark-editor": ["./packages/bitmark-editor/src/index.ts"] }
+    "paths": {
+      "@gmb/bitmark-editor": ["./packages/bitmark-editor/src/index.ts"],
+      // The package's source is compiled against the playground's own
+      // Monaco (the host's, PLAN-020 D8), not the package's dev copy.
+      "monaco-editor": ["./node_modules/monaco-editor"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

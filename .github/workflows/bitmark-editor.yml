@@ -10,11 +10,13 @@ on:
     paths:
       - "packages/bitmark-editor/**"
       - "packages/bitmark-editor-angular/**"
+      - "src/**"
       - ".github/workflows/bitmark-editor.yml"
   pull_request:
     paths:
       - "packages/bitmark-editor/**"
       - "packages/bitmark-editor-angular/**"
+      - "src/**"
       - ".github/workflows/bitmark-editor.yml"
   workflow_dispatch:
 
@@ -36,6 +38,11 @@ jobs:
       - name: Install (workspace)
         working-directory: .
         run: bun install --frozen-lockfile
+      - name: The playground still compiles and passes on the package source
+        working-directory: .
+        run: |
+          npx tsc --noEmit
+          bun run test
       - run: bun run lint
       - run: bun run typecheck
       - run: bun run test
