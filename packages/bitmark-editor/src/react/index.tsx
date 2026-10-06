@@ -23,6 +23,7 @@ import {
   createTextPane,
   createXmlPane,
 } from '../panes/panes';
+import { createEchoGuard } from '../session/echoGuard';
 import { createBitmarkSession } from '../session/session';
 import type {
   BitmarkPane as Pane,
@@ -58,6 +59,8 @@ export interface BitmarkSessionProps extends Omit<
 export const BitmarkSession = (props: BitmarkSessionProps): ReactElement => {
   const { children, value, theme, onChange, onError, onReady } = props;
   const [session, setSession] = useState<Session>();
+  /** The session's recent reports: a `value` among them is the host's own echo. */
+  const echo = useRef(createEchoGuard());
   const latest = useRef({ onChange, onError, onReady });
   latest.current = { onChange, onError, onReady };
 
@@ -65,7 +68,10 @@ export const BitmarkSession = (props: BitmarkSessionProps): ReactElement => {
     const { monaco, children: _c, onChange: _o, onError: _e, onReady: _r, ...options } = props;
     const s = createBitmarkSession({ ...options, monaco: monaco as Monaco, value, theme });
     const offs = [
-      s.on('change', (e) => latest.current.onChange?.(e)),
+      s.on('change', (e) => {
+        echo.current.remember(e.bitmark);
+        latest.current.onChange?.(e);
+      }),
       s.on('error', (e) => latest.current.onError?.(e)),
       s.on('ready', (e) => latest.current.onReady?.(e)),
     ];
@@ -79,7 +85,16 @@ export const BitmarkSession = (props: BitmarkSessionProps): ReactElement => {
   }, []);
 
   useEffect(() => {
-    if (session && value !== undefined && value !== session.getBitmark()) session.setBitmark(value);
+    // A controlled `value` that is (or lags behind as) our own emission is
+    // not a new document: setting it back would undo the user's typing.
+    if (
+      session &&
+      value !== undefined &&
+      !echo.current.isEcho(value) &&
+      value !== session.getBitmark()
+    ) {
+      session.setBitmark(value);
+    }
   }, [session, value]);
 
   useEffect(() => {

@@ -54,6 +54,7 @@ const openLane = (
     rejectReady = rej;
   });
   let dead: Error | undefined;
+  let isReady = false;
   const lane: Lane = {
     port,
     feature: 'bitmark-json',
@@ -77,6 +78,7 @@ const openLane = (
   port.addEventListener('message', (event: MessageEvent) => {
     const message = event.data as FromWorker;
     if (message.type === 'ready') {
+      isReady = true;
       lane.feature = message.feature;
       resolveReady(message);
     } else if (message.type === 'feature') {
@@ -102,7 +104,15 @@ const openLane = (
   const onError = (event: Event) => {
     const message =
       (event as ErrorEvent).message || `the bitmark engine worker failed (${event.type})`;
-    lane.fail(new BitmarkEngineError(message));
+    const error = new BitmarkEngineError(message);
+    // Before `ready`: the worker never started, so the lane is dead. After:
+    // the calls in flight may be lost, so they reject, but the worker may
+    // well be alive, so later calls still go to it.
+    if (!isReady) lane.fail(error);
+    else {
+      for (const p of pending.values()) p.reject(error);
+      pending.clear();
+    }
   };
   port.addEventListener('error', onError as (e: MessageEvent) => void);
   port.addEventListener('messageerror', onError as (e: MessageEvent) => void);

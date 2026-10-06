@@ -18,6 +18,7 @@ import {
   type BitmarkSession,
   type BitmarkTheme,
   createBitmarkSession,
+  createEchoGuard,
   type EngineSource,
   type Monaco,
   type SessionChange,
@@ -70,12 +71,18 @@ export class BmSessionComponent implements OnInit, OnDestroy, ControlValueAccess
   private onTouched: () => void = () => {};
   private pendingValue: string | undefined;
   private destroyed = false;
+  /** The session's recent reports: a `[value]` among them is our own echo. */
+  private readonly echo = createEchoGuard();
 
   constructor() {
     effect(() => {
       const value = this.value();
       const s = this.session();
-      if (s && value !== undefined && value !== s.getBitmark()) this.zone.runOutsideAngular(() => s.setBitmark(value));
+      // A `[value]` that is (or lags behind as) our own emission is not a new
+      // document: setting it back would undo the user's typing.
+      if (s && value !== undefined && !this.echo.isEcho(value) && value !== s.getBitmark()) {
+        this.zone.runOutsideAngular(() => s.setBitmark(value));
+      }
     });
     effect(() => {
       const theme = this.theme();
@@ -118,6 +125,7 @@ export class BmSessionComponent implements OnInit, OnDestroy, ControlValueAccess
       // A change with no source pane came from here (`writeValue`, the
       // `[value]` input): not an edit, so not echoed back to the form.
       if (!e.source) return;
+      this.echo.remember(e.bitmark);
       this.zone.run(() => {
         this.onChange(e.bitmark);
         this.change.emit(e);

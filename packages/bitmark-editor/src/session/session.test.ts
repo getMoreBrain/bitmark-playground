@@ -438,3 +438,31 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     expect(off()).toBe(false); // already removed by dispose
   });
 });
+
+describe('second review fixes', () => {
+  const stateOf = (fake: ReturnType<typeof createFakeMonaco>, pane: BitmarkPane) =>
+    fake.editors.find((e) => e.options['model'] === pane.textEditor.model)!;
+
+  // @awa-test: PLAN-021-Step8 (blur never replaces the user's own text)
+  it.each([
+    ['valid compact JSON', (t: string) => JSON.stringify(JSON.parse(t.replace('Typed', 'Mine')))],
+    ['half-typed JSON', () => '[{"bit": '],
+  ])('keeps what the user typed in a pane on blur (%s)', async (_name, edit) => {
+    const { session, el, fake } = setup();
+    const bitmark = createBitmarkPane(el(), session);
+    const json = createJsonPane(el(), session);
+    await vi.waitFor(() => expect(text(json)).toContain('World'));
+    // The JSON pane has focus when an edit from the bitmark pane lands: pending.
+    stateOf(fake, json).focused = true;
+    type(bitmark, '[.article]\nTyped');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(text(json)).not.toContain('Typed');
+    // The user types in the JSON pane, then leaves it.
+    const theirs = edit(await session.getJson());
+    type(json, theirs);
+    await new Promise((r) => setTimeout(r, 20));
+    stateOf(fake, json).blur();
+    await new Promise((r) => setTimeout(r, 20));
+    expect(text(json)).toBe(theirs);
+  });
+});

@@ -11,6 +11,7 @@ import {
   createTextPane,
   createXmlPane,
 } from '../panes/panes';
+import { createEchoGuard } from '../session/echoGuard';
 import { createBitmarkSession } from '../session/session';
 import type { BitmarkPane, BitmarkSession, EngineSource, PaneType } from '../session/types';
 import type { BitmarkTheme } from '../theme/applyTheme';
@@ -94,6 +95,8 @@ export const defineBitmarkElements = (): void => {
     #engine: EngineSource | undefined;
     #pendingValue: string | undefined;
     #cleanups: (() => void)[] = [];
+    /** The session's recent reports: a `value` attribute among them is an echo. */
+    #echo = createEchoGuard();
     /** True when narrow screens get read-only panes (D12). */
     forceReadOnly = false;
 
@@ -155,7 +158,12 @@ export const defineBitmarkElements = (): void => {
 
     attributeChangedCallback(name: string, _old: string | null, value: string | null) {
       if (!this.#session) return;
-      if (name === 'value' && value !== null && value !== this.#session.getBitmark())
+      if (
+        name === 'value' &&
+        value !== null &&
+        !this.#echo.isEcho(value) &&
+        value !== this.#session.getBitmark()
+      )
         this.#session.setBitmark(value);
       if (name === 'theme' && value) this.#session.setTheme(value as BitmarkTheme);
     }
@@ -223,9 +231,10 @@ export const defineBitmarkElements = (): void => {
         });
         this.#session = session;
         this.#cleanups.push(
-          session.on('change', (e) =>
-            this.dispatchEvent(new CustomEvent('change', { detail: e, bubbles: true })),
-          ),
+          session.on('change', (e) => {
+            this.#echo.remember(e.bitmark);
+            this.dispatchEvent(new CustomEvent('change', { detail: e, bubbles: true }));
+          }),
           session.on('error', (e) =>
             this.dispatchEvent(new CustomEvent('error', { detail: e, bubbles: true })),
           ),

@@ -1,3 +1,4 @@
+export { createEchoGuard } from './echoGuard';
 export { DEFAULT_MESSAGES } from './messages';
 export { createBitmarkSession } from './session';
 export type {

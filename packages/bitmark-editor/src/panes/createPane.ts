@@ -122,7 +122,10 @@ export const createPane = (
     readOnly,
     editorOptions: { ...DEFAULT_EDITOR_OPTIONS, ariaLabel: label, ...options.editorOptions },
     onInput: (text) => {
-      if (!readOnly) s.edit(control, text);
+      if (readOnly) return;
+      // The user's own text now wins: drop any catch-up waiting for blur.
+      pending = false;
+      s.edit(control, text);
     },
   });
   const { editor, model } = textEditor;
@@ -280,7 +283,10 @@ export const createPane = (
     },
     showSourceError: (error: Error | undefined) => {
       // A committed edit (no error) makes this pane the document's source.
-      if (!error) isSource = true;
+      if (!error) {
+        isSource = true;
+        pending = false;
+      }
       state.sourceError = error?.message;
       // A JSON syntax error is marked by Monaco's JSON language already.
       const convertMarkers =

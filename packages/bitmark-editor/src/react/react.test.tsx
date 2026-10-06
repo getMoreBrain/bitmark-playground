@@ -44,7 +44,12 @@ describe('React adapter (PLAN-020 D3)', () => {
 
     // A new `value` from outside replaces the document.
     view.rerender(
-      <BitmarkSession monaco={monaco} engine={engine} value="[.article]\nFrom props" schema={false}>
+      <BitmarkSession
+        monaco={monaco}
+        engine={engine}
+        value={'[.article]\nFrom props'}
+        schema={false}
+      >
         <BitmarkPane type="bitmark" onPane={(p) => (panes.bitmark = p)} />
         <BitmarkPane type="json" readOnly={false} onPane={(p) => (panes.json = p)} />
       </BitmarkSession>,
@@ -53,5 +58,35 @@ describe('React adapter (PLAN-020 D3)', () => {
     expect(panes.json!.readOnly).toBe(false);
     view.unmount();
     expect(panes.json).toBeUndefined();
+  });
+});
+
+describe('React adapter: controlled value (second review)', () => {
+  // @awa-test: PLAN-021-Step13 (a lagging controlled value is not set back over the user's edit)
+  it('does not roll the document back to its own lagging value', async () => {
+    const { monaco } = createFakeMonaco();
+    let bitmarkPane: Pane | undefined;
+    const view = render(
+      <BitmarkSession monaco={monaco} engine={engine} value={DOC} schema={false}>
+        <BitmarkPane type="bitmark" onPane={(p) => (bitmarkPane = p)} />
+      </BitmarkSession>,
+    );
+    await vi.waitFor(() => expect(bitmarkPane).toBeDefined());
+    // Two edits, each committed (and reported) before the host re-renders.
+    await act(async () => {
+      (bitmarkPane!.textEditor.model as FakeModel).setText('[.article]\nX1');
+      await new Promise((r) => setTimeout(r, 0));
+      (bitmarkPane!.textEditor.model as FakeModel).setText('[.article]\nX2');
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    // The host's state is one change behind: it re-renders with X1.
+    view.rerender(
+      <BitmarkSession monaco={monaco} engine={engine} value={'[.article]\nX1'} schema={false}>
+        <BitmarkPane type="bitmark" onPane={(p) => (bitmarkPane = p)} />
+      </BitmarkSession>,
+    );
+    await new Promise((r) => setTimeout(r, 10));
+    expect(bitmarkPane!.textEditor.getValue()).toBe('[.article]\nX2');
+    view.unmount();
   });
 });

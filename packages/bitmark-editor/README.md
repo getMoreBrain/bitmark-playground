@@ -201,6 +201,12 @@ import { BitmarkSession, BitmarkPane } from '@gmb/bitmark-editor/react';
 </BitmarkSession>
 ```
 
+A controlled `value` that lags behind (your state is still one of the last
+few documents the session reported) is treated as an echo and ignored, so it
+never undoes typing. The same goes for Angular's `[value]` and the element's
+`value` attribute. To set the document back to one of those values on
+purpose, call `session.setBitmark()`.
+
 ## Angular
 
 See `@gmb/bitmark-editor-angular`: `bm-session` (a form control),

@@ -203,17 +203,19 @@ describe('worker failures (PLAN-021 pass 1)', () => {
     return port;
   };
 
-  // @awa-test: PLAN-021-Step1a (a worker that dies rejects its pending and later calls)
-  it('rejects pending and later calls when a worker dies', async () => {
+  // @awa-test: PLAN-021-Step1a (an error after ready rejects the calls in flight, not the lane)
+  it('rejects the calls in flight on a worker error after ready, and keeps the lane', async () => {
     const ports = [readyPort(), readyPort()];
     let i = 0;
     const worker = await createBitmarkWorkerEngine({ createPort: () => ports[i++]!, url: 'x' });
     const stuck = worker.convert('[.article]', { outputFormat: 'json' });
     ports[1]!.fail('messageerror');
     await expect(stuck).rejects.toBeInstanceOf(BitmarkEngineError);
-    await expect(worker.convert('x', { outputFormat: 'json' })).rejects.toBeInstanceOf(
-      BitmarkEngineError,
-    );
+    // One bad message must not kill the lane: the next call still reaches the worker.
+    const sent = ports[1]!.posted.length;
+    void worker.convert('x', { outputFormat: 'json' }).catch(() => undefined);
+    expect(ports[1]!.posted.length).toBe(sent + 1);
+    worker.dispose();
   });
 
   // @awa-test: PLAN-021-Step1a (dispose rejects what is still pending)

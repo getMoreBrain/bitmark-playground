@@ -432,6 +432,24 @@ and to the package in Phase 2.
 - [x] Hand-off briefs for the other repos: `docs/handoff-cosmic.md`
   (Step 17) and `docs/handoff-docs-site.md` (Step 18).
 
+### Double-check (2026-10-06)
+
+Two independent code reviews, then the full matrix again.
+- First review: 10 findings, all fixed. The worst: a slow conversion could
+  overwrite a newer edit (now an edit sequence); the schema binding replaced
+  the host's JSON options (now merged); a dead worker hung its calls.
+- Second review, of those fixes and the rest: 5 findings, all fixed. A
+  focused pane's catch-up could replace the user's own text on blur; a
+  lagging controlled `value` could roll back typing (now `createEchoGuard`);
+  a single worker error killed a lane; the bump PR got no CI (now a
+  `BITMARK_EDITOR_BOT_TOKEN` secret); the bump could leave the peer range.
+- Every fix has a regression test, mutation-checked: each was removed in
+  turn and its test failed. Three tests were found not to catch their bug
+  this way and were corrected.
+- Also found while checking: the playground's `tsc` broke when the
+  package's dev Monaco moved to 0.57. The playground now compiles the package
+  against its own Monaco, and the package CI checks the playground too.
+
 ## Completion Criteria
 
 - [ ] `@gmb/bitmark-editor` builds `/esm` and `/bundled`, with type
