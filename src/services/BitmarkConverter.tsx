@@ -5,6 +5,7 @@ import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generat
 import debounce from 'lodash/debounce';
 import { useCallback } from 'react';
 
+import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState, ParserType } from '../state/bitmarkState';
 import { StringUtils } from '../utils/StringUtils';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
@@ -54,6 +55,8 @@ interface M2JResult {
 
 interface J2MResult {
   markup?: string;
+  /** Where each bit starts in the JSON (PLAN-020); WASM parsers only. */
+  inputStarts?: number[];
   error?: Error;
   durationSec: number;
 }
@@ -76,6 +79,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
   const {
     bitmarkToObjects: wasmBitmarkToObjects,
     convert: wasmConvert,
+    convertWithDetails: wasmConvertWithDetails,
     loadSuccess: wasmLoadSuccess,
     loadError: wasmLoadError,
   } = useBitmarkParser();
@@ -121,6 +125,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
       performance.mark(startMark);
 
       let markup: string | undefined;
+      let inputStarts: number[] | undefined;
       let error: Error | undefined;
       try {
         if (parser === 'js') {
@@ -131,9 +136,14 @@ const useBitmarkConverter = (): BitmarkConverter => {
         } else {
           if (!wasmConvert) return null;
           const mode = parser === 'wasm' ? 'optimized' : 'full';
-          markup = throwIfParserError(
-            wasmConvert(json, { inputFormat: 'json', outputFormat: 'bitmark', mode }),
-          );
+          // @awa-impl: PLAN-020-Step2 (the conversion reads where each bit is in the JSON)
+          // Only the optimized run's positions are used (below).
+          ({ output: markup, inputStarts } = convertWithBitStarts(
+            wasmConvert,
+            parser === 'wasm' ? wasmConvertWithDetails : undefined,
+            json,
+            { inputFormat: 'json', outputFormat: 'bitmark', mode },
+          ));
         }
       } catch (e) {
         error = e as Error;
@@ -142,9 +152,9 @@ const useBitmarkConverter = (): BitmarkConverter => {
       performance.mark(endMark);
       const durationSec =
         performance.measure(`${parser}-jsonToMarkup`, startMark, endMark).duration / 1000;
-      return { markup, error, durationSec };
+      return { markup, inputStarts, error, durationSec };
     },
-    [bitmarkParserGenerator, wasmConvert],
+    [bitmarkParserGenerator, wasmConvert, wasmConvertWithDetails],
   );
 
   // Lex the WASM optimized tab's markup into both lexer outputs:
@@ -215,6 +225,13 @@ const useBitmarkConverter = (): BitmarkConverter => {
           // bpg may legitimately return a non-string ('Expected string'); keep last good.
           if (parser === 'js' && r.error && r.error.message === 'Expected string') return;
           bitmarkState.setMarkup(parser, r.markup, r.error, r.durationSec);
+          // @awa-impl: PLAN-020-Step2 (pin the typed JSON's bits in its own pane)
+          // Where the bits are depends on the JSON only, not on the parser that
+          // converts it, so the WASM optimized run places them for whichever
+          // tab was edited — the Original (bpg) run reports no positions.
+          if (parser === 'wasm' && r.inputStarts) {
+            bitmarkState.setEditedJsonBitStarts(editedTab, json, r.inputStarts);
+          }
         }),
       );
 

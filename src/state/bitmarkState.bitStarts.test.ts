@@ -17,4 +17,15 @@ describe('bitmarkState bit starts', () => {
     bitmarkState.setEditedJson('wasm', '[{"bit": {}}]');
     expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
   });
+
+  // @awa-test: PLAN-020-Step2 (the typed JSON's positions, only for that text)
+  it('stores the positions the typed JSON was read with, unless it has changed since', () => {
+    bitmarkState.setEditedJson('wasm', '[{"bit": {}}]');
+    bitmarkState.setEditedJsonBitStarts('wasm', '[{"bit": {}}]', [1]);
+    expect(bitmarkState.wasm.jsonBitStarts).toEqual([1]);
+    // A later edit: positions of the earlier text are ignored.
+    bitmarkState.setEditedJson('wasm', '[ {"bit": {}}]');
+    bitmarkState.setEditedJsonBitStarts('wasm', '[{"bit": {}}]', [1]);
+    expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
+  });
 });

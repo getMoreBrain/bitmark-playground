@@ -135,6 +135,11 @@ export interface BitmarkState {
   setEditedMarkup(parser: ParserType, markup: string): void;
   /** Set the edited tab's JSON verbatim (raw user input; clears JSON error). */
   setEditedJson(parser: ParserType, json: string): void;
+  /**
+   * Where each bit starts in the JSON the user typed, as its own conversion
+   * read it (PLAN-020). Ignored unless the tab still shows exactly `json`.
+   */
+  setEditedJsonBitStarts(parser: ParserType, json: string, bitStarts: readonly number[]): void;
   /** Record the window the user just edited (drives the mapping report). */
   setLastEdit(
     inputFormat: string,
@@ -350,10 +355,19 @@ const bitmarkState = proxy<BitmarkState>({
   setEditedJson: (parser: ParserType, json: string) => {
     const slice = bitmarkState[parser] as Writable<ParserSlice>;
     slice.jsonAsString = json;
-    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
+    // @awa-impl: PLAN-018-Step2 (typed text: no known positions until its
+    // conversion reads them — PLAN-020)
     slice.jsonBitStarts = undefined;
     slice.jsonError = undefined;
     slice.jsonErrorAsString = undefined;
+  },
+
+  // @awa-impl: PLAN-020-Step2 (the typed JSON's positions, from its conversion)
+  setEditedJsonBitStarts: (parser: ParserType, json: string, bitStarts: readonly number[]) => {
+    const slice = bitmarkState[parser] as Writable<ParserSlice>;
+    // A later edit has replaced the text these positions describe.
+    if (slice.jsonAsString !== json) return;
+    slice.jsonBitStarts = bitStarts;
   },
 
   // @awa-impl: PLAN-014-Step1 (record the last edited window)

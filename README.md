@@ -9,6 +9,7 @@ A web playground for parsing and generating bitmark
 
 Features:
 - Convert bitmark to JSON, and vice-versa.
+- Editing help from the parser: diagnostics, hover, and completion — choosing a bit type after `[.` inserts the bit's template (its usual tags, body and card structure) as a snippet.
 
 ## The editors as a package
 

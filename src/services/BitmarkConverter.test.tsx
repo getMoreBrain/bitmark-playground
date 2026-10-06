@@ -208,3 +208,65 @@ describe('useBitmarkConverter — round-trip recalculation', () => {
     expect(bitmarkState.wasmFull.lexerOutput).toMatch(/^Lexer error: .*lexer exploded/);
   });
 });
+
+// @awa-test: PLAN-020-Step2 (typed JSON: its bits are pinned in its own pane)
+describe('useBitmarkConverter — positions in typed JSON', () => {
+  beforeEach(reset);
+
+  const INPUT_STARTS = [4, 50];
+  const withDetails = {
+    ...fakeWasm,
+    convertWithDetails: (json: string, opts?: { mode?: string }) => {
+      if (json === 'BAD') throw new Error('invalid-json');
+      return {
+        output: `wasm<<${opts?.mode}:${json}>>`,
+        bitSpans: {
+          positionEncoding: 'utf-16',
+          spans: INPUT_STARTS.map((inputStart, index) => ({
+            index,
+            inputStart,
+            inputEnd: inputStart + 2,
+            outputStart: index * 10,
+            outputEnd: index * 10 + 5,
+          })),
+        },
+      };
+    },
+  };
+  const detailsWrapper = ({ children }: { children: React.ReactNode }) => (
+    <BitmarkParserGeneratorContext.Provider
+      value={{ loadSuccess: true, loadError: false, bitmarkParserGenerator: fakeBpg }}
+    >
+      <BitmarkParserContext.Provider
+        value={
+          withDetails as unknown as Parameters<typeof BitmarkParserContext.Provider>[0]['value']
+        }
+      >
+        {children}
+      </BitmarkParserContext.Provider>
+    </BitmarkParserGeneratorContext.Provider>
+  );
+
+  it.each(['js', 'wasm', 'wasmFull'] as ParserType[])(
+    'pins where the bits are in the JSON typed into the %s tab',
+    async (tab) => {
+      const { result } = renderHook(() => useBitmarkConverter(), { wrapper: detailsWrapper });
+      await act(async () => {
+        await result.current.jsonToMarkup(tab, 'J');
+        await flushOldParser();
+      });
+      expect(bitmarkState[tab].jsonAsString).toBe('J');
+      expect(bitmarkState[tab].jsonBitStarts).toEqual(INPUT_STARTS);
+      expect(bitmarkState[tab].markup).not.toBe('');
+    },
+  );
+
+  it('pins nothing when the typed JSON does not convert (the markers move with the edits)', async () => {
+    const { result } = renderHook(() => useBitmarkConverter(), { wrapper: detailsWrapper });
+    await act(async () => {
+      await result.current.jsonToMarkup('wasm', 'BAD');
+    });
+    expect(bitmarkState.wasm.jsonAsString).toBe('BAD');
+    expect(bitmarkState.wasm.jsonBitStarts).toBeUndefined();
+  });
+});
