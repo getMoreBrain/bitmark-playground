@@ -21,6 +21,14 @@ type Win = Window & { __example?: Record<string, unknown> };
       </bm-split>
     </bm-session>
     <p>Form value length: <span id="form-length">{{ content.value?.length ?? 0 }}</span>; changes: <span id="changes">{{ changes }}</span></p>
+    <h3>A second session that loads its own parser (the load path, D2)</h3>
+    <bm-session [engine]="loadedEngine" value="[.article]&#10;Loaded parser" (ready)="loadedReady = true" style="height: 160px">
+      <bm-split>
+        <bm-pane type="bitmark"></bm-pane>
+        <bm-pane type="json"></bm-pane>
+      </bm-split>
+    </bm-session>
+    <p>Loaded session ready: <span id="loaded-ready">{{ loadedReady }}</span></p>
     <h3>The host's own JSON editor (must get no bitmark schema)</h3>
     <div id="host-json" style="height: 120px; border: 1px solid #444"></div>
   `,
@@ -29,6 +37,9 @@ export class App {
   private readonly zone = inject(NgZone);
   readonly content = new FormControl('[.article]\nHello **World**!\n\n[.cloze]\nThe capital of France is [_Paris].');
   changes = 0;
+  loadedReady = false;
+  /** The load path: the package imports and initialises this parser build itself. */
+  readonly loadedEngine = { url: '/assets/parser-browser/bitmark-parser.min.js' };
 
   constructor() {
     const w = window as Win;

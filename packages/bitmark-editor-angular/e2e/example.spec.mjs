@@ -18,7 +18,7 @@ test('bm-session and bm-panes on Monaco 0.46 AMD with the injected parser', asyn
   await expect.poll(() => paneValue(page, 'json')).toContain('"type": "cloze"');
   await expect(page.locator('.bm-pane-bitmark .bm-tok-bitType').first()).toBeVisible();
   // Tabs: only the active pane is mounted.
-  await expect(page.locator('.bm-pane-text')).toHaveCount(0);
+  await expect(page.locator('bm-session').first().locator('.bm-pane-text')).toHaveCount(0);
 
   // Type: the JSON follows, and the form value with it.
   await page.locator('.bm-pane-bitmark .monaco-editor').first().click();
@@ -59,8 +59,9 @@ test('bm-session and bm-panes on Monaco 0.46 AMD with the injected parser', asyn
 
   // The second tab mounts when chosen, and the first unmounts.
   await page.getByRole('tab', { name: 'Text' }).click();
-  await expect(page.locator('.bm-pane-text')).toHaveCount(1);
-  await expect(page.locator('.bm-pane-json')).toHaveCount(0);
+  const first = page.locator('bm-session').first();
+  await expect(first.locator('.bm-pane-text')).toHaveCount(1);
+  await expect(first.locator('.bm-pane-json')).toHaveCount(0);
 
   // The host's own JSON model gets no bitmark schema markers (D5).
   await page.waitForTimeout(1500);
@@ -69,5 +70,16 @@ test('bm-session and bm-panes on Monaco 0.46 AMD with the injected parser', asyn
     return m.editor.getModelMarkers({ resource: m.Uri.parse('inmemory://host/config.json') }).length;
   });
   expect(hostMarkers).toBe(0);
+  // The second session loads its own parser (D2's load path) and works.
+  await expect(page.locator('#loaded-ready')).toHaveText('true', { timeout: 30_000 });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.__example.monaco.editor
+          .getModels()
+          .some((m) => m.uri.toString().endsWith('/json.json') && m.getValue().includes('Loaded parser')),
+      ),
+    )
+    .toBe(true);
   expect(errors).toEqual([]);
 });

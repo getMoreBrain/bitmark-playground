@@ -99,6 +99,15 @@
                 "glob": "bitmark.schema.json",
                 "input": "node_modules/@gmb/bitmark-parser/schema",
                 "output": "/assets/bitmark-parser/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@gmb/bitmark-parser/dist/browser",
+                "output": "/assets/parser-browser/",
+                "ignore": [
+                  "cjs/**",
+                  "**/*.map"
+                ]
               }
             ],
             "styles": [
