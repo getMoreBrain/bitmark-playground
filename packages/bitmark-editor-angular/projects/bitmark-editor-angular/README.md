@@ -4,6 +4,12 @@ Angular components for [`@gmb/bitmark-editor`](../../../bitmark-editor/README.md
 (PLAN-022 D10): `bm-session`, `bm-pane`, `bm-tabs`, `bm-split`, with forms
 support. Angular 21+.
 
+> **Moved:** the package's development now happens in
+> [getMoreBrain/bitmark-editor](https://github.com/getMoreBrain/bitmark-editor).
+> This copy is frozen at that repo's starting point (8297e94) and will be
+> removed once the playground uses the published package. Send changes
+> there, not here.
+
 ```ts
 // app.module.ts (or an app config's providers)
 providers: [
