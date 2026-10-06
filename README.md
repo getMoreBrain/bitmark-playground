@@ -10,6 +10,19 @@ A web playground for parsing and generating bitmark
 Features:
 - Convert bitmark to JSON, and vice-versa.
 
+## The editors as a package
+
+The playground's bitmark and JSON editors are also a framework-agnostic
+package, in this repo's workspace:
+
+- [`@gmb/bitmark-editor`](packages/bitmark-editor/README.md): the core,
+  custom elements, a React adapter, and a CDN-ready `/bundled` build;
+- [`@gmb/bitmark-editor-angular`](packages/bitmark-editor-angular/projects/bitmark-editor-angular/README.md):
+  Angular components.
+
+The playground uses the package from source. Both packages are at 0.1.0
+and not yet published.
+
 
 ## Available Scripts
 

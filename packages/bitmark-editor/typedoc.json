@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "@gmb/bitmark-editor",
+  "entryPoints": ["src/index.ts", "src/elements/index.ts", "src/react/index.tsx", "src/bundled/index.ts"],
+  "out": "docs/api",
+  "tsconfig": "tsconfig.json",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "readme": "README.md",
+  "exclude": ["**/*.test.ts", "**/*.test.tsx", "src/testing/**"]
+}

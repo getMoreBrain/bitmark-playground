@@ -408,21 +408,29 @@ and to the package in Phase 2.
 
 ### Documentation
 
-- [ ] TypeDoc for the public API of both packages, published beside the
-  README (D16).
-- [ ] The upstream note to the parser repo (D16).
+- [x] TypeDoc for the public API (D16): `bun run docs` in the core package
+  (`docs/api`, not committed). The Angular wrapper's API is small and is
+  documented in its README.
+  - Publishing the docs beside the README (e.g. on Pages) waits for the
+    first release.
+- [x] The upstream note to the parser repo (D16): written,
+  `packages/bitmark-editor/docs/upstream-parser-note.md`, not sent. Two of
+  the three asks are already met by parser 7.7.0+.
 
-- [ ] Package README: install, the two builds, the two engine paths (D2),
+- [x] Package README: install, the two builds, the two engine paths (D2),
   sessions, panes, the optional layouts, options and events; host recipes for Angular, static sites
   (no bundler, CDN or vendored), Vite / React and SSR frameworks
   (client-only import); CSP notes (wasm, workers, CDN).
-- [ ] ARCHITECTURE.md:
+- [x] ARCHITECTURE.md (also corrected the stale CRA / react-app-rewired build
+  description and the removed `src/monaco-bitmark`):
   - a package layer;
   - the workspace in the directory structure;
   - the parser-loading rule amended to "loaded at runtime from the CDN, a
     host URL, or injected by the host — never bundled by the playground";
   - a change-log line.
-- [ ] Playground README: a pointer to the package.
+- [x] Playground README: a pointer to the package.
+- [x] Hand-off briefs for the other repos: `docs/handoff-cosmic.md`
+  (Step 17) and `docs/handoff-docs-site.md` (Step 18).
 
 ## Completion Criteria
 

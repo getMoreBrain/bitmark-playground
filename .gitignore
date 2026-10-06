@@ -54,3 +54,4 @@ junit.xml
 /packages/**/examples/**/results
 /packages/**/examples/**/dist
 /packages/**/examples/**/.angular
+/packages/bitmark-editor/docs/api
