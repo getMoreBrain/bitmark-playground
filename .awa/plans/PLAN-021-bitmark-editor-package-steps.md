@@ -272,6 +272,16 @@ and to the package in Phase 2.
       `tsconfig` paths for type checking.
     - Errors show in the pane's banner, and the last good content stays
       (D15). This replaces the old in-pane error dump.
+    - The right-hand session panes all stay mounted (the inactive ones
+      hidden), so each tab's duration stays current, as with the runners.
+    - Changed on purpose: HTML, Text, XML, Info and Mappings follow the shown
+      left tab's bitmark (before: HTML from Original, the others from WASM),
+      and HTML and XML edits go into the shown tab. Invalid JSON typed in a
+      session pane stays in that pane (marked); the playground keeps the last
+      valid JSON.
+    - Review fixes: a left-tab switch just after a pane edit, the converted
+      pane text (not newer typing) sent to the pipeline, and a parser load
+      failure shown in the panes. Each new check was mutation-checked.
     - Checked: `spikes/tests/playground-session.spec.mjs`, and the PLAN-018
       smoke checks (scroll linking by bit). Playground `tsc`, tests (167)
       and lint pass (lint's only errors are the existing ones in the

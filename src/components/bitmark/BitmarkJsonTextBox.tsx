@@ -11,7 +11,7 @@ import { useSnapshot } from 'valtio';
 
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
-import { SessionPaneTab } from '../../session/PlaygroundSession';
+import { RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/PlaygroundSession';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { WasmCheckPanel } from './WasmCheckPanel';
@@ -54,46 +54,57 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     [jsonToMarkup],
   );
 
-  // @awa-impl: PLAN-006-Step4 (render WasmCheckPanel when wasmCheck tab is active)
-  if (activeTab === 'wasmCheck') {
-    return (
-      <WasmCheckPanel
-        markup={bitmarkStateSnap.wasmCheck.markup}
-        errorAsString={bitmarkStateSnap.wasmCheck.markupErrorAsString}
-      />
-    );
-  }
-
   // @awa-impl: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
-  if (activeTab !== 'js') {
-    return <SessionPaneTab tab={activeTab} className={restProps.className ?? undefined} />;
-  }
+  // All stay mounted (the inactive ones hidden), so each tab's duration stays current.
+  const sessionPanes = RIGHT_SESSION_TABS.map((tab) => (
+    <SessionPaneTab
+      key={tab}
+      tab={tab}
+      hidden={tab !== activeTab}
+      className={tab === activeTab ? (restProps.className ?? undefined) : undefined}
+    />
+  ));
 
-  const activeSlice = bitmarkStateSnap.js;
+  return (
+    <>
+      {sessionPanes}
+      {activeTab === 'js' || activeTab === 'wasmCheck' ? ownTab() : null}
+    </>
+  );
 
-  if (anyLoadSuccess) {
-    const opts = {
-      ...DEFAULT_MONACO_OPTIONS,
-      ...options,
-    };
+  /** The tabs the playground renders itself. */
+  function ownTab() {
+    // @awa-impl: PLAN-006-Step4 (render WasmCheckPanel when wasmCheck tab is active)
+    if (activeTab === 'wasmCheck') {
+      return (
+        <WasmCheckPanel
+          markup={bitmarkStateSnap.wasmCheck.markup}
+          errorAsString={bitmarkStateSnap.wasmCheck.markupErrorAsString}
+        />
+      );
+    }
 
-    const value = activeSlice.jsonErrorAsString ?? activeSlice.jsonAsString;
-    return (
-      <MonacoTextArea
-        {...restProps}
-        theme={MONACO_THEME}
-        language="json"
-        value={value}
-        options={opts}
-        onInput={onInput}
-        editorDidMount={onMount}
-        editorWillUnmount={onUnmount}
-      />
-    );
-  } else {
-    let text = 'Loading...';
-    if (allLoadError) {
-      text = 'Load failed.';
+    const activeSlice = bitmarkStateSnap.js;
+
+    if (anyLoadSuccess) {
+      const opts = {
+        ...DEFAULT_MONACO_OPTIONS,
+        ...options,
+      };
+
+      const value = activeSlice.jsonErrorAsString ?? activeSlice.jsonAsString;
+      return (
+        <MonacoTextArea
+          {...restProps}
+          theme={MONACO_THEME}
+          language="json"
+          value={value}
+          options={opts}
+          onInput={onInput}
+          editorDidMount={onMount}
+          editorWillUnmount={onUnmount}
+        />
+      );
     }
     return (
       <Flex
@@ -103,7 +114,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
           width: '100%',
         }}
       >
-        {text}
+        {allLoadError ? 'Load failed.' : 'Loading...'}
       </Flex>
     );
   }

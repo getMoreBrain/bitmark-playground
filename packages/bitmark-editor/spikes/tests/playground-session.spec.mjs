@@ -77,3 +77,28 @@ test('switching the left tab shows that parser\'s bitmark in the session', async
   await expect(page.locator('.markup-editor .view-lines')).toContainText('Switch check', { timeout: 15_000 });
   await expect(rightPane(page)).toContainText('Switch check');
 });
+
+test('hidden tabs keep converting: every tab shows its duration', async ({ page }) => {
+  await page.goto(URL);
+  await expect(page.locator('.markup-editor .bm-tok-bitType').first()).toBeVisible({ timeout: 30_000 });
+  await typeBitmark(page, '[.article]\nTimed');
+  // Not visited: their panes are mounted but hidden.
+  for (const name of [/^HTML/, /^Text/, /^XML \(NISO-IEC\)/, /^XML \(NISO-IEC-ES\)/]) {
+    await expect(rightTab(page, name)).toContainText(/\d/, { timeout: 15_000 });
+  }
+});
+
+test('a left-tab switch right after a pane edit still reaches the panes', async ({ page }) => {
+  await page.goto(URL);
+  await expect(page.locator('.markup-editor .bm-tok-bitType').first()).toBeVisible({ timeout: 30_000 });
+  await typeBitmark(page, '[.article]\nBefore');
+  await rightTab(page, /^WASM(?! \(full\)| Check)/).click();
+  await expect(rightPane(page)).toContainText('Before', { timeout: 10_000 });
+  await rightPane(page).getByText('Before').first().dblclick();
+  await page.keyboard.type('After');
+  // Switch at once, inside the Original parser's debounce.
+  await page.getByRole('tab', { name: /^Original/ }).first().click();
+  await expect(page.locator('.markup-editor .view-lines')).toContainText('After', { timeout: 15_000 });
+  await rightTab(page, /^Text/).click();
+  await expect(rightPane(page)).toContainText('After', { timeout: 15_000 });
+});

@@ -28,8 +28,12 @@ import { uiState } from '../state/uiState';
  *   pipeline, so every parser tab, the lexer and the LED stay current.
  */
 
-/** How an edit in a session pane goes back into the playground's pipeline. */
-type PaneRoute = (pane: Pane, change: SessionChange, converter: BitmarkConverter) => void;
+/**
+ * How an edit in a session pane goes back into the playground's pipeline.
+ * `text` is the pane text the session converted (not the pane's current
+ * text, which may be newer).
+ */
+type PaneRoute = (text: string, change: SessionChange, converter: BitmarkConverter) => void;
 const routes = new WeakMap<Pane, PaneRoute>();
 
 const MESSAGES = {
@@ -43,24 +47,23 @@ const shownBitmark = (): string => bitmarkState[bitmarkState.activeMarkupTab].ma
 /** The session for the whole playground. Mount once, inside `BitmarkParserProvider`. */
 // @awa-impl: PLAN-021-Step14 (the playground's session)
 export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactElement => {
-  const { engine } = useBitmarkParser();
+  const { engine, loadError } = useBitmarkParser();
   // Created once; the engine arrives after the first load stage.
   const deferred = useMemo(() => {
     let resolve!: (e: BitmarkEngine) => void;
-    const promise = new Promise<BitmarkEngine>((r) => (resolve = r));
-    return { promise, resolve };
+    let reject!: (e: Error) => void;
+    const promise = new Promise<BitmarkEngine>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
   }, []);
   useEffect(() => {
     if (engine) deferred.resolve(engine);
-  }, [engine, deferred]);
+    // The panes then show the load error, not an endless "loading".
+    else if (loadError) deferred.reject(new Error('The bitmark parser failed to load.'));
+  }, [engine, loadError, deferred]);
   const [initial] = useState(shownBitmark);
-  const converter = useBitmarkConverter();
-  const latest = useRef(converter);
-  latest.current = converter;
-
-  const onChange = useCallback((e: SessionChange) => {
-    if (e.source) routes.get(e.source)?.(e.source, e, latest.current);
-  }, []);
 
   return (
     <BitmarkSession
@@ -72,7 +75,6 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
       theme="dark"
       scrollGroup={playgroundScrollGroup()}
       messages={MESSAGES}
-      onChange={onChange}
     >
       <SessionSync />
       {children}
@@ -80,35 +82,72 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
   );
 };
 
-/** Push the playground's edits (and left-tab switches) into the session. */
-// @awa-impl: PLAN-021-Step14 (playground → session)
+/** Keep the session and the playground's state in step, both ways. */
+// @awa-impl: PLAN-021-Step14 (playground → session; session → playground)
 const SessionSync = (): null => {
   const session = useBitmarkSession();
+  const converter = useBitmarkConverter();
+  const latest = useRef(converter);
+  latest.current = converter;
+
   useEffect(() => {
     if (!session) return;
+    // Session → playground: a pane edit runs the playground's own pipeline.
+    const off = session.on('change', (e) => {
+      const route = e.source && routes.get(e.source);
+      if (route) route(session.lastEdit?.content ?? '', e, latest.current);
+    });
+
+    // Playground → session.
     let tab = bitmarkState.activeMarkupTab;
+    let seenEdits = bitmarkState.lastEdit.updates;
+    // After a left-tab switch the session follows the shown bitmark again,
+    // even while the last edit was a session pane's (its pipeline may still
+    // be filling the newly shown tab).
+    let switched = false;
     const sync = () => {
       const doc = shownBitmark();
+      const { origin, inputFormat, content, label, updates } = bitmarkState.lastEdit;
+      if (updates !== seenEdits) {
+        seenEdits = updates;
+        switched = false;
+      }
       if (bitmarkState.activeMarkupTab !== tab) {
-        // Another left tab: the session shows its bitmark; not an edit.
         tab = bitmarkState.activeMarkupTab;
-        if (doc !== session.getBitmark()) session.setBitmark(doc, false);
+        switched = true;
+      }
+      if (doc === session.getBitmark()) return;
+      if (origin === 'session') {
+        // That edit is in the session already; only a tab switch shows
+        // another bitmark (not an edit).
+        if (switched) session.setBitmark(doc, false);
         return;
       }
-      const { origin, inputFormat, content, label } = bitmarkState.lastEdit;
-      // An edit made in a session pane is in the session already.
-      if (origin === 'session' || doc === session.getBitmark()) return;
       // Before the first edit (the initial document) there is no origin.
-      session.setBitmark(doc, inputFormat ? { inputFormat, content, label } : false);
+      session.setBitmark(doc, inputFormat && !switched ? { inputFormat, content, label } : false);
     };
     sync();
-    return subscribe(bitmarkState, sync);
+    const unsubscribe = subscribe(bitmarkState, sync);
+    return () => {
+      off();
+      unsubscribe();
+    };
   }, [session]);
   return null;
 };
 
 /** The right-hand tabs (and bottom panels) that are session panes. */
 export type SessionTab = 'wasm' | 'wasmFull' | TimedPane | 'info' | 'mappings';
+
+/** The right-hand (JSON side) tabs that are session panes, in tab order. */
+export const RIGHT_SESSION_TABS = [
+  'wasm',
+  'wasmFull',
+  'tableHtml',
+  'text',
+  'xmlNiso',
+  'xmlNisoEs',
+] as const satisfies readonly SessionTab[];
 
 interface TabSpec {
   type: 'json' | 'html' | 'xml' | 'text' | 'info' | 'mappings';
@@ -123,8 +162,7 @@ interface TabSpec {
 /** A JSON edit goes through the playground's JSON pipeline for its tab. */
 const jsonRoute =
   (tab: 'wasm' | 'wasmFull', label: string): PaneRoute =>
-  (pane, _change, converter) => {
-    const json = pane.textEditor.getValue();
+  (json, _change, converter) => {
     bitmarkState.setLastEdit('json', json, label, 'session');
     void converter.jsonToMarkup(tab, json);
   };
@@ -132,8 +170,8 @@ const jsonRoute =
 /** A markup-format edit (HTML, XML): its bitmark goes in as an edit of the left tab. */
 const markupRoute =
   (inputFormat: string, label: string): PaneRoute =>
-  (pane, change, converter) => {
-    bitmarkState.setLastEdit(inputFormat, pane.textEditor.getValue(), label, 'session');
+  (text, change, converter) => {
+    bitmarkState.setLastEdit(inputFormat, text, label, 'session');
     void converter.markupToJson(bitmarkState.activeMarkupTab, change.bitmark);
   };
 
@@ -184,10 +222,16 @@ const TABS: Record<SessionTab, TabSpec> = {
 export const SessionPaneTab = ({
   tab,
   className,
+  hidden = false,
 }: {
   tab: SessionTab;
   /** The playground's editor class (its border, and `.json-editor` for the checks). */
   className?: string;
+  /**
+   * Mounted but not shown: it still converts on every edit, so its tab keeps
+   * a current duration (as the playground's runners did); it doesn't scroll.
+   */
+  hidden?: boolean;
 }): ReactElement => {
   const ui = useSnapshot(uiState);
   const spec = TABS[tab];
@@ -210,11 +254,11 @@ export const SessionPaneTab = ({
       mode={spec.mode}
       mapping={spec.mapping}
       label={spec.label}
-      scrollSync={spec.scroll === false ? false : ui.linkScroll}
+      scrollSync={spec.scroll === false || hidden ? false : ui.linkScroll}
       onPane={onPane}
       onRender={onRender}
       className={className}
-      style={{ height: '100%', width: '100%' }}
+      style={{ height: '100%', width: '100%', display: hidden ? 'none' : undefined }}
     />
   );
 };
