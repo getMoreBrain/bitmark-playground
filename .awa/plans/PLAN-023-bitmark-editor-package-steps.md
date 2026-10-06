@@ -411,7 +411,11 @@ and to the package in Phase 2.
   - Package changes it needed: `<bitmark-session>` takes `messages`; and
     `/bundled` now really applies the session's theme to its own Monaco
     (the README said so, the code did not: the panes stayed light on the
-    dark site). `setMonacoLoader(loader, { own: true })`.
+    dark site). `setMonacoLoader(loader, { own: true })`. Also from its
+    review: `setBitmark` drops an edit still waiting out the debounce (a
+    Reset within 300 ms of typing was overwritten by the typed text); and a
+    theme first given after the start still sets that Monaco's theme (after
+    the docs site's vendored 0.1.0, which sets its theme before the start).
 
 ### Testing
 
@@ -560,8 +564,8 @@ Two independent code reviews, then the full matrix again.
   propagate to all the others, and read-only and scroll-sync membership are
   per pane.
 - [x] Two sessions work independently on one page.
-- [ ] The cosmic proof of concept (Step 17) builds and works in the
+- [x] The cosmic proof of concept (Step 17) builds and works in the
   browser.
-- [ ] The docs site runs its "Try it" editor on the package (Step 18).
+- [x] The docs site runs its "Try it" editor on the package (Step 18).
 - [x] The package README documents both engine paths and the host recipes.
 - [ ] `awa check` passes.

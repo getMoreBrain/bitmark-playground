@@ -166,6 +166,20 @@ describe('<bitmark-session> and <bitmark-pane> (PLAN-022 D3, D9)', () => {
     second.setAttribute('theme', 'dark');
     expect(hostMonaco.setTheme).not.toHaveBeenCalled();
     other.remove();
+
+    // A theme first given after the start still reaches the package's Monaco.
+    const late = createFakeMonaco();
+    setMonacoLoader(async () => late.monaco, { own: true });
+    const third = document.createElement('div');
+    third.innerHTML = `<bitmark-session value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`;
+    const lateSession = third.querySelector('bitmark-session') as BitmarkSessionElementApi;
+    lateSession.engine = engine;
+    document.body.append(third);
+    await vi.waitFor(() => expect(lateSession.dataset.state).toBe('ready'));
+    expect(late.setTheme).not.toHaveBeenCalled();
+    lateSession.setAttribute('theme', 'light');
+    expect(late.setTheme).toHaveBeenLastCalledWith('vs');
+    third.remove();
     setMonacoLoader(undefined as never);
   });
 

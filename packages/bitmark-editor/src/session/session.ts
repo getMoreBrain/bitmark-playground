@@ -120,11 +120,19 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
   stage2Pending = resolved.loading;
   const ready = resolved.engine;
 
-  // The session-wide theme: Monaco's is global, so it is set here once (D11).
-  const monacoTheme =
-    options.applyMonacoTheme && theme !== undefined
-      ? applyBitmarkTheme(document.createElement('div'), theme, { monaco, applyMonacoTheme: true })
-      : undefined;
+  // The session-wide theme: Monaco's is global, so it is set here once (D11),
+  // from the first theme the session gets (at start or later).
+  let monacoTheme: ReturnType<typeof applyBitmarkTheme> | undefined;
+  const applyMonacoTheme = (next: BitmarkTheme | undefined) => {
+    if (!options.applyMonacoTheme || next === undefined) return;
+    if (monacoTheme) monacoTheme.setTheme(next);
+    else
+      monacoTheme = applyBitmarkTheme(document.createElement('div'), next, {
+        monaco,
+        applyMonacoTheme: true,
+      });
+  };
+  applyMonacoTheme(theme);
 
   const commit = (text: string, source: PaneControl | undefined, edit: EditOrigin | undefined) => {
     editSeq++;
@@ -219,7 +227,7 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
     },
     setTheme: (next) => {
       theme = next;
-      monacoTheme?.setTheme(next);
+      applyMonacoTheme(next);
       for (const c of controls) c.applyTheme(next);
     },
     on: (event, listener) => {
