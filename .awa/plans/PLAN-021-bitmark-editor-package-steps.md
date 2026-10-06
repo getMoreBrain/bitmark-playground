@@ -287,11 +287,16 @@ and to the package in Phase 2.
       and lint pass (lint's only errors are the existing ones in the
       `.claude/` and `CLAUDE.md` markdown). The package's typecheck, lint and
       tests (175) pass.
-- [ ] Step 15 — Promote the spikes to maintained examples in
+- [x] Step 15 — Promote the spikes to maintained examples in
   `packages/bitmark-editor/examples/`: `static` (no bundler, CDN
   `/bundled`, shaped like the docs site) and `angular`. Each
   shows both engine paths (D2): one page loads the engine, one injects it.
   Build them in CI.
+  - Done: `examples/static` (`index.html` loads the engine, `inject.html`
+    injects it, `relocated.html` moves the assets) and `examples/esm`; the
+    Angular example lives in the Angular workspace
+    (`packages/bitmark-editor-angular/projects/example`, both paths). CI
+    builds and checks both.
 - [x] Step 15a — The Angular example is shaped like cosmic (D10):
   - Angular 21, NgModule bootstrap, `provideZoneChangeDetection`;
   - Monaco 0.46 AMD copied to assets and read as `window.monaco`;
@@ -501,19 +506,19 @@ Two independent code reviews, then the full matrix again.
 
 ## Completion Criteria
 
-- [ ] `@gmb/bitmark-editor` builds `/esm` and `/bundled`, with type
+- [x] `@gmb/bitmark-editor` builds `/esm` and `/bundled`, with type
   declarations.
-- [ ] The static and Angular examples build in CI and pass the
+- [x] The static and Angular examples build in CI and pass the
   browser checks, each with both a loaded and an injected engine.
 - [x] The playground runs on the package with no loss of information (its
   error dump moves outside the panes, D15); its lint,
   `tsc` and tests pass.
-- [ ] Panes are placed freely by the host; any combination works, edits
+- [x] Panes are placed freely by the host; any combination works, edits
   propagate to all the others, and read-only and scroll-sync membership are
   per pane.
-- [ ] Two sessions work independently on one page.
+- [x] Two sessions work independently on one page.
 - [ ] The cosmic proof of concept (Step 17) builds and works in the
   browser.
 - [ ] The docs site runs its "Try it" editor on the package (Step 18).
-- [ ] The package README documents both engine paths and the host recipes.
+- [x] The package README documents both engine paths and the host recipes.
 - [ ] `awa check` passes.
