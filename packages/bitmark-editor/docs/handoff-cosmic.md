@@ -1,8 +1,8 @@
 # Hand-off: cosmic proof of concept (PLAN-023 Step 17)
 
-For a branch in `getMoreBrain/cosmic` (`gmb.web`). Not started: it is work
-in another repository, and it needs the packages as a prerelease or local
-tarballs.
+For a branch in `getMoreBrain/cosmic` (`gmb.web`). Done on branch
+`feat/bitmark-editor-poc` (PLAN-023 Step 17); this brief is kept for the
+real integration.
 
 ## What to do
 
@@ -43,6 +43,16 @@ tarballs.
   JSON markers.
 
 ## Notes
+
+- Monaco's theme is page-wide. Set `vs-dark` (as cosmic's reader does) with
+  the package's `theme: 'dark'`; on Monaco's default `vs` the dark token
+  colours are unreadable.
+- cosmic's CI deletes the lockfile and reinstalls: a local tarball must be
+  committed in the repo (`file:vendor/…`).
+- Re-vendoring: bump the version, or cosmic's production `npm ci` fails on
+  the lockfile's integrity hash.
+- A route guard on a flag must wait for `FeatureFlagService.ready`: the
+  first navigation runs before DevCycle answers.
 
 - `packages/bitmark-editor-angular/projects/example` reproduces this setup,
   and its e2e passes: Angular 21 with zones, Monaco 0.46 AMD, the injected

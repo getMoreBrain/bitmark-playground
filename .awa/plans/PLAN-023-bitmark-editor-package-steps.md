@@ -357,7 +357,7 @@ and to the package in Phase 2.
     package's own are. `@gmb/bitmark-editor-angular` is 13 kB.
   - The workflow YAML parses (js-yaml), but it has not run on GitHub
     yet.
-- [ ] Step 17 — cosmic proof of concept, on a branch in `getMoreBrain/cosmic`.
+- [x] Step 17 — cosmic proof of concept, on a branch in `getMoreBrain/cosmic`.
   It is the last step, after the `0.x` prerelease (Step 16); a local
   `npm pack` tarball is enough before that.
   - One `bm-session` with bitmark and JSON panes on one screen, behind a
@@ -366,6 +366,21 @@ and to the package in Phase 2.
     browser (highlighting, diagnostics, completion, hover, conversion both
     ways, scroll sync), with cosmic's existing Monaco editors unaffected.
   - Where the editor goes in cosmic's UI is product work for a separate plan.
+  - Done: cosmic branch `feat/bitmark-editor-poc` (gmb.web): `/editor-poc`,
+    matched only with flag `bitmark-editor-poc`; the 0.1.0 tarballs vendored
+    in `gmb.web/vendor/` (cosmic's CI reinstalls from scratch, so a path
+    outside the repo fails); the parser module from
+    `BitmarkConvertorService.rustParserModule()` (one shared init); Monaco
+    from ngx-monaco-editor-v2's AMD assets, loaded once; the parser's schema
+    as an asset. `build:cosmic` passes (initial bundle +0.16 kB, the editor is
+    lazy). Checked in headless Chromium on the production build: every
+    service, conversion both ways, the form control, scroll sync by bit; a
+    host JSON model gets no bitmark markers; the flag gate. Not exercised: a
+    logged-in reader beside the editor (no account).
+  - Found: Monaco's theme is page-wide (D11), and the package's default
+    `theme: 'dark'` on a host left on Monaco's default `vs` makes bold text
+    unreadable. cosmic sets `vs-dark`, as its reader does. Follow-up for the
+    package: warn, or pick the token theme from the host's Monaco theme.
 - [ ] Step 18 — Docs site switch (D12), on a branch in the parser repo
   (`docs-site`), after the `0.x` prerelease:
   - `live-examples.js` mounts a `<bitmark-session lazy="idle"
