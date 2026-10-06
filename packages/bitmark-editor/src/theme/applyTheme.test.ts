@@ -36,15 +36,20 @@ describe('the theme stylesheet (PLAN-020 D11)', () => {
     const light = css.match(/\.bm-theme-light\{([^}]*)\}/)![1]!;
     const dark = css.match(/\.bm-theme-dark\{([^}]*)\}/)![1]!;
     for (const key of [...Object.keys(TOKEN_STYLES), ...Object.keys(STYLED_MODIFIERS)]) {
-      expect(light).toContain(`${tokenVar(key as never, 'color')}:`);
-      expect(dark).toContain(`${tokenVar(key as never, 'color')}:`);
+      const hostVar = tokenVar(key as never, 'color');
+      const themeVar = hostVar.replace('--bm-', '--bm-theme-');
+      expect(light).toContain(`${themeVar}:`);
+      expect(dark).toContain(`${themeVar}:`);
+      // The theme classes never set the host's variable, so a host's wins (D12).
+      expect(light).not.toContain(`${hostVar}:`);
+      expect(dark).not.toContain(`${hostVar}:`);
     }
   });
 
   // @awa-test: PLAN-021-Step5a (dark is the fallback: no theme class needed)
   it('falls back to the dark palette when no theme class applies', () => {
     expect(css).toContain(
-      `.monaco-editor .bm-tok-bitType{color:var(--bm-tok-bitType-color,${TOKEN_STYLES.bitType.color});`,
+      `.monaco-editor .bm-tok-bitType{color:var(--bm-tok-bitType-color,var(--bm-theme-tok-bitType-color,${TOKEN_STYLES.bitType.color}));`,
     );
   });
 

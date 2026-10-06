@@ -51,3 +51,6 @@ junit.xml
 /packages/**/node_modules
 /packages/**/spikes/**/dist
 /packages/**/spikes/**/results
+/packages/**/examples/**/results
+/packages/**/examples/**/dist
+/packages/**/examples/**/.angular

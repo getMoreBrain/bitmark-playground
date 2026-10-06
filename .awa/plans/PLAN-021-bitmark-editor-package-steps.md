@@ -81,10 +81,9 @@ takes an injected Monaco and parser (D2, D8). All 9 browser checks pass.
 
 #### Not covered by Phase 0 (moved on)
 
-- [ ] `/bundled` consumed through a host bundler (e.g. Angular with no
-  Monaco): `import.meta.url` then points at the host's chunk, so the
-  sibling CSS and workers are not found. The `assetBase` option and a copy
-  recipe are needed. Test in Phase 2 Step 11.
+- [x] `/bundled` consumed through a host bundler: `setBitmarkAssetBase`
+  points the relocated loader at its Monaco, CSS and workers (tested in
+  `examples/static/relocated.html`, Step 11).
 - [x] Token CSS variables and `setTheme` (D11): built in Phase 1 Step 5a
   (`applyBitmarkTheme`, unit-tested). The host `--syntax-*` mapping itself
   is the docs site's own CSS (Step 18).
@@ -200,12 +199,26 @@ and to the package in Phase 2.
   - The package's dev copies of `monaco-editor` and `@gmb/bitmark-parser`
     are never reached at runtime, because the source only imports their
     types (the lint guard enforces this).
-- [ ] Step 11 — Builds:
+- [x] Step 11 — Builds:
   - `/esm` (tsup or Vite library mode; `d.ts` files);
   - `/bundled` per the Phase 0 outcome (Monaco + core + element, CSS file,
     worker files, asset base option).
 
   Size budget: report the `/bundled` sizes in the README.
+
+  Done: `scripts/build.mjs` (esbuild).
+  - `dist/esm`: entries for the core, `elements`, `react` and
+    `engineWorker`, with shared chunks; Monaco, the parser and React stay
+    external.
+  - `dist/types`: from `tsc`.
+  - `dist/bundled`: `bundled.js` (the elements and core, 13 KB brotli),
+    `monaco.js` + `monaco.css` (556 + 14 KB brotli, loaded when a session
+    starts), the classic worker files behind blob URLs, the module
+    `engineWorker.js`, and `setBitmarkAssetBase`.
+  - Checked: `examples/esm` bundles the package by name through "exports"
+    with no Monaco inside; `examples/static` runs it from a cross-origin
+    CDN, including a relocated `bundled.js` (asset base) and the bundled
+    worker engine.
 - [x] Step 12 — Custom elements:
   - `<bitmark-session>` and `<bitmark-pane>`: binding by ancestor or id,
     attributes, properties and events, a pane that appears before its
@@ -243,8 +256,8 @@ and to the package in Phase 2.
 
   It is the reproducible CI test for cosmic's setup, which cosmic itself
   cannot provide (it has no test runner).
-- [ ] Step 15b — Package features for D12 (done: `lazy`, `narrow`,
-  `debounceMs`, `messages`, the error slot; left: CDN-safe workers, Step 11):
+- [x] Step 15b — Package features for D12 (`lazy`, `narrow`, `debounceMs`,
+  `messages`, the error slot, CDN-safe workers):
   - `lazy`, `narrow`, `debounceMs`, `messages`, the per-pane error slot;
   - CDN-safe workers in `/bundled`.
 - [ ] Step 16 — Publish config, for both packages (`@gmb/bitmark-editor`,

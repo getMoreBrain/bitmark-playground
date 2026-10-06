@@ -196,13 +196,23 @@ export const tokenVar = (
 ): string => `--bm-${key in MODIFIER_ROLES ? 'mod' : 'tok'}-${key}-${prop}`;
 
 /**
+ * The theme layer under the host's variable: `.bm-theme-dark` /
+ * `.bm-theme-light` set these, never `tokenVar`'s, so a host variable set on
+ * any ancestor always wins (PLAN-020 D12: a site maps the tokens onto its
+ * own design tokens).
+ */
+const themeVar = (key: TokenKey): string =>
+  `--bm-theme-${key in MODIFIER_ROLES ? 'mod' : 'tok'}-${key}-color`;
+
+/**
  * One rule's declarations. Every property the style sets goes through its
  * variable, with the dark value as the fallback, so the look needs no theme
  * class and a host can restyle with plain CSS. A property the style does
  * not set is left out, so a modifier never resets what its type set.
  */
 const declarations = (key: TokenKey, style: TokenStyle): string => {
-  let css = `color:var(${tokenVar(key, 'color')},${style.color});`;
+  // The host's variable, then the theme's, then the dark default.
+  let css = `color:var(${tokenVar(key, 'color')},var(${themeVar(key)},${style.color}));`;
   if (style.fontWeight) css += `font-weight:var(${tokenVar(key, 'weight')},${style.fontWeight});`;
   if (style.fontStyle) css += `font-style:var(${tokenVar(key, 'style')},${style.fontStyle});`;
   if (style.textDecoration) {
@@ -217,7 +227,7 @@ const paletteVars = (
   modifiers: Record<string, TokenStyle>,
 ): string =>
   [...Object.entries(types), ...Object.entries(modifiers)]
-    .map(([key, style]) => `${tokenVar(key as TokenKey, 'color')}:${style.color};`)
+    .map(([key, style]) => `${themeVar(key as TokenKey)}:${style.color};`)
     .join('');
 
 /**

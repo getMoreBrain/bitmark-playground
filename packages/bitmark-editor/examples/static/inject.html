@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>bitmark editor: injected parser</title>
+    <style>
+      body { margin: 16px; font-family: system-ui, sans-serif; }
+      .row { display: flex; gap: 8px; height: 300px; }
+      .row > bitmark-pane { flex: 1; border: 1px solid #8884; }
+    </style>
+  </head>
+  <body>
+    <!-- The host loads and initialises the parser itself, and injects it
+         (PLAN-020 D2, D7): the package never calls init on it. -->
+    <bitmark-session id="doc" value="[.article]
+Injected parser" schema="off">
+      <div class="row">
+        <bitmark-pane type="bitmark"></bitmark-pane>
+        <bitmark-pane type="json"></bitmark-pane>
+        <bitmark-pane type="html"></bitmark-pane>
+      </div>
+    </bitmark-session>
+    <script type="module">
+      const t = (window.__example = {});
+      const parser = await import('http://localhost:4612/parser/dist/browser/bitmark-parser.min.js');
+      await parser.init({ feature: 'bitmark-json' });
+      const session = document.getElementById('doc');
+      // Set before the bundle defines the element: the element reads it on start.
+      session.engine = { module: parser, feature: 'bitmark-json' };
+      session.addEventListener('ready', () => (t.ready = true));
+      window.__parser = parser;
+      await import('http://localhost:4612/pkg/bundled/bundled.js');
+    </script>
+  </body>
+</html>

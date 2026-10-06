@@ -61,4 +61,9 @@ export default [
       ],
     },
   },
+  // `/bundled` is the one place Monaco is imported at runtime (PLAN-020 D4).
+  {
+    files: ['src/bundled/**/*.ts'],
+    rules: { '@typescript-eslint/no-restricted-imports': 'off' },
+  },
 ];

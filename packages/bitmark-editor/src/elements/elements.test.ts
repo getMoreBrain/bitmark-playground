@@ -231,3 +231,29 @@ describe('<bitmark-tabs>, <bitmark-split> and <bitmark-editor>', () => {
     );
   });
 });
+
+describe('properties set before the elements are defined', () => {
+  // @awa-test: PLAN-021-Step12 (the upgrade pattern: engine / monaco set first)
+  it('takes over engine and monaco set on an element before its upgrade', async () => {
+    const { monaco } = createFakeMonaco();
+    const host = document.createElement('div');
+    host.innerHTML = `<bitmark-session value="${DOC}" schema="off"><bitmark-pane type="json"></bitmark-pane></bitmark-session>`;
+    const real = host.querySelector('bitmark-session') as BitmarkSessionElementApi;
+    // Own properties shadowing the accessors, as an early host script leaves them.
+    Object.defineProperty(real, 'engine', {
+      value: engine,
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+    Object.defineProperty(real, 'monaco', {
+      value: monaco,
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+    document.body.append(host);
+    await vi.waitFor(() => expect(paneText(host.querySelector('bitmark-pane'))).toContain('World'));
+    expect(Object.prototype.hasOwnProperty.call(real, 'engine')).toBe(false);
+  });
+});

@@ -48,6 +48,21 @@ export const isNarrowTouch = (): boolean =>
   typeof matchMedia === 'function' &&
   matchMedia('(pointer: coarse) and (max-width: 700px)').matches;
 
+/**
+ * A property set on the element before it was defined is an own property
+ * that hides the class's accessor: take it over (the custom elements
+ * "upgrade" pattern). Hosts often set `engine` / `monaco` first.
+ */
+const upgradeProperties = (el: HTMLElement, names: string[]) => {
+  for (const name of names) {
+    if (Object.prototype.hasOwnProperty.call(el, name)) {
+      const value = (el as unknown as Record<string, unknown>)[name];
+      delete (el as unknown as Record<string, unknown>)[name];
+      (el as unknown as Record<string, unknown>)[name] = value;
+    }
+  }
+};
+
 /** Run `fn` unless the element is reconnected first (a DOM move is not a removal). */
 const afterDisconnect = (el: Element, fn: () => void) =>
   queueMicrotask(() => {
@@ -107,6 +122,7 @@ export const defineBitmarkElements = (): void => {
 
     connectedCallback() {
       injectElementsCss();
+      upgradeProperties(this, ['monaco', 'engine', 'value']);
       if (this.#session || this.#starting) return;
       const narrow = (this.getAttribute('narrow') ?? 'edit') as NarrowMode;
       if (narrow !== 'edit' && isNarrowTouch()) {
@@ -509,6 +525,7 @@ export const defineBitmarkElements = (): void => {
 
     connectedCallback() {
       injectElementsCss();
+      upgradeProperties(this, ['monaco', 'engine', 'value']);
       this.#build();
     }
 
