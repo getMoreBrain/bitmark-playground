@@ -88,8 +88,16 @@ takes an injected Monaco and parser (D2, D8). All 9 browser checks pass.
   (`applyBitmarkTheme`, unit-tested). The host `--syntax-*` mapping itself
   is the docs site's own CSS (Step 18).
 - [ ] Zoneless Angular: not tried (cosmic is zone-based). Phase 2 Step 13a.
-- [ ] The current Monaco release is 0.57.0; the spikes used 0.52.2 and
-  0.46.0. Add 0.57 to the CI matrix (D8).
+- [x] The current Monaco release is 0.57.0. `/bundled` now ships 0.57 (D4),
+  and the static examples run on it. Monaco 0.55+ moved the JSON API to a
+  top-level `monaco.json` (`languages.json` is only a deprecation stub) and
+  its module paths to `monaco-editor/<path>` through "exports".
+  - The package handles both JSON locations (`jsonDefaultsOf`): before
+    this, the schema binding would have silently done nothing on 0.57.
+  - Covered points: 0.46 AMD (the Angular example), 0.52 ESM (the
+    playground), 0.57 (`/bundled`, the static examples).
+  - Monaco 0.57 is larger: `monaco.js` is 808 KB brotli (556 KB on 0.52),
+    and start-up was 298 ms cold / 86 ms warm on localhost.
 - [ ] Start-up over a throttled network (cold visit): measure in Phase 3
   with the real CDN.
 

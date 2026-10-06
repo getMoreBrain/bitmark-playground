@@ -75,7 +75,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "jsdom": "^28.1.0",
-    "monaco-editor": "0.52.2",
+    "monaco-editor": "0.57.0",
     "prettier": "^3.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

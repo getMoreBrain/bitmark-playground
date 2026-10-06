@@ -12,6 +12,7 @@ import {
   toMonacoCompletionList,
   triggerCharacterOf,
 } from './completion';
+import { jsonDefaultsOf } from './jsonSchema';
 import type { Monaco, TextModel } from './types';
 
 /** Monaco language id for bitmark markup. */
@@ -89,7 +90,7 @@ export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void 
   injectHighlightCss();
 
   // Capability check (D8): degrade with a warning, never a crash.
-  if (!(monaco.languages as { json?: unknown }).json) {
+  if (!jsonDefaultsOf(monaco)) {
     log.warnOnce(
       'no-json-language',
       'this Monaco has no JSON language: the JSON pane runs without schema validation',

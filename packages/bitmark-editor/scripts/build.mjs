@@ -52,8 +52,8 @@ await build({
   ...common,
   minify: true,
   entryPoints: {
-    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
-    'json.worker': 'monaco-editor/esm/vs/language/json/json.worker.js',
+    'editor.worker': 'monaco-editor/editor/editor.worker',
+    'json.worker': 'monaco-editor/language/json/json.worker',
   },
   outdir: path.join(dist, 'bundled'),
   format: 'iife',

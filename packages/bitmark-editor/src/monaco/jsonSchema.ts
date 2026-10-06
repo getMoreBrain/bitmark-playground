@@ -17,6 +17,25 @@ export const BITMARK_MODEL_SCHEME = 'bitmark-editor';
  */
 export const BITMARK_MODEL_FILE_MATCH = `${BITMARK_MODEL_SCHEME}://**`;
 
+/** What the schema binding needs of Monaco's JSON language service. */
+interface JsonDefaults {
+  setDiagnosticsOptions(options: {
+    validate?: boolean;
+    allowComments?: boolean;
+    enableSchemaRequest?: boolean;
+    schemas?: { uri: string; fileMatch?: string[]; schema?: unknown }[];
+  }): void;
+}
+
+/**
+ * Monaco's JSON defaults, wherever this Monaco keeps them: the top-level
+ * `monaco.json` (0.55+; `languages.json` is then only a deprecation stub),
+ * or `monaco.languages.json` (0.46 to 0.54). `undefined`: no JSON language.
+ */
+export const jsonDefaultsOf = (monaco: Monaco): JsonDefaults | undefined =>
+  (monaco as unknown as { json?: { jsonDefaults?: JsonDefaults } }).json?.jsonDefaults ??
+  (monaco.languages as unknown as { json?: { jsonDefaults?: JsonDefaults } }).json?.jsonDefaults;
+
 /** The schema's id in Monaco's JSON service. */
 export const BITMARK_SCHEMA_URI = 'https://getmorebrain.github.io/bitmark/bitmark.schema.json';
 
@@ -57,9 +76,9 @@ export const bindBitmarkJsonSchema = (
   schema: unknown,
   options: { fileMatch?: string[] } = {},
 ): boolean => {
-  const json = (monaco.languages as { json?: Monaco['languages']['json'] }).json;
-  if (!json?.jsonDefaults) return false;
-  json.jsonDefaults.setDiagnosticsOptions({
+  const jsonDefaults = jsonDefaultsOf(monaco);
+  if (!jsonDefaults) return false;
+  jsonDefaults.setDiagnosticsOptions({
     validate: true,
     allowComments: false,
     enableSchemaRequest: false,

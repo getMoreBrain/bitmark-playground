@@ -252,6 +252,16 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     expect(fake.setDiagnosticsOptions.mock.calls[1]![0].schemas[0].fileMatch).toEqual(['*']);
   });
 
+  // @awa-test: PLAN-021-Step3 (Monaco 0.55+: the top-level monaco.json; languages.json a stub)
+  it('binds through the top-level monaco.json when languages.json is only a stub', () => {
+    const fake = createFakeMonaco();
+    const top = vi.fn();
+    (fake.monaco.languages as unknown as { json: unknown }).json = { deprecated: true };
+    (fake.monaco as unknown as { json: unknown }).json = { jsonDefaults: { setDiagnosticsOptions: top } };
+    expect(bindBitmarkJsonSchema(fake.monaco, {})).toBe(true);
+    expect(top).toHaveBeenCalled();
+  });
+
   // @awa-test: PLAN-021-Step4 (no JSON language: false, no crash)
   it('reports false on a Monaco without the JSON language', () => {
     const fake = createFakeMonaco();
