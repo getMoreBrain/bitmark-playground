@@ -1,12 +1,11 @@
 # CI for @gmb/bitmark-editor and @gmb/bitmark-editor-angular (PLAN-021 Step 16).
-# Publishing runs only for a release tag (bitmark-editor-v*), and needs the
-# NPM_TOKEN secret.
+# No publishing from this repo: the packages are published once they have
+# their own repository (PLAN-020 D6). Their package.json files are ready for it.
 name: bitmark-editor
 
 on:
   push:
     branches: ["main"]
-    tags: ["bitmark-editor-v*"]
     paths:
       - "packages/bitmark-editor/**"
       - "packages/bitmark-editor-angular/**"
@@ -85,32 +84,3 @@ jobs:
         with:
           name: bitmark-editor-angular-dist
           path: packages/bitmark-editor-angular/dist/bitmark-editor-angular
-
-  publish:
-    if: startsWith(github.ref, 'refs/tags/bitmark-editor-v')
-    needs: [core, angular]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24.x"
-          registry-url: "https://registry.npmjs.org"
-      - uses: actions/download-artifact@v4
-        with:
-          name: bitmark-editor-dist
-          path: packages/bitmark-editor/dist
-      - uses: actions/download-artifact@v4
-        with:
-          name: bitmark-editor-angular-dist
-          path: packages/bitmark-editor-angular/dist/bitmark-editor-angular
-      - name: Publish @gmb/bitmark-editor
-        working-directory: packages/bitmark-editor
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish @gmb/bitmark-editor-angular
-        working-directory: packages/bitmark-editor-angular/dist/bitmark-editor-angular
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

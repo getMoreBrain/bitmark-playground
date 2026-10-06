@@ -9,7 +9,7 @@ import { BitmarkEngine, RawParserModule } from './types';
  * exact version per release, so the editor behaves the same wherever it is
  * installed and the CDN serves it as immutable. Bumped by an automated PR.
  */
-export const DEFAULT_PARSER_VERSION = '7.7.0';
+export const DEFAULT_PARSER_VERSION = '7.9.0';
 
 /** The jsDelivr URL of the parser's browser build at `version`. */
 export const parserCdnUrl = (version: string = DEFAULT_PARSER_VERSION): string =>

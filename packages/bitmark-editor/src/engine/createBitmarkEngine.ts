@@ -16,6 +16,13 @@ export const throwIfParserError = (out: string): string => {
   return out;
 };
 
+/**
+ * Where a bit span starts in the output: `outputStart` from parser 7.9
+ * (which added `inputStart`), `start` before it.
+ */
+export const spanOutputStart = (span: { outputStart?: number; start?: number }): number =>
+  (span.outputStart ?? span.start)!;
+
 /** Positions in UTF-16, the editors' own units. */
 const UTF16 = { positionEncoding: 'utf-16' } as const;
 
@@ -90,7 +97,7 @@ export const createBitmarkEngine = (
         const { output, bitSpans } = module.convertWithDetails(input, { ...opts, bitSpans: true });
         return {
           output: throwIfParserError(output),
-          bitStarts: bitSpans?.spans.map((span) => span.start),
+          bitStarts: bitSpans?.spans.map(spanOutputStart),
         };
       }),
     semanticTokens: (input) =>

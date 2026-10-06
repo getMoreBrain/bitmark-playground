@@ -432,6 +432,18 @@ and to the package in Phase 2.
 - [x] Hand-off briefs for the other repos: `docs/handoff-cosmic.md`
   (Step 17) and `docs/handoff-docs-site.md` (Step 18).
 
+### Parser 7.9.0 and publishing (2026-10-06)
+
+- The default parser is 7.9.0 (D13), and the playground's dev dependency
+  is too.
+- Parser 7.9.0 renamed a bit span's `start` to `outputStart` (and added
+  `inputStart`). Both the package and the playground read `outputStart`,
+  falling back to `start`. Before the fix, the live playground (which loads
+  `@latest`) had no bit positions for HTML, XML and Text, so their scroll
+  linking was proportional. A real-parser test now asserts numeric starts.
+- No publishing from this repo (decided): the publish job is removed; the
+  packages are published once they have their own repository (D6).
+
 ### Double-check (2026-10-06)
 
 Two independent code reviews, then the full matrix again.

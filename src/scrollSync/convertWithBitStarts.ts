@@ -28,6 +28,10 @@ export const convertWithBitStarts = (
   const { output, bitSpans } = convertWithDetails(input, { ...options, bitSpans: true });
   return {
     output: throwIfParserError(output),
-    bitStarts: bitSpans?.spans.map((span) => span.start),
+    // `outputStart` from parser 7.9, `start` before it.
+    bitStarts: bitSpans?.spans.map((span) => {
+      const s = span as { outputStart?: number; start?: number };
+      return (s.outputStart ?? s.start)!;
+    }),
   };
 };

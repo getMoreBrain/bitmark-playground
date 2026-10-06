@@ -27,6 +27,22 @@ describe('convertWithBitStarts', () => {
     expect(convert).not.toHaveBeenCalled();
   });
 
+  it('reads parser 7.9’s outputStart', () => {
+    const convertWithDetails = vi.fn(() => ({
+      output: 'one\ntwo',
+      bitSpans: {
+        positionEncoding: 'utf-16',
+        spans: [
+          { index: 0, inputStart: 0, inputEnd: 3, outputStart: 0, outputEnd: 3 },
+          { index: 1, inputStart: 5, inputEnd: 8, outputStart: 4, outputEnd: 7 },
+        ],
+      },
+    })) as unknown as typeof convertWithDetailsFn;
+    expect(convertWithBitStarts(vi.fn(), convertWithDetails, 'bitmark', OPTIONS).bitStarts).toEqual(
+      [0, 4],
+    );
+  });
+
   it('throws on a parser error string', () => {
     const convertWithDetails = vi.fn(() => ({
       output: 'error: boom',

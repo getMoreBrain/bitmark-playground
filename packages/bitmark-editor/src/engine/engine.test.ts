@@ -113,6 +113,24 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     ).resolves.toEqual({ output: 'out:x', bitStarts: undefined });
   });
 
+  // @awa-test: PLAN-021-Step1 (bit starts from parser 7.9's outputStart, and the older start)
+  it('reads outputStart (parser 7.9+) and start (older) from the bit spans', async () => {
+    const module = fakeModule();
+    module.convertWithDetails = vi.fn(() => ({
+      output: 'out',
+      bitSpans: {
+        positionEncoding: 'utf-16',
+        spans: [{ index: 0, inputStart: 0, inputEnd: 2, outputStart: 7, outputEnd: 9 }],
+      },
+    })) as unknown as RawParserModule['convertWithDetails'];
+    await expect(
+      createBitmarkEngine(module).convertWithBitStarts('x', { outputFormat: 'text' }),
+    ).resolves.toEqual({
+      output: 'out',
+      bitStarts: [7],
+    });
+  });
+
   // @awa-test: PLAN-021-Step1 (missing optional exports switch features off, no errors)
   it('answers undefined, and reports no capability, for exports an older parser lacks', async () => {
     const engine = createBitmarkEngine(fakeModule(false));

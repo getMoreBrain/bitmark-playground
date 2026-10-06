@@ -64,6 +64,10 @@ describe('worker engine (PLAN-020 D14)', () => {
     const back = { inputFormat: 'json', outputFormat: 'bitmark' } as const;
     expect(await worker.convert(json, back)).toBe(await main.convert(json, back));
     const toText = { inputFormat: 'bitmark', outputFormat: 'text' } as const;
+    // The real parser gives numeric bit starts (7.9 renamed `start` to `outputStart`).
+    const { bitStarts } = await main.convertWithBitStarts(book, toText);
+    expect(bitStarts?.length).toBeGreaterThan(1);
+    expect(bitStarts!.every((n) => typeof n === 'number')).toBe(true);
     expect(await worker.convertWithBitStarts(book, toText)).toEqual(
       await main.convertWithBitStarts(book, toText),
     );
