@@ -8,7 +8,7 @@ TRACEABILITY: Extends PLAN-003/PLAN-005 (bottom output panels), PLAN-007 (Table 
 
 ## Goal
 
-Add a `Mappings` tab to the **bottom-left** output panel showing the parser's human-readable MAPPING REPORT for the window the user last edited, and move the HTML tab off `bitmark-parser-generator` onto the WASM parser.
+Add a `Mappings` tab to the *bottom-left* output panel showing the parser's human-readable MAPPING REPORT for the window the user last edited, and move the HTML tab off `bitmark-parser-generator` onto the WASM parser.
 
 ## Report Direction
 
@@ -26,9 +26,9 @@ Everything that is not already bitmark reports its mapping INTO bitmark — that
 
 ## Tracking "the last window changed"
 
-Recorded at the **UI entry points** (each editor's `onInput`), NOT inside `BitmarkConverter`: `markupToJson` is also called programmatically by the XML and HTML panels, and would otherwise report those edits as bitmark edits.
+Recorded at the *UI entry points* (each editor's `onInput`), NOT inside `BitmarkConverter`: `markupToJson` is also called programmatically by the XML and HTML panels, and would otherwise report those edits as bitmark edits.
 
-There are **nine editable windows** (3 bitmark + 3 JSON + 2 XML + 1 HTML), recorded by **four** code paths — three of them parameterised over their tabs:
+There are *nine editable windows* (3 bitmark + 3 JSON + 2 XML + 1 HTML), recorded by *four* code paths — three of them parameterised over their tabs:
 
 | Path | Windows covered |
 |---|---|
@@ -48,7 +48,7 @@ The Table (HTML) tab previously used `bitmark-parser-generator`'s `convertHtmlTa
 - `bitmark → HTML` — `convert(markup, { inputFormat: 'bitmark', outputFormat: 'html' })`
 - `HTML → bitmark` — `convert(html, { inputFormat: 'html', outputFormat: 'bitmark' })`
 
-**Consequence:** the tab now shows the WHOLE document as `<bitmark-bit>` envelope HTML, not just its tables. The parser's own bpg-compat `legacy.BitmarkParserGenerator.convertHtmlTable` was evaluated as a drop-in and rejected — it silently returns an empty `[.table-extended]` and an empty string on the way back (see the `wasm-parser-converthtmltable-broken` note). The core mapping is the only working route.
+*Consequence:* the tab now shows the WHOLE document as `<bitmark-bit>` envelope HTML, not just its tables. The parser's own bpg-compat `legacy.BitmarkParserGenerator.convertHtmlTable` was evaluated as a drop-in and rejected — it silently returns an empty `[.table-extended]` and an empty string on the way back (see the `wasm-parser-converthtmltable-broken` note). The core mapping is the only working route.
 
 This also deletes the `ensureHtmlTableGlobals()` shim that worked around the bpg browser bundle's minification bug.
 

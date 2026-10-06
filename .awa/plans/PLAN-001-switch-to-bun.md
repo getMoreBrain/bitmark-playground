@@ -1,8 +1,8 @@
 # PLAN-001: Switch from Yarn to Bun
 
 STATUS: completed
-WORKFLOW: lateral
-TRACES: ARCHITECTURE.md (Build Layer)
+DIRECTION: lateral
+TRACEABILITY: ARCHITECTURE.md (Build Layer)
 
 ## Goal
 

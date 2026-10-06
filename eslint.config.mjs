@@ -132,6 +132,8 @@ const config = [
   })),
   {
     files: ['**/*.md'],
+    // GitHub-flavoured: task lists (`- [ ]`) are not label references.
+    language: 'markdown/gfm',
     rules: {
       // 'markdown/no-html': 'error',
     },

@@ -8,11 +8,11 @@ TRACEABILITY: Revises PLAN-002 conversion flow (`markupToJson` / `jsonToMarkup`,
 
 ## Goal
 
-When the user manually edits one tab, recompute **all** related tabs by calculation instead of copying the edited value across same-side tabs. The edited tab keeps the user's input; every other related tab is derived.
+When the user manually edits one tab, recompute *all* related tabs by calculation instead of copying the edited value across same-side tabs. The edited tab keeps the user's input; every other related tab is derived.
 
 ## Problem (current behaviour)
 
-Editing a JSON tab calls `syncJsonInput`, which **copies** the edited JSON string into all JSON slices (`js`, `wasm`, `wasmFull`); the cross-side (bitmark) tabs are calculated. (Symmetrically, editing a bitmark tab copies markup across the bitmark slices.) So same-side non-edited tabs mirror the edit rather than showing each parser's own result.
+Editing a JSON tab calls `syncJsonInput`, which *copies* the edited JSON string into all JSON slices (`js`, `wasm`, `wasmFull`); the cross-side (bitmark) tabs are calculated. (Symmetrically, editing a bitmark tab copies markup across the bitmark slices.) So same-side non-edited tabs mirror the edit rather than showing each parser's own result.
 
 ## Model (per-tab own-parser round-trip)
 
@@ -23,13 +23,13 @@ Conversion primitives (already used today):
 - `m2j_P(markup)` — markup→JSON for parser P.
 - `j2m_P(json)` — JSON→bitmark for parser P.
 
-**Edit JSON on tab X** (X ∈ {js, wasm, wasmFull}):
+*Edit JSON on tab X* (X ∈ {js, wasm, wasmFull}):
 ```
 X.json := user input (verbatim, kept)
 Forward (cross-side, as today) for all P:   P.markup := j2m_P(X.json)
 Back (same-side, NEW) for P ≠ X:            P.json   := m2j_P(P.markup)
 ```
-**Edit bitmark on tab X** — symmetric:
+*Edit bitmark on tab X* — symmetric:
 ```
 X.markup := user input (verbatim, kept)
 Forward for all P:                          P.json   := m2j_P(X.markup)
@@ -50,9 +50,9 @@ The "edited tab" = the active tab on the edited side (`activeMarkupTab` / `activ
 
 ## Error handling
 
-- **Cross-side** tabs: show the conversion result or the error (as today).
-- **Same-side non-edited** tabs: update **only on a successful back-conversion**; otherwise keep their last good value (never cleared, never shown as error).
-- **Edited tab**: shows the user input verbatim (even if it fails to convert).
+- *Cross-side* tabs: show the conversion result or the error (as today).
+- *Same-side non-edited* tabs: update *only on a successful back-conversion*; otherwise keep their last good value (never cleared, never shown as error).
+- *Edited tab*: shows the user input verbatim (even if it fails to convert).
 
 So editing invalid JSON ⇒ all JSON tabs keep last good, all bitmark tabs show the error (and symmetrically for invalid bitmark).
 
@@ -71,15 +71,15 @@ edit side S (json|bitmark), other side O, edited tab X
 
 ### Step 1 — State setters: single-side, no copy
 - File: `src/state/bitmarkState.ts`
-- `setJson` / `setMarkup` set **only** their own representation side; remove the opposite-side source parameter and its write (the copy).
-- Replace `syncMarkupInput` / `syncJsonInput` (bulk copy) with setting **only the edited tab's** field immediately (e.g. `setEditedMarkup(parser, markup)` / `setEditedJson(parser, json)`), so the edited editor and tab-switching reflect input before async completes.
-- Same-side back-fill uses the normal setter on success and is simply **not called on failure** (keep last good). Cross-side forward uses the error path as today.
+- `setJson` / `setMarkup` set *only* their own representation side; remove the opposite-side source parameter and its write (the copy).
+- Replace `syncMarkupInput` / `syncJsonInput` (bulk copy) with setting *only the edited tab's* field immediately (e.g. `setEditedMarkup(parser, markup)` / `setEditedJson(parser, json)`), so the edited editor and tab-switching reflect input before async completes.
+- Same-side back-fill uses the normal setter on success and is simply *not called on failure* (keep last good). Cross-side forward uses the error path as today.
 
 ### Step 2 — Converter: forward + back, threaded edited tab
 - File: `src/services/BitmarkConverter.tsx`
 - `markupToJson(editedTab, markup, options?)` and `jsonToMarkup(editedTab, json, options?)` take the edited tab.
 - Set the edited tab's edited side immediately (Step 1).
-- Forward: per-parser conversion of the **source** input for all of `js`/`wasm`/`wasmFull` (calculation unchanged from today); write cross-side via the single-side setter.
+- Forward: per-parser conversion of the *source* input for all of `js`/`wasm`/`wasmFull` (calculation unchanged from today); write cross-side via the single-side setter.
 - `await` forward, then Back: for each `P ≠ editedTab`, convert P's freshly-computed cross-side value via P's own parser/mode; write same-side only on success.
 - Factor per-parser `m2j_P` / `j2m_P` helpers (DRY — forward and back share them).
 - Lexers: lex each WASM tab's resulting markup.

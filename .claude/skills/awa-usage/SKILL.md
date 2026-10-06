@@ -114,7 +114,7 @@ awa may be installed locally. Detect the package manager and use the appropriate
     pnpm:    pnpm exec awa <command>
     bun:     bunx awa <command>
 
-### awa init [output] / awa template generate [output]
+### awa init \[output] / awa template generate \[output]
 
 Generate configuration files from templates. `init` is a top-level convenience command equivalent to `awa template generate`.
 
@@ -136,7 +136,7 @@ Generate configuration files from templates. `init` is a top-level convenience c
 | `--json` | Output results as JSON (implies --dry-run) |
 | `--summary` | Compact one-line counts summary |
 
-### awa template diff [target]
+### awa template diff \[target]
 
 Compare generated template output against an existing target directory. Exit code 0 = match, 1 = differences.
 
@@ -202,7 +202,7 @@ Navigate the traceability chain and assemble context from specs, code, and tests
 | `-A/-B/-C <n>` | Lines of context after/before/both around a code marker (`--content` only) |
 | `-c, --config <path>` | Path to configuration file |
 
-### awa spec renumber [code]
+### awa spec renumber \[code]
 
 Renumber traceability IDs to match document order, closing gaps in numbering sequences. Exit code 0 = no changes, 1 = changes applied/previewed.
 

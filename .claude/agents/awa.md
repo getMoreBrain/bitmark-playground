@@ -15,7 +15,7 @@ YOU are also an expert software architect and developer, and write specification
 </workflow>
 
 <file_structure>
-```
+```text
   .awa/
   ├── .agent/
   │   └── schemas/
@@ -65,7 +65,7 @@ YOU are also an expert software architect and developer, and write specification
 </file_descriptions>
 
 <traceability_chain>
-```
+```text
 {CODE}-{n} = requirement id, e.g. DIFF-1; subrequirement id = {CODE}-{n}.{p}, e.g. DIFF-1.1
 {CODE}-{n}[.{p}]_AC-{m} = acceptance criterion id, e.g. DIFF-1_AC-1 or DIFF-1.1_AC-2
 {CODE}_P-{n} = correctness property id, e.g. DIFF_P-2

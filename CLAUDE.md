@@ -10,7 +10,8 @@ YOU are also an expert software architect and developer, and write specification
 </workflow>
 
 <file_structure>
-```
+
+```text
   .awa/
   ├── .agent/
   │   └── schemas/
@@ -43,9 +44,11 @@ YOU are also an expert software architect and developer, and write specification
   └── rules/
       └── *.md
 ```
+
 </file_structure>
 
 <file_descriptions>
+
 - ARCHITECTURE.md: High-level architecture overview of the project.
 - FEAT-{CODE}-{feature-name}.md: Non-normative feature context — problem, motivation, conceptual model, scenarios.
 - EXAMPLE-{CODE}-{feature-name}-{nnn}.md: Concrete usage examples — code, CLI, config demonstrations for a feature.
@@ -56,11 +59,12 @@ YOU are also an expert software architect and developer, and write specification
 - PLAN-{nnn}-{plan-name}.md: Ad-hoc plans for vibe coding.
 - ALIGN-{x}-WITH-{y}-{nnn}.md: Report comparing alignment of x with y (e.g. code with requirements).
 - deprecated/DEPRECATED.md: Tombstone file for retired spec ids.
-- rules/*.md: Rules specific to the project (e.g. Coding standards, best practices to follow).
-</file_descriptions>
+- rules/\*.md: Rules specific to the project (e.g. Coding standards, best practices to follow).
+  </file_descriptions>
 
 <traceability_chain>
-```
+
+```text
 {CODE}-{n} = requirement id, e.g. DIFF-1; subrequirement id = {CODE}-{n}.{p}, e.g. DIFF-1.1
 {CODE}-{n}[.{p}]_AC-{m} = acceptance criterion id, e.g. DIFF-1_AC-1 or DIFF-1.1_AC-2
 {CODE}_P-{n} = correctness property id, e.g. DIFF_P-2
@@ -93,6 +97,7 @@ DESIGN-{CODE}-{feature}.md
 
 Markers create the trace, not file paths.
 ```
+
 </traceability_chain>
 
 <file_size_limits>
@@ -100,21 +105,24 @@ Any file exceeding schema defined line-limit, or otherwise 800 lines, MUST be sp
 </file_size_limits>
 
 <core_principles>
+
 - KISS: Simple solutions over clever ones
-- YAGNI: Build only what's specified
 - DRY: Research existing code before creating new
+- Build only what's specified
+- Follow idiomatic standards
 - Reference, Don't Duplicate: Use IDs (e.g., `DIFF-1.1_AC-1`) or other references. Never restate content
 - Trace Everything: Explicit links between artifacts
-</core_principles>
+  </core_principles>
 
 <awa_cli_invocation>
 awa may be installed locally (devDependency) rather than globally. To invoke it, detect the project's package manager from lockfiles and use the appropriate exec command:
+
 - npm/npx: `npx awa <command>`
 - yarn: `yarn exec awa <command>`
 - pnpm: `pnpm exec awa <command>`
 - bun: `bunx awa <command>`
-All `awa` commands in these instructions assume this resolution.
-</awa_cli_invocation>
+  All `awa` commands in these instructions assume this resolution.
+  </awa_cli_invocation>
 
 <validation>
 You SHALL run `awa check --spec-only` after creating or modifying any file in `.awa/specs/`, `.awa/tasks/`, or `.awa/plans/` to verify structural correctness and cross-reference integrity. Fix any errors before proceeding.

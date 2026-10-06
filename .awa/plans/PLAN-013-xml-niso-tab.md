@@ -8,9 +8,9 @@ TRACEABILITY: Extends PLAN-002 (parser tab bar, BitmarkState slices, dual conver
 
 ## Goal
 
-Add `XML (NISO-IEC)` and `XML (NISO-IEC-ES)` tabs as the last tabs on the JSON editor's tab bar, each hosting an **editable** Monaco editor in `xml` language mode. Each bidirectionally syncs a NISO-STS XML document with the `WASM` bitmark via one of the parser's config-driven XML mappings.
+Add `XML (NISO-IEC)` and `XML (NISO-IEC-ES)` tabs as the last tabs on the JSON editor's tab bar, each hosting an *editable* Monaco editor in `xml` language mode. Each bidirectionally syncs a NISO-STS XML document with the `WASM` bitmark via one of the parser's config-driven XML mappings.
 
-The two variants are identical in every respect except the mapping id, so the slice, runner and panel are **parameterised by `XmlVariant`** rather than duplicated.
+The two variants are identical in every respect except the mapping id, so the slice, runner and panel are *parameterised by `XmlVariant`* rather than duplicated.
 
 ## Scope
 
@@ -27,12 +27,12 @@ The two variants are identical in every respect except the mapping id, so the sl
 
 ## Conversion API
 
-`xml-niso-iec` and `xml-niso-iec-es` are config-driven mapping ids accepted by `convert` in **both** directions (both verified against the browser bundle at 6.6.0):
+`xml-niso-iec` and `xml-niso-iec-es` are config-driven mapping ids accepted by `convert` in *both* directions (both verified against the browser bundle at 6.6.0):
 
 - `bitmark → XML` — `convert(markup, { inputFormat: 'bitmark', outputFormat: <mappingId> })`
 - `XML → bitmark` — `convert(xml, { inputFormat: <mappingId>, outputFormat: 'bitmark' })`
 
-NOTE: on every sample tried (article, table, cloze, interview, multiple-choice), the two mappings emit **byte-identical** output. They are distinct registered mappings, not aliases, so they are wired as separate tabs; any divergence is content-dependent and will simply show up.
+NOTE: on every sample tried (article, table, cloze, interview, multiple-choice), the two mappings emit *byte-identical* output. They are distinct registered mappings, not aliases, so they are wired as separate tabs; any divergence is content-dependent and will simply show up.
 
 The published `OutputFormat` type is narrower than the runtime (`bitmark | json | text` only), so the output direction needs a documented cast. `InputFormat` already admits mapping ids via `(string & {})`.
 
