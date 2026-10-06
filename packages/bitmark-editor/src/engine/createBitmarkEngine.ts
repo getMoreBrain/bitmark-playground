@@ -23,6 +23,10 @@ export const throwIfParserError = (out: string): string => {
 export const spanOutputStart = (span: { outputStart?: number; start?: number }): number =>
   (span.outputStart ?? span.start)!;
 
+/** The offsets, or `undefined` when the parser gave none (one older than PLAN-223). */
+const offsets = (values: readonly unknown[] | undefined): number[] | undefined =>
+  values?.every((v) => typeof v === 'number') ? (values as number[]) : undefined;
+
 /** Positions in UTF-16, the editors' own units. */
 const UTF16 = { positionEncoding: 'utf-16' } as const;
 
@@ -92,12 +96,17 @@ export const createBitmarkEngine = (
         // An engine without `convertWithDetails` still converts; it just
         // gives no positions (PLAN-018 D2).
         if (!module.convertWithDetails) {
-          return { output: throwIfParserError(module.convert(input, opts)), bitStarts: undefined };
+          return {
+            output: throwIfParserError(module.convert(input, opts)),
+            bitStarts: undefined,
+            inputStarts: undefined,
+          };
         }
         const { output, bitSpans } = module.convertWithDetails(input, { ...opts, bitSpans: true });
         return {
           output: throwIfParserError(output),
           bitStarts: bitSpans?.spans.map(spanOutputStart),
+          inputStarts: offsets(bitSpans?.spans.map((span) => span.inputStart)),
         };
       }),
     semanticTokens: (input) =>

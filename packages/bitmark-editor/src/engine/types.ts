@@ -47,7 +47,13 @@ export interface JsonText {
 /** Converted output, with where each bit starts in it when the parser says. */
 export interface OutputWithBitStarts {
   output: string;
+  /** Where each bit starts in the output. */
   bitStarts: number[] | undefined;
+  /**
+   * Where each bit starts in the input (parser PLAN-223, 7.8+), for the pane
+   * the user typed it in (main's PLAN-020). `undefined` from an older parser.
+   */
+  inputStarts: number[] | undefined;
 }
 
 /** What the parser can do; fixed per module, independent of the variant. */

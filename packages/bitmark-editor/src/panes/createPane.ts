@@ -10,7 +10,13 @@ import { attachBitMarkers, BitMarkers } from '../scroll/bitMarkers';
 import type { ScrollSyncMember } from '../scroll/scrollSyncGroup';
 import { createSplitBitStarts, SplitBitStarts } from '../scroll/splitBitStarts';
 import type { SessionInternals } from '../session/types';
-import type { BitmarkPane, BitmarkSession, PaneControl, PaneType } from '../session/types';
+import type {
+  BitmarkPane,
+  BitmarkSession,
+  PaneControl,
+  PaneType,
+  ToBitmarkResult,
+} from '../session/types';
 import { AppliedTheme, applyBitmarkTheme } from '../theme/applyTheme';
 import { injectPaneCss } from './styles';
 
@@ -29,7 +35,11 @@ export interface PaneSpec {
   services?: boolean;
   /** Needs the `full` variant's markup formats (D1). */
   needsMarkup?: boolean;
-  toBitmark?(engine: BitmarkEngine, text: string): Promise<string>;
+  /**
+   * Text in this pane → bitmark, and where each bit starts in the text
+   * (pinned in the pane, so typed text links its scrolling by bit).
+   */
+  toBitmark?(engine: BitmarkEngine, text: string): Promise<ToBitmarkResult>;
   /** Regenerate the pane's text from the session. */
   fromSession?(
     engine: BitmarkEngine,
@@ -278,6 +288,8 @@ export const createPane = (
     inputFormat: spec.inputFormat,
     label,
     toBitmark: spec.toBitmark,
+    pinInput: (text: string, inputStarts: readonly number[] | undefined) =>
+      markers?.pin(text, inputStarts),
     render,
     engineChanged: () => {
       services?.setEngine(s.engine);

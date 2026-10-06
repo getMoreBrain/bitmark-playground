@@ -60,7 +60,11 @@ export const createJsonPane = (
         // The engine recovers leniently from malformed JSON: check the
         // syntax first, so the user sees the real error (a SyntaxError).
         JSON.parse(text);
-        return engine.convert(text, { inputFormat: 'json', outputFormat: 'bitmark' });
+        const { output, inputStarts } = await engine.convertWithBitStarts(text, {
+          inputFormat: 'json',
+          outputFormat: 'bitmark',
+        });
+        return { bitmark: output, inputStarts };
       },
       fromSession: (engine, s) => engine.bitmarkToJsonText(s.getBitmark(), { mode: options?.mode }),
     },
@@ -76,8 +80,14 @@ const mappingSpec = (type: 'html' | 'xml', mapping: string, language: string): P
   editable: true,
   scroll: 'pinned',
   needsMarkup: true,
-  toBitmark: async (engine, text) =>
-    text === '' ? '' : engine.convert(text, { inputFormat: mapping, outputFormat: 'bitmark' }),
+  toBitmark: async (engine, text) => {
+    if (text === '') return { bitmark: '', inputStarts: [] };
+    const { output, inputStarts } = await engine.convertWithBitStarts(text, {
+      inputFormat: mapping,
+      outputFormat: 'bitmark',
+    });
+    return { bitmark: output, inputStarts };
+  },
   fromSession: async (engine, s) => {
     const bitmark = s.getBitmark();
     if (bitmark === '') return { text: '', bitStarts: [] };

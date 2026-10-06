@@ -128,7 +128,17 @@ describe('createBitmarkEngine (injection, PLAN-022 D7)', () => {
     ).resolves.toEqual({
       output: 'out',
       bitStarts: [7],
+      // Where the bit starts in the input (parser PLAN-223, main's PLAN-020).
+      inputStarts: [0],
     });
+    // An older parser's spans (`start` only): output positions, no input ones.
+    module.convertWithDetails = vi.fn(() => ({
+      output: 'out',
+      bitSpans: { positionEncoding: 'utf-16', spans: [{ index: 0, start: 5, end: 6 }] },
+    })) as unknown as RawParserModule['convertWithDetails'];
+    await expect(
+      createBitmarkEngine(module).convertWithBitStarts('x', { outputFormat: 'text' }),
+    ).resolves.toEqual({ output: 'out', bitStarts: [5], inputStarts: undefined });
   });
 
   // @awa-test: PLAN-023-Step1 (missing optional exports switch features off, no errors)

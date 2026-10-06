@@ -52,6 +52,14 @@ Your Monaco needs the JSON language (for schema validation) and the suggest
 and hover contributions (for completion and hover). If one is missing, that
 feature is off and a warning is logged once; nothing crashes.
 
+The bitmark editor:
+- highlights, marks errors, and offers completion and hover from the parser;
+- auto-closes `[` (the language declares the `[` `]` pair, as the VS Code
+  extension does; a `bitmark` language your app registered keeps its own
+  configuration);
+- completes a bit type to its template (parser 7.9+): `[.art` + Enter
+  inserts `[.article]` with the bit's usual tags and body as a snippet.
+
 ## Quick start: a static site (no bundler)
 
 ```html
@@ -134,6 +142,9 @@ Monaco), `errorSlot` (an element or a callback that also receives the
 pane's error message), and `onRender` (called with `{ durationMs }` after
 each conversion the pane shows). At runtime: `pane.setReadOnly()`,
 `pane.setScrollSync()`, `session.setScrollSync([panes])`.
+
+Scrolling stays linked by bit in a pane you typed or pasted into too: the
+conversion reports where each bit is in your text (parser 7.8+).
 
 On an error, the edited pane keeps your text, shows the error and gets a
 marker. The other panes keep their last good content and are marked

@@ -287,6 +287,19 @@ and to the package in Phase 2.
       and lint pass (lint's only errors are the existing ones in the
       `.claude/` and `CLAUDE.md` markdown). The package's typecheck, lint and
       tests (175) pass.
+- [x] Step 14a — Main's later work, merged and moved into the package
+  (main's PLAN-020 and PLAN-021):
+  - bit templates: completion asks for `bitTemplate`, and a template
+    replaces the `]` auto-closed after the cursor (`replacedSuffixLength`);
+  - the `[` `]` bracket pair on the language the package registers;
+  - typed text links its scrolling by bit: a pane edit's conversion returns
+    where each bit is in the typed text (`OutputWithBitStarts.inputStarts`),
+    pinned in that pane. The playground's Original JSON tab keeps main's own
+    code for it (`src/scrollSync/convertWithBitStarts.ts`).
+  - This branch's plans were renumbered from PLAN-020/021 to PLAN-022/023,
+    since main's own PLAN-020/021 were already pushed.
+  - Checked: `spikes/tests/bit-templates.spec.mjs`,
+    `spikes/tests/typed-scroll.spec.mjs` (mutation-checked).
 - [x] Step 15 — Promote the spikes to maintained examples in
   `packages/bitmark-editor/examples/`: `static` (no bundler, CDN
   `/bundled`, shaped like the docs site) and `angular`. Each

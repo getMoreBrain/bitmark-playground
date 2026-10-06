@@ -244,7 +244,7 @@ describe('createBitmarkSession and its panes (PLAN-022 D9)', () => {
 
   // @awa-test: PLAN-023-Step7 (debounceMs: one conversion for a burst, last edit wins)
   it('converts once for a burst of edits with debounceMs', async () => {
-    const spy = vi.spyOn(engine, 'convert');
+    const spy = vi.spyOn(engine, 'convertWithBitStarts');
     const { session, el } = setup({ debounceMs: 30 });
     createBitmarkPane(el(), session);
     const json = createJsonPane(el(), session);
@@ -255,7 +255,8 @@ describe('createBitmarkSession and its panes (PLAN-022 D9)', () => {
     type(json, base.replace('World', 'Two'));
     type(json, base.replace('World', 'Three'));
     await vi.waitFor(() => expect(session.getBitmark()).toContain('Three'));
-    expect(spy).toHaveBeenCalledTimes(1);
+    // One JSON → bitmark conversion (the other calls regenerate the panes).
+    expect(spy.mock.calls.filter(([, o]) => o.inputFormat === 'json')).toHaveLength(1);
     spy.mockRestore();
   });
 

@@ -151,13 +151,22 @@ export interface SessionInternals extends BitmarkSession {
   reportError(pane: PaneControl | undefined, error: Error): void;
 }
 
+/** A pane's text converted to bitmark (main's PLAN-020). */
+export interface ToBitmarkResult {
+  bitmark: string;
+  /** Where each bit starts in the pane's text; `undefined` when unknown. */
+  inputStarts: readonly number[] | undefined;
+}
+
 /** The session's handle on a pane. */
 export interface PaneControl {
   readonly pane: BitmarkPane;
   readonly inputFormat: string;
   readonly label: string;
   /** Text in this pane → bitmark. `undefined`: the pane is bitmark already. */
-  toBitmark?(engine: BitmarkEngine, text: string): Promise<string>;
+  toBitmark?(engine: BitmarkEngine, text: string): Promise<ToBitmarkResult>;
+  /** Pin where each bit starts in `text`, if the pane still shows it. */
+  pinInput(text: string, inputStarts: readonly number[] | undefined): void;
   /**
    * Regenerate from the session's bitmark. `force`: even if the user has
    * focus here (an API change); otherwise a focused pane catches up on blur.
