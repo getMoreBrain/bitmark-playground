@@ -1,11 +1,11 @@
-// @awa-component: PLAN-021-WorkerEngine
+// @awa-component: PLAN-023-WorkerEngine
 import { parserCdnUrl } from '../loadBitmarkEngine';
 import { BitmarkEngine, BitmarkEngineError, EngineCapabilities, Feature } from '../types';
 import { EngineMethod, EnginePort, FromWorker, ResultMessage } from './protocol';
 
 /**
  * Methods on the fast lane: what the editor needs on every keystroke and
- * must never wait behind a long conversion (PLAN-020 D14).
+ * must never wait behind a long conversion (PLAN-022 D14).
  */
 const FAST_LANE: ReadonlySet<EngineMethod> = new Set([
   'semanticTokens',
@@ -121,7 +121,7 @@ const openLane = (
 };
 
 /**
- * An engine whose parser runs in workers, off the main thread (PLAN-020
+ * An engine whose parser runs in workers, off the main thread (PLAN-022
  * D14): one worker for the fast lane (tokens, diagnostics, completion,
  * hover, bit splits) and one for conversions. Resolves once both workers
  * have loaded the parser (stage 1); `feature` follows stage 2 once both
@@ -130,7 +130,7 @@ const openLane = (
  * Calls are not coalesced here: one engine can serve several documents, so
  * "the latest call" is the caller's to decide (`createLatestRunner`).
  */
-// @awa-impl: PLAN-021-Step1a (the worker engine)
+// @awa-impl: PLAN-023-Step1a (the worker engine)
 export const createBitmarkWorkerEngine = async (
   options: CreateBitmarkWorkerEngineOptions,
 ): Promise<BitmarkEngine> => {

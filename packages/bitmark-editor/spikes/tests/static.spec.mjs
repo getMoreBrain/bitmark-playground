@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: the no-bundler static spike (D4, D12).
+// PLAN-022 Phase 0: the no-bundler static spike (D4, D12).
 import { expect, test } from '@playwright/test';
 
 import {

@@ -1,13 +1,13 @@
-# PLAN-021: bitmark Editor Package — Steps
+# PLAN-023: bitmark Editor Package — Steps
 
 STATUS: in-progress
 DIRECTION: lateral
-TRACEABILITY: The steps of PLAN-020 (`PLAN-020-bitmark-editor-package.md`), which holds the context, the decisions (D1 to D12), the design notes, the risks and the open questions. Decision ids below refer to PLAN-020.
+TRACEABILITY: The steps of PLAN-022 (`PLAN-022-bitmark-editor-package.md`), which holds the context, the decisions (D1 to D12), the design notes, the risks and the open questions. Decision ids below refer to PLAN-022.
 
 ## Context
 
-PLAN-020 grew past the plan size limit, so its steps and completion criteria
-live here. Read PLAN-020 first; nothing here restates its decisions.
+PLAN-022 grew past the plan size limit, so its steps and completion criteria
+live here. Read PLAN-022 first; nothing here restates its decisions.
 
 ## Steps
 

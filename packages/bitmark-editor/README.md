@@ -3,7 +3,7 @@
 bitmark and JSON editors on Monaco, with optional HTML, XML, Text, Info and
 Mappings panes, for any framework.
 
-> Pre-release: 0.1.0, not yet published. Design: PLAN-020 / PLAN-021 in the
+> Pre-release: 0.1.0, not yet published. Design: PLAN-022 / PLAN-023 in the
 > bitmark playground repo (`.awa/plans/`).
 
 - **Session**: one bitmark document, the source of truth.
@@ -248,5 +248,5 @@ cd examples && bun install && bun run test   # browser checks (Playwright)
 ```
 
 The playground (at the repo root) uses this package from source through a
-path alias. `spikes/` and `playground-spike/` hold the PLAN-021 Phase 0 and
+path alias. `spikes/` and `playground-spike/` hold the PLAN-023 Phase 0 and
 Phase 1 browser checks.

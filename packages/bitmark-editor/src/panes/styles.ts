@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Panes
+// @awa-component: PLAN-023-Panes
 
 /**
  * The panes' own layout and banner styles, once per document. Colours come

@@ -21,7 +21,7 @@ export interface ScrollSyncCallbacks {
 
 /**
  * Link a pane that shows bitmark (the bitmark editor, WASM Check). Its bit
- * starts are split from its own text by the engine (PLAN-018 D1, PLAN-021
+ * starts are split from its own text by the engine (PLAN-018 D1, PLAN-023
  * Step 5), asynchronously.
  */
 // @awa-impl: PLAN-018-Step7 (split panes)

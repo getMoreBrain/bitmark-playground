@@ -52,8 +52,8 @@ const banner = (pane: BitmarkPane) => {
   return b.hidden ? '' : b.textContent;
 };
 
-describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
-  // @awa-test: PLAN-021-Step8 (each pane shows the document in its format)
+describe('createBitmarkSession and its panes (PLAN-022 D9)', () => {
+  // @awa-test: PLAN-023-Step8 (each pane shows the document in its format)
   it('shows the document in every pane once the engine is ready', async () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -66,7 +66,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(text(txt)).toContain('Hello World!'));
   });
 
-  // @awa-test: PLAN-021-Step7 (an edit in any pane updates the others; the source keeps its text)
+  // @awa-test: PLAN-023-Step7 (an edit in any pane updates the others; the source keeps its text)
   it('updates every other pane after an edit, and never the edited one', async () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -88,7 +88,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(text(html)).toContain('From JSON'));
   });
 
-  // @awa-test: PLAN-021-Step8 (HTML and XML panes convert both ways)
+  // @awa-test: PLAN-023-Step8 (HTML and XML panes convert both ways)
   it('converts an HTML edit and an XML edit back to bitmark', async () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -103,7 +103,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(text(bitmark)).toContain('XmlWorld'));
   });
 
-  // @awa-test: PLAN-021-Step7 (an error keeps the last good value; others stale; D15)
+  // @awa-test: PLAN-023-Step7 (an error keeps the last good value; others stale; D15)
   it('keeps the document on a failed edit, marks the edited pane, and shows the others stale', async () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -130,7 +130,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(html.element.classList.contains('bm-stale')).toBe(false);
   });
 
-  // @awa-test: PLAN-021-Step7 (undo survives a failed conversion, D15)
+  // @awa-test: PLAN-023-Step7 (undo survives a failed conversion, D15)
   it('keeps the edited pane’s undo through a failed conversion', async () => {
     const { session, el } = setup();
     createBitmarkPane(el(), session);
@@ -143,7 +143,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(text(json)).toBe(good);
   });
 
-  // @awa-test: PLAN-021-Step8 (read-only panes regenerate but are not sources)
+  // @awa-test: PLAN-023-Step8 (read-only panes regenerate but are not sources)
   it('regenerates a read-only pane, ignores edits to it, and can switch', async () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -160,7 +160,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(session.getBitmark()).toContain('Editable'));
   });
 
-  // @awa-test: PLAN-021-Step8 (Text is always read-only)
+  // @awa-test: PLAN-023-Step8 (Text is always read-only)
   it('keeps the Text pane read-only', () => {
     const { session, el } = setup();
     const txt = createTextPane(el(), session);
@@ -168,7 +168,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(txt.readOnly).toBe(true);
   });
 
-  // @awa-test: PLAN-021-Step8 (two JSON panes in different modes stay consistent)
+  // @awa-test: PLAN-023-Step8 (two JSON panes in different modes stay consistent)
   it('keeps optimized and full JSON panes consistent', async () => {
     const { session, el } = setup();
     const optimized = createJsonPane(el(), session);
@@ -179,7 +179,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(text(full)).toContain('Both'));
   });
 
-  // @awa-test: PLAN-021-Step8 (a pane converts only while it exists)
+  // @awa-test: PLAN-023-Step8 (a pane converts only while it exists)
   it('stops converting for a pane once it is disposed', async () => {
     const spy = vi.spyOn(engine, 'convertWithBitStarts');
     const { session, el } = setup();
@@ -195,7 +195,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     spy.mockRestore();
   });
 
-  // @awa-test: PLAN-021-Step8 (markup panes wait for the full variant)
+  // @awa-test: PLAN-023-Step8 (markup panes wait for the full variant)
   it('shows "needs the full parser" for a markup pane on a bitmark-json engine, until it upgrades', async () => {
     const injected = createBitmarkEngine(parser as unknown as RawParserModule); // declared bitmark-json
     const { session, el } = setup({ engine: injected });
@@ -206,7 +206,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(banner(html)).toBe('');
   });
 
-  // @awa-test: PLAN-021-Step7 (the engine can arrive later; panes show loading)
+  // @awa-test: PLAN-023-Step7 (the engine can arrive later; panes show loading)
   it('shows loading until the engine arrives', async () => {
     let resolve!: (e: BitmarkEngine) => void;
     const { session, el } = setup({ engine: new Promise<BitmarkEngine>((r) => (resolve = r)) });
@@ -216,7 +216,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(text(json)).toContain('World'));
   });
 
-  // @awa-test: PLAN-021-Step8 (Info: one section per distinct bit type)
+  // @awa-test: PLAN-023-Step8 (Info: one section per distinct bit type)
   it('fills the Info pane with each distinct bit type', async () => {
     const { session, el } = setup({ value: '[.article]\nA\n\n[.article]\nB\n\n[.note]\nC' });
     const info = createInfoPane(el(), session);
@@ -225,7 +225,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(info.scrollSync).toBe(false);
   });
 
-  // @awa-test: PLAN-021-Step8 (Mappings: the report for the last edit, every edit)
+  // @awa-test: PLAN-023-Step8 (Mappings: the report for the last edit, every edit)
   it('reports the last edit in the Mappings pane, and labels an API edit', async () => {
     const { session, el } = setup();
     createBitmarkPane(el(), session);
@@ -242,7 +242,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(session.lastEdit!.count).toBe(count + 2);
   });
 
-  // @awa-test: PLAN-021-Step7 (debounceMs: one conversion for a burst, last edit wins)
+  // @awa-test: PLAN-023-Step7 (debounceMs: one conversion for a burst, last edit wins)
   it('converts once for a burst of edits with debounceMs', async () => {
     const spy = vi.spyOn(engine, 'convert');
     const { session, el } = setup({ debounceMs: 30 });
@@ -259,7 +259,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     spy.mockRestore();
   });
 
-  // @awa-test: PLAN-021-Step7 (scroll membership per pane)
+  // @awa-test: PLAN-023-Step7 (scroll membership per pane)
   it('links exactly the panes given to setScrollSync', () => {
     const { session, el } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -270,7 +270,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect([bitmark.scrollSync, json.scrollSync, html.scrollSync]).toEqual([true, false, true]);
   });
 
-  // @awa-test: PLAN-021-Step7 (theme on every pane; Monaco theme only when asked, D11)
+  // @awa-test: PLAN-023-Step7 (theme on every pane; Monaco theme only when asked, D11)
   it('themes every pane, and sets the Monaco theme only with applyMonacoTheme', () => {
     const { session, el, fake } = setup({ theme: 'light' });
     const bitmark = createBitmarkPane(el(), session);
@@ -282,7 +282,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(owned.fake.setTheme).toHaveBeenCalledWith('vs');
   });
 
-  // @awa-test: PLAN-021-Step8 (error slot, D12; messages, D12)
+  // @awa-test: PLAN-023-Step8 (error slot, D12; messages, D12)
   it('reports the edited pane’s error to its error slot, with the host’s messages', async () => {
     const { session, el } = setup({ messages: { errorPrefix: 'Fehler: ' } });
     createBitmarkPane(el(), session);
@@ -299,7 +299,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     await vi.waitFor(() => expect(callback).toHaveBeenLastCalledWith(expect.any(String)));
   });
 
-  // @awa-test: PLAN-021-Step7 (two sessions are independent)
+  // @awa-test: PLAN-023-Step7 (two sessions are independent)
   it('keeps two sessions independent', async () => {
     const a = setup();
     const b = setup({ value: '[.article]\nOther' });
@@ -312,7 +312,7 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(b.session.getBitmark()).toBe('[.article]\nOther');
   });
 
-  // @awa-test: PLAN-021-Step7 (dispose removes the panes and their models)
+  // @awa-test: PLAN-023-Step7 (dispose removes the panes and their models)
   it('disposes every pane, its element and its model', async () => {
     const { session, el, fake } = setup();
     const host = el();
@@ -324,19 +324,19 @@ describe('createBitmarkSession and its panes (PLAN-020 D9)', () => {
     expect(fake.editors.every((e) => e.disposed)).toBe(true);
   });
 
-  // @awa-test: PLAN-021-Step7 (getJson on demand)
+  // @awa-test: PLAN-023-Step7 (getJson on demand)
   it('gives the document as JSON on demand', async () => {
     const { session } = setup();
     await expect(session.getJson()).resolves.toContain('"type": "article"');
   });
 });
 
-describe('review fixes (PLAN-021 pass 1)', () => {
+describe('review fixes (PLAN-023 pass 1)', () => {
   /** The fake editor state behind a pane. */
   const stateOf = (fake: ReturnType<typeof createFakeMonaco>, pane: BitmarkPane) =>
     fake.editors.find((e) => e.options['model'] === pane.textEditor.model)!;
 
-  // @awa-test: PLAN-021-Step7 (a slow conversion never overwrites a newer edit)
+  // @awa-test: PLAN-023-Step7 (a slow conversion never overwrites a newer edit)
   it('drops a conversion that a newer edit superseded, result and error alike', async () => {
     let release!: () => void;
     const gate = new Promise<void>((r) => (release = r));
@@ -362,7 +362,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     expect(banner(html)).toBe('');
   });
 
-  // @awa-test: PLAN-021-Step8 (an applied regeneration clears the pane's old source error)
+  // @awa-test: PLAN-023-Step8 (an applied regeneration clears the pane's old source error)
   it('clears a pane’s error once it shows the document again', async () => {
     const { session, el, fake } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -376,7 +376,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     expect(fake.markersOf(json.textEditor.model, 'bitmark-convert')).toEqual([]);
   });
 
-  // @awa-test: PLAN-021-Step8 (an API change reaches a focused pane)
+  // @awa-test: PLAN-023-Step8 (an API change reaches a focused pane)
   it('applies setBitmark to a focused pane', async () => {
     const { session, el, fake } = setup();
     const bitmark = createBitmarkPane(el(), session);
@@ -385,7 +385,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     expect(text(bitmark)).toBe('[.article]\nFrom the API');
   });
 
-  // @awa-test: PLAN-021-Step8 (a focused pane catches up on blur)
+  // @awa-test: PLAN-023-Step8 (a focused pane catches up on blur)
   it('catches a focused pane up on blur when it could not regenerate', async () => {
     const injected = createBitmarkEngine(parser as unknown as RawParserModule);
     const { session, el, fake } = setup({ engine: injected });
@@ -399,7 +399,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     await vi.waitFor(() => expect(text(html)).toContain('World'));
   });
 
-  // @awa-test: PLAN-021-Step8 (a stage-2 failure ends "loading")
+  // @awa-test: PLAN-023-Step8 (a stage-2 failure ends "loading")
   it('says "needs the full parser" when stage 2 fails on the load path', async () => {
     const failing = {
       ...(parser as unknown as RawParserModule),
@@ -414,7 +414,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     await vi.waitFor(() => expect(banner(html)).toBe(session.messages.needsFullParser));
   });
 
-  // @awa-test: PLAN-021-Step7 (a failed engine load shows in the panes)
+  // @awa-test: PLAN-023-Step7 (a failed engine load shows in the panes)
   it('shows a failed engine load in every pane', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const { session, el } = setup({ engine: Promise.reject(new Error('engine unreachable')) });
@@ -425,7 +425,7 @@ describe('review fixes (PLAN-021 pass 1)', () => {
     vi.restoreAllMocks();
   });
 
-  // @awa-test: PLAN-021-Step7 (dispose releases the feature subscription)
+  // @awa-test: PLAN-023-Step7 (dispose releases the feature subscription)
   it('releases its feature-change subscription on dispose', async () => {
     const shared = createBitmarkEngine(parser as unknown as RawParserModule, { feature: 'full' });
     const spy = vi.spyOn(shared, 'onFeatureChange');
@@ -443,7 +443,7 @@ describe('second review fixes', () => {
   const stateOf = (fake: ReturnType<typeof createFakeMonaco>, pane: BitmarkPane) =>
     fake.editors.find((e) => e.options['model'] === pane.textEditor.model)!;
 
-  // @awa-test: PLAN-021-Step8 (blur never replaces the user's own text)
+  // @awa-test: PLAN-023-Step8 (blur never replaces the user's own text)
   it.each([
     ['valid compact JSON', (t: string) => JSON.stringify(JSON.parse(t.replace('Typed', 'Mine')))],
     ['half-typed JSON', () => '[{"bit": '],
@@ -467,8 +467,8 @@ describe('second review fixes', () => {
   });
 });
 
-describe('host integration options (PLAN-021 Step 14)', () => {
-  // @awa-test: PLAN-021-Step14 (setBitmark with an origin or as no edit at all)
+describe('host integration options (PLAN-023 Step 14)', () => {
+  // @awa-test: PLAN-023-Step14 (setBitmark with an origin or as no edit at all)
   it('records a host edit’s origin, and leaves the last edit alone for `false`', async () => {
     const { session, el } = setup();
     const mappings = createMappingsPane(el(), session);
@@ -486,7 +486,7 @@ describe('host integration options (PLAN-021 Step 14)', () => {
     expect(session.lastEdit!.label).toBe('Original bitmark');
   });
 
-  // @awa-test: PLAN-021-Step14 (a host's scroll group)
+  // @awa-test: PLAN-023-Step14 (a host's scroll group)
   it('joins the host’s scroll group when given one', async () => {
     const { createScrollSyncGroup } = await import('../scroll/scrollSyncGroup');
     const group = createScrollSyncGroup();
@@ -497,7 +497,7 @@ describe('host integration options (PLAN-021 Step 14)', () => {
     expect(group.members()).toHaveLength(2);
   });
 
-  // @awa-test: PLAN-021-Step14 (onRender reports each shown regeneration)
+  // @awa-test: PLAN-023-Step14 (onRender reports each shown regeneration)
   it('reports how long each shown regeneration took', async () => {
     const { session, el } = setup();
     const onRender = vi.fn();

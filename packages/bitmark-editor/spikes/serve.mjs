@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: two origins, so the "CDN" is cross-origin as jsDelivr is.
+// PLAN-022 Phase 0: two origins, so the "CDN" is cross-origin as jsDelivr is.
 //   http://localhost:4601  the host site: static/ pages, and Monaco 0.46 AMD at /monaco046/
 //   http://localhost:4602  the "CDN": bundled/dist at /editor/, the parser at /parser/
 // The CDN sends `Access-Control-Allow-Origin: *` and immutable caching, as

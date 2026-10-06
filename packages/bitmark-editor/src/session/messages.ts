@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Session
+// @awa-component: PLAN-023-Session
 import type { BitmarkEditorMessages, BitmarkSessionOptions } from './types';
 
 export const DEFAULT_MESSAGES: BitmarkEditorMessages = {
@@ -17,7 +17,7 @@ export const DEFAULT_MESSAGES: BitmarkEditorMessages = {
   },
 };
 
-/** The defaults with the host's overrides (PLAN-020 D12). */
+/** The defaults with the host's overrides (PLAN-022 D12). */
 export const resolveMessages = (
   overrides: BitmarkSessionOptions['messages'],
 ): BitmarkEditorMessages => ({

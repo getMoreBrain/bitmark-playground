@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Session
+// @awa-component: PLAN-023-Session
 
 /**
  * Tells a host's own lagging `value` apart from a new document (for

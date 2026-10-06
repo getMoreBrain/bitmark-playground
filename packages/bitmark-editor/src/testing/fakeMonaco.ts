@@ -1,4 +1,4 @@
-// Test doubles for the injected Monaco (PLAN-020 D8). Only what src/lib uses.
+// Test doubles for the injected Monaco (PLAN-022 D8). Only what src/lib uses.
 import { vi } from 'vitest';
 
 import type { CodeEditor, Monaco, TextModel } from '../monaco/types';

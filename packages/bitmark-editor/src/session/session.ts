@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Session
+// @awa-component: PLAN-023-Session
 import {
   BitmarkEngine,
   createBitmarkEngine,
@@ -77,13 +77,13 @@ const resolveEngine = (
 };
 
 /**
- * One bitmark document (PLAN-020 D9). The bitmark text is the source of
+ * One bitmark document (PLAN-022 D9). The bitmark text is the source of
  * truth: an edit in any pane converts to bitmark, then every other pane
  * regenerates from it; the edited pane keeps the user's text. A failed
  * conversion keeps the last good document, marks the edited pane and shows
  * the others as stale (D15).
  */
-// @awa-impl: PLAN-021-Step7 (the session)
+// @awa-impl: PLAN-023-Step7 (the session)
 export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSession => {
   const { monaco } = options;
   setupBitmarkMonaco({ monaco });

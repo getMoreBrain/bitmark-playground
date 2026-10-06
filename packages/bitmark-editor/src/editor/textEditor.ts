@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-TextEditor
+// @awa-component: PLAN-023-TextEditor
 import type * as MonacoApi from 'monaco-editor';
 
 import { BITMARK_MODEL_SCHEME } from '../monaco/jsonSchema';
@@ -29,10 +29,10 @@ export const createChangeFilter = (initial: string) => {
 
 /**
  * Replace a model's whole text as one undoable edit, not `setValue`: the
- * pane's undo stack survives regeneration (PLAN-020 D16). The cursor is
+ * pane's undo stack survives regeneration (PLAN-022 D16). The cursor is
  * clamped by Monaco; scroll is left where it was.
  */
-// @awa-impl: PLAN-021-Step6 (regeneration keeps undo)
+// @awa-impl: PLAN-023-Step6 (regeneration keeps undo)
 export const replaceAllKeepingUndo = (model: TextModel, text: string): void => {
   if (model.getValue() === text) return;
   model.pushStackElement();
@@ -42,7 +42,7 @@ export const replaceAllKeepingUndo = (model: TextModel, text: string): void => {
 
 let editorSeq = 0;
 
-/** A fresh model URI under the package scheme (PLAN-020 D5). */
+/** A fresh model URI under the package scheme (PLAN-022 D5). */
 export const createModelUri = (monaco: Monaco, kind: string, extension: string): MonacoApi.Uri =>
   monaco.Uri.parse(`${BITMARK_MODEL_SCHEME}://editor-${++editorSeq}/${kind}.${extension}`);
 
@@ -76,13 +76,13 @@ export interface TextEditor extends MonacoApi.IDisposable {
 }
 
 /**
- * One Monaco editor on its own model, in plain TypeScript (PLAN-021 Step 6,
+ * One Monaco editor on its own model, in plain TypeScript (PLAN-023 Step 6,
  * the behaviour of the playground's `MonacoTextArea`): user edits are
  * reported once per distinct value, a programmatic value never echoes back
  * as input, a focused editor is never overwritten, regeneration keeps undo,
  * and the editor lays itself out as its element resizes.
  */
-// @awa-impl: PLAN-021-Step6 (createTextEditor)
+// @awa-impl: PLAN-023-Step6 (createTextEditor)
 export const createTextEditor = (element: HTMLElement, options: TextEditorOptions): TextEditor => {
   const { monaco } = options;
   const model = monaco.editor.createModel(

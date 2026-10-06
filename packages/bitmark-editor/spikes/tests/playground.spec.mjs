@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: the playground injects its own Monaco (/esm path, D8).
+// PLAN-022 Phase 0: the playground injects its own Monaco (/esm path, D8).
 // Needs the playground's Vite dev server on :4604 (see the Phase 0 notes).
 import { expect, test } from '@playwright/test';
 

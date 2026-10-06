@@ -1,5 +1,5 @@
-// The static-site example (PLAN-021 Step 15): /bundled from a cross-origin
-// "CDN", no bundler, shaped like the docs site (PLAN-020 D12).
+// The static-site example (PLAN-023 Step 15): /bundled from a cross-origin
+// "CDN", no bundler, shaped like the docs site (PLAN-022 D12).
 import { expect, test } from '@playwright/test';
 
 const PAGE = 'http://localhost:4611/index.html';

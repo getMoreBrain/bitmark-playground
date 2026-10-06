@@ -1,4 +1,4 @@
-// The custom elements (PLAN-020 D3). Importing this module defines them
+// The custom elements (PLAN-022 D3). Importing this module defines them
 // (in a browser; a no-op during server rendering).
 import { defineBitmarkElements } from './elements';
 

@@ -43,22 +43,22 @@ const fakeModule = (full = true): RawParserModule & { init: ReturnType<typeof vi
   } as unknown as RawParserModule & { init: ReturnType<typeof vi.fn> };
 };
 
-describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
-  // @awa-test: PLAN-021-Step1 (an injected module is never initialised)
+describe('createBitmarkEngine (injection, PLAN-022 D7)', () => {
+  // @awa-test: PLAN-023-Step1 (an injected module is never initialised)
   it('never calls init on a module it was given', () => {
     const module = fakeModule();
     createBitmarkEngine(module);
     expect(module.init).not.toHaveBeenCalled();
   });
 
-  // @awa-test: PLAN-021-Step1 (declared feature; default bitmark-json)
+  // @awa-test: PLAN-023-Step1 (declared feature; default bitmark-json)
   it('takes the declared feature, defaulting to bitmark-json (no markup formats)', () => {
     expect(createBitmarkEngine(fakeModule()).feature).toBe('bitmark-json');
     expect(createBitmarkEngine(fakeModule()).markupFormats).toBe(false);
     expect(createBitmarkEngine(fakeModule(), { feature: 'full' }).markupFormats).toBe(true);
   });
 
-  // @awa-test: PLAN-021-Step1 (setFeature notifies)
+  // @awa-test: PLAN-023-Step1 (setFeature notifies)
   it('setFeature notifies listeners once per change', () => {
     const engine = createBitmarkEngine(fakeModule());
     const listener = vi.fn();
@@ -72,7 +72,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  // @awa-test: PLAN-021-Step1 (async calls; parser error strings reject)
+  // @awa-test: PLAN-023-Step1 (async calls; parser error strings reject)
   it('returns promises, and rejects a parser error string with BitmarkEngineError', async () => {
     const engine = createBitmarkEngine(fakeModule());
     await expect(engine.convert('ok', { outputFormat: 'json' })).resolves.toBe('out:ok');
@@ -82,7 +82,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     await expect(engine.convert('bad', { outputFormat: 'json' })).rejects.toThrow('broken input');
   });
 
-  // @awa-test: PLAN-021-Step1 (a synchronous throw becomes a rejection)
+  // @awa-test: PLAN-023-Step1 (a synchronous throw becomes a rejection)
   it('turns a synchronous throw into a rejection', async () => {
     const module = fakeModule();
     module.bitmarkToObjects = vi.fn(() => {
@@ -91,7 +91,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     await expect(createBitmarkEngine(module).bitmarkToObjects('x')).rejects.toThrow('boom');
   });
 
-  // @awa-test: PLAN-021-Step1 (JSON text with bit starts)
+  // @awa-test: PLAN-023-Step1 (JSON text with bit starts)
   it('writes the JSON text as JSON.stringify does, with the bit starts', async () => {
     const { text, bitStarts } = await createBitmarkEngine(fakeModule()).bitmarkToJsonText('x');
     expect(text).toBe(JSON.stringify(BITS, undefined, 2));
@@ -99,7 +99,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     expect(text.slice(bitStarts[1])).toMatch(/^\{/);
   });
 
-  // @awa-test: PLAN-021-Step1 (bit starts from the conversion, when the parser gives them)
+  // @awa-test: PLAN-023-Step1 (bit starts from the conversion, when the parser gives them)
   it('converts with bit starts when the parser has convertWithDetails, without otherwise', async () => {
     const opts = { outputFormat: 'html' as const };
     await expect(
@@ -113,7 +113,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     ).resolves.toEqual({ output: 'out:x', bitStarts: undefined });
   });
 
-  // @awa-test: PLAN-021-Step1 (bit starts from parser 7.9's outputStart, and the older start)
+  // @awa-test: PLAN-023-Step1 (bit starts from parser 7.9's outputStart, and the older start)
   it('reads outputStart (parser 7.9+) and start (older) from the bit spans', async () => {
     const module = fakeModule();
     module.convertWithDetails = vi.fn(() => ({
@@ -131,7 +131,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     });
   });
 
-  // @awa-test: PLAN-021-Step1 (missing optional exports switch features off, no errors)
+  // @awa-test: PLAN-023-Step1 (missing optional exports switch features off, no errors)
   it('answers undefined, and reports no capability, for exports an older parser lacks', async () => {
     const engine = createBitmarkEngine(fakeModule(false));
     expect(engine.capabilities).toEqual({
@@ -150,7 +150,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
     await expect(engine.info({ infoType: 'list' })).resolves.toBeUndefined();
   });
 
-  // @awa-test: PLAN-021-Step1 (positions in UTF-16; tokens in the absolute layout)
+  // @awa-test: PLAN-023-Step1 (positions in UTF-16; tokens in the absolute layout)
   it('asks the parser for UTF-16 positions and absolute tokens', async () => {
     const module = fakeModule();
     const engine = createBitmarkEngine(module);
@@ -173,7 +173,7 @@ describe('createBitmarkEngine (injection, PLAN-020 D7)', () => {
 describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
   afterEach(() => resetLoadedModules());
 
-  // @awa-test: PLAN-021-Step1 (pinned default version, D13)
+  // @awa-test: PLAN-023-Step1 (pinned default version, D13)
   it('defaults to the pinned parser version on jsDelivr', () => {
     expect(parserCdnUrl()).toBe(
       `https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${DEFAULT_PARSER_VERSION}/dist/browser/bitmark-parser.min.js`,
@@ -181,7 +181,7 @@ describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
     expect(DEFAULT_PARSER_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
-  // @awa-test: PLAN-021-Step1 (two stages, in order)
+  // @awa-test: PLAN-023-Step1 (two stages, in order)
   it('initialises bitmark-json first, then the stage-2 variant', async () => {
     const module = fakeModule();
     const { stage2 } = await loadBitmarkModule('u1', { importModule: async () => module });
@@ -192,7 +192,7 @@ describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
     ]);
   });
 
-  // @awa-test: PLAN-021-Step1 (per-URL cache)
+  // @awa-test: PLAN-023-Step1 (per-URL cache)
   it('loads each URL once', async () => {
     const importModule = vi.fn(async () => fakeModule());
     await loadBitmarkModule('u2', { importModule });
@@ -201,7 +201,7 @@ describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
     expect(importModule).toHaveBeenCalledTimes(2);
   });
 
-  // @awa-test: PLAN-021-Step1 (a failed load can be retried)
+  // @awa-test: PLAN-023-Step1 (a failed load can be retried)
   it('does not cache a failed load', async () => {
     const importModule = vi
       .fn()
@@ -211,7 +211,7 @@ describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
     await expect(loadBitmarkModule('u4', { importModule })).resolves.toBeDefined();
   });
 
-  // @awa-test: PLAN-021-Step1 (the engine switches feature when stage 2 lands)
+  // @awa-test: PLAN-023-Step1 (the engine switches feature when stage 2 lands)
   it('gives an engine at stage 1 that switches to the stage-2 variant', async () => {
     let finishStage2: () => void = () => {};
     const module = fakeModule();
@@ -226,7 +226,7 @@ describe('loadBitmarkModule / loadBitmarkEngine (the load path)', () => {
     expect(engine.markupFormats).toBe(true);
   });
 
-  // @awa-test: PLAN-021-Step1 (a stage-2 failure leaves stage 1)
+  // @awa-test: PLAN-023-Step1 (a stage-2 failure leaves stage 1)
   it('keeps the stage-1 engine when stage 2 fails', async () => {
     const module = fakeModule();
     module.init.mockImplementation(async ({ feature }: { feature: string }) => {

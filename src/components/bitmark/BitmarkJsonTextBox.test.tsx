@@ -84,7 +84,7 @@ describe('BitmarkJsonTextBox', () => {
     expect(editor).toHaveAttribute('data-default-value', '[.article] round-tripped');
   });
 
-  // @awa-test: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are session panes)
+  // @awa-test: PLAN-023-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are session panes)
   it.each(['wasm', 'wasmFull', 'tableHtml', 'text', 'xmlNiso', 'xmlNisoEs'] as const)(
     'renders a session pane when activeJsonTab is %s',
     (tab) => {

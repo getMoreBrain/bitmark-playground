@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-AngularWrapper
+// @awa-component: PLAN-023-AngularWrapper
 import {
   Component,
   effect,
@@ -28,15 +28,15 @@ import {
 import { BITMARK_EDITOR_CONFIG } from './config';
 
 /**
- * `<bm-session>`: one bitmark document (PLAN-020 D9, D10). Put `bm-pane`s
+ * `<bm-session>`: one bitmark document (PLAN-022 D9, D10). Put `bm-pane`s
  * (and `bm-tabs` / `bm-split`) inside it. Works with forms:
  * `formControlName` / `ngModel` bind the bitmark text.
  *
  * Monaco and the session run outside the Angular zone, so typing causes no
- * change detection (0 against 122 turns per 21 keystrokes in PLAN-021
+ * change detection (0 against 122 turns per 21 keystrokes in PLAN-023
  * Phase 0); the outputs re-enter it.
  */
-// @awa-impl: PLAN-021-Step13a (bm-session, ControlValueAccessor, zone handling)
+// @awa-impl: PLAN-023-Step13a (bm-session, ControlValueAccessor, zone handling)
 @Component({
   selector: 'bm-session',
   standalone: true,

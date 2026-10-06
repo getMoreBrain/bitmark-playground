@@ -1,4 +1,4 @@
-// The example app, shaped like cosmic (PLAN-020 D10, PLAN-021 Step 15a):
+// The example app, shaped like cosmic (PLAN-022 D10, PLAN-023 Step 15a):
 // NgModule bootstrap, zone change detection, Monaco 0.46 AMD from assets as
 // `window.monaco`, the parser bundled and initialised by the app.
 import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';

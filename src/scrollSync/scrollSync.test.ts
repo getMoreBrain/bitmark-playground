@@ -1,4 +1,4 @@
-// The playground's adapter over the lib scroll group (PLAN-021 Step 5). The
+// The playground's adapter over the lib scroll group (PLAN-023 Step 5). The
 // group's own rules are tested in src/lib/scroll.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

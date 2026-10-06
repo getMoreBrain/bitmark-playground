@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-AngularWrapper
+// @awa-component: PLAN-023-AngularWrapper
 import { Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked } from '@angular/core';
 import {
   type BitmarkPane,
@@ -28,11 +28,11 @@ const sharedOverflowNode = (): HTMLElement => {
 };
 
 /**
- * `<bm-pane type="…">`: one pane of the enclosing `bm-session` (PLAN-020 D9,
+ * `<bm-pane type="…">`: one pane of the enclosing `bm-session` (PLAN-022 D9,
  * D10). The host gives it a height. `readonly` and `scrollSync` switch at
  * runtime; a new `type`, `mode`, `mapping` or `label` makes a new pane.
  */
-// @awa-impl: PLAN-021-Step13a (bm-pane)
+// @awa-impl: PLAN-023-Step13a (bm-pane)
 @Component({
   selector: 'bm-pane',
   standalone: true,

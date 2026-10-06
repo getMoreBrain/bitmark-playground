@@ -35,11 +35,11 @@ export interface OutputPanelProps {
   lexerOutput?: string;
   /** Show the Info tab (bottom-left panel only). */
   showInfo?: boolean;
-  /** The Info tab's content (the playground's session pane, PLAN-021 Step 14). */
+  /** The Info tab's content (the playground's session pane, PLAN-023 Step 14). */
   infoPane?: ReactNode;
   /** Show the Mappings tab (bottom-left panel only). */
   showMappings?: boolean;
-  /** The Mappings tab's content (the playground's session pane, PLAN-021 Step 14). */
+  /** The Mappings tab's content (the playground's session pane, PLAN-023 Step 14). */
   mappingsPane?: ReactNode;
 }
 

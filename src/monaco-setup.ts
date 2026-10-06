@@ -41,6 +41,6 @@ self.MonacoEnvironment = {
 };
 
 // @awa-impl: PLAN-016-Step5 (bitmark language + token stylesheet registered before any editor mounts)
-// @awa-impl: PLAN-021-Step4 (on the playground's own Monaco, injected; the
+// @awa-impl: PLAN-023-Step4 (on the playground's own Monaco, injected; the
 // providers answer for each editor's model with that editor's engine)
 setupBitmarkMonaco({ monaco: monaco as unknown as Monaco });

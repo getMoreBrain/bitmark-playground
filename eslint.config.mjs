@@ -28,7 +28,7 @@ const config = [
       '.awa',
       'src/generated',
       '**/*.d.ts',
-      // The package lints itself (its own eslint.config.mjs, PLAN-020 D6).
+      // The package lints itself (its own eslint.config.mjs, PLAN-022 D6).
       'packages/bitmark-editor',
       'packages/bitmark-editor-angular',
     ],

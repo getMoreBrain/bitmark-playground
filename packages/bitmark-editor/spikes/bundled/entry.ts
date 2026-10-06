@@ -1,5 +1,5 @@
 /**
- * PLAN-020 Phase 0: the `/bundled` prototype (D4, D12). Monaco + the core,
+ * PLAN-022 Phase 0: the `/bundled` prototype (D4, D12). Monaco + the core,
  * prebuilt. Loads straight from a CDN with no bundler: its CSS and its
  * workers are found beside this file (`import.meta.url`), and the workers
  * start from same-origin blob URLs, as a cross-origin `new Worker(url)` is

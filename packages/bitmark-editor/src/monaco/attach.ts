@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-MonacoServices
+// @awa-component: PLAN-023-MonacoServices
 import type { BitmarkEngine } from '../engine/types';
 import { log } from '../log';
 import { attachBitmarkDiagnostics } from './diagnostics';
@@ -32,11 +32,11 @@ const hasContribution = (editor: CodeEditor, ids: string[]): boolean =>
   });
 
 /**
- * The bitmark editor services on one editor (PLAN-020 D8, D14): highlighting,
+ * The bitmark editor services on one editor (PLAN-022 D8, D14): highlighting,
  * diagnostics, and the completion and hover the providers give for its
  * model. The engine may arrive later (`setEngine`).
  */
-// @awa-impl: PLAN-021-Step2 (per-instance services, engine switchable)
+// @awa-impl: PLAN-023-Step2 (per-instance services, engine switchable)
 export const attachBitmarkEditor = (
   monaco: Monaco,
   editor: CodeEditor,

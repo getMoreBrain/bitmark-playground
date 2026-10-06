@@ -1,4 +1,4 @@
-// PLAN-021 Steps 7-8 in a real browser (playground Vite dev server :4604 + serve.mjs :4602).
+// PLAN-023 Steps 7-8 in a real browser (playground Vite dev server :4604 + serve.mjs :4602).
 import { expect, test } from '@playwright/test';
 
 const PAGE = 'http://localhost:4604/bitmark-playground/packages/bitmark-editor/playground-spike/panes.html';

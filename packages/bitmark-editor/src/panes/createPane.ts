@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Panes
+// @awa-component: PLAN-023-Panes
 import type * as MonacoApi from 'monaco-editor';
 
 import { createTextEditor } from '../editor/textEditor';
@@ -63,10 +63,10 @@ const DEFAULT_EDITOR_OPTIONS: MonacoApi.editor.IStandaloneEditorConstructionOpti
 
 /**
  * A pane: one Monaco editor showing the session's document in one format,
- * mounted inside `element` (PLAN-020 D9). Editing it updates every other
+ * mounted inside `element` (PLAN-022 D9). Editing it updates every other
  * pane; it regenerates when another pane is edited.
  */
-// @awa-impl: PLAN-021-Step8 (the pane: mount, edit, regenerate, error, stale, theme, scroll)
+// @awa-impl: PLAN-023-Step8 (the pane: mount, edit, regenerate, error, stale, theme, scroll)
 export const createPane = (
   element: HTMLElement,
   session: BitmarkSession,

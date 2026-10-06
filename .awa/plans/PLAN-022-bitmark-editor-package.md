@@ -1,4 +1,4 @@
-# PLAN-020: Extract the bitmark / JSON Editor into an npm Package
+# PLAN-022: Extract the bitmark / JSON Editor into an npm Package
 
 STATUS: in-progress
 DIRECTION: lateral
@@ -179,7 +179,7 @@ likes, and the playground consumes the package.
   - per-editor state is per instance;
   - the JSON schema applies only to the package's own models (their URI
     scheme), never `fileMatch: ['*']`. The pattern is the scheme followed by
-    a double-star glob: a single `*` does not cross `/` (Phase 0, PLAN-021).
+    a double-star glob: a single `*` does not cross `/` (Phase 0, PLAN-023).
 - D6 — Location: a bun workspace in this repo for now,
   `packages/bitmark-editor`, with the playground staying at the root. The
   package moves to its own repo later, so it is built to be lifted out
@@ -518,7 +518,7 @@ likes, and the playground consumes the package.
 ## Steps
 
 The steps, testing, documentation work and completion criteria are in
-PLAN-021 (`PLAN-021-bitmark-editor-package-steps.md`), split out to keep
+PLAN-023 (`PLAN-023-bitmark-editor-package-steps.md`), split out to keep
 each plan within the size limit. Decision ids (D1 to D12) are defined here.
 
 ## Risks

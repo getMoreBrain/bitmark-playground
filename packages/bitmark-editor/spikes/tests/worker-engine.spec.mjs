@@ -1,4 +1,4 @@
-// PLAN-021 Step 1a in a real browser (needs the playground Vite dev server on :4604
+// PLAN-023 Step 1a in a real browser (needs the playground Vite dev server on :4604
 // and `node serve.mjs` for the parser on :4602).
 import { expect, test } from '@playwright/test';
 

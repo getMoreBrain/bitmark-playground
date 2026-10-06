@@ -30,7 +30,7 @@ const initialMarkup = '[.article]\nHello World!';
 // @awa-impl: PLAN-002-Step5 (tab bar integration)
 // @awa-impl: PLAN-002-Step7 (provider nesting)
 // @awa-impl: PLAN-003-Step6 (App integration)
-// @awa-impl: PLAN-021-Step14 (the playground's session wraps the layout)
+// @awa-impl: PLAN-023-Step14 (the playground's session wraps the layout)
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);

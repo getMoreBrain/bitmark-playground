@@ -56,7 +56,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   // @awa-impl: PLAN-016-Step5 (bitmark editor highlighted from parser semantic tokens)
   // @awa-impl: PLAN-017-Step3 (and marked from parser diagnostics)
   // @awa-impl: PLAN-018-Step7 (and linked to the output pane's scrolling)
-  // @awa-impl: PLAN-021-Step2 (through the lib's per-editor services)
+  // @awa-impl: PLAN-023-Step2 (through the lib's per-editor services)
   const { onMount: scrollSyncMount, onUnmount: scrollSyncUnmount } = scrollSync;
   const { attach, detach } = services;
   const editorDidMount = useCallback<EditorDidMount>(

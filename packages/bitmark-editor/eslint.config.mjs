@@ -1,5 +1,5 @@
 // @gmb/bitmark-editor lint config: self-contained, so the package lifts out
-// unchanged (PLAN-020 D6).
+// unchanged (PLAN-022 D6).
 import eslint from '@eslint/js';
 import prettier from 'eslint-plugin-prettier';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
@@ -25,25 +25,25 @@ export default [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
       ],
       // The core must stay framework-free and receive Monaco by injection
-      // (PLAN-020 D6, D8).
+      // (PLAN-022 D6, D8).
       '@typescript-eslint/no-restricted-imports': [
         'error',
         {
           paths: [
             {
               name: 'monaco-editor',
-              message: 'The core receives Monaco by injection (PLAN-020 D8); import types only.',
+              message: 'The core receives Monaco by injection (PLAN-022 D8); import types only.',
               allowTypeImports: true,
             },
           ],
           patterns: [
             {
               group: ['react', 'react-*', 'valtio', 'valtio/*', 'theme-ui', 'lodash', 'lodash/*'],
-              message: 'The core is framework-free (PLAN-020 D6).',
+              message: 'The core is framework-free (PLAN-022 D6).',
             },
             {
               group: ['monaco-editor/*'],
-              message: 'The core receives Monaco by injection (PLAN-020 D8); import types only.',
+              message: 'The core receives Monaco by injection (PLAN-022 D8); import types only.',
               allowTypeImports: true,
             },
           ],
@@ -51,17 +51,17 @@ export default [
       ],
     },
   },
-  // The React adapter is the one place React is allowed (PLAN-020 D3).
+  // The React adapter is the one place React is allowed (PLAN-022 D3).
   {
     files: ['src/react/**/*.tsx'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
-        { paths: [{ name: 'monaco-editor', allowTypeImports: true, message: 'Types only (PLAN-020 D8).' }] },
+        { paths: [{ name: 'monaco-editor', allowTypeImports: true, message: 'Types only (PLAN-022 D8).' }] },
       ],
     },
   },
-  // `/bundled` is the one place Monaco is imported at runtime (PLAN-020 D4).
+  // `/bundled` is the one place Monaco is imported at runtime (PLAN-022 D4).
   {
     files: ['src/bundled/**/*.ts'],
     rules: { '@typescript-eslint/no-restricted-imports': 'off' },

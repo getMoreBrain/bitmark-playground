@@ -30,7 +30,7 @@
       "react": ["./node_modules/@types/react"],
       "react/*": ["./node_modules/@types/react/*"],
       // The package's source is compiled against the playground's own
-      // Monaco (the host's, PLAN-020 D8), not the package's dev copy.
+      // Monaco (the host's, PLAN-022 D8), not the package's dev copy.
       "monaco-editor": ["./node_modules/monaco-editor"]
     }
   },

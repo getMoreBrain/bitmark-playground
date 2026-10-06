@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: Monaco 0.46 AMD injected (D8), and the /bundled guard.
+// PLAN-022 Phase 0: Monaco 0.46 AMD injected (D8), and the /bundled guard.
 import { expect, test } from '@playwright/test';
 
 import {

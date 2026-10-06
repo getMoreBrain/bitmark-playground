@@ -1,4 +1,4 @@
-// PLAN-021 Step 14: the playground's WASM JSON, HTML, Text, XML, Info and
+// PLAN-023 Step 14: the playground's WASM JSON, HTML, Text, XML, Info and
 // Mappings tabs are the package's session panes (needs the playground's Vite
 // dev server on :4604).
 import { expect, test } from '@playwright/test';

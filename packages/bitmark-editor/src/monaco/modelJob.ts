@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-MonacoServices
+// @awa-component: PLAN-023-MonacoServices
 import { createLatestRunner, SUPERSEDED } from '../engine/latest';
 import type { CodeEditor, IDisposable, TextModel } from './types';
 
@@ -45,7 +45,7 @@ export interface ModelJobOptions<R> {
 /**
  * Run `compute` over an editor's text after each change (debounced,
  * latest-wins), and apply the result only if the model is still at the
- * version it was computed for (PLAN-020 D14). `run()` re-runs now, e.g.
+ * version it was computed for (PLAN-022 D14). `run()` re-runs now, e.g.
  * when the engine changes.
  */
 export const attachModelJob = <R>(options: ModelJobOptions<R>): IDisposable & { run(): void } => {

@@ -54,7 +54,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     [jsonToMarkup],
   );
 
-  // @awa-impl: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
+  // @awa-impl: PLAN-023-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
   // The timed ones stay mounted (hidden when inactive), so each tab's duration stays current.
   const sessionPanes = RIGHT_SESSION_TABS.filter(
     (tab) => tab === activeTab || keepsMounted(tab),

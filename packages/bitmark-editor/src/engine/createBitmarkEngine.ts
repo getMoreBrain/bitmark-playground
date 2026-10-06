@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Engine
+// @awa-component: PLAN-023-Engine
 import type { ConvertOptions, Feature } from '@gmb/bitmark-parser';
 
 import { jsonWithBitStarts } from '../json/jsonText';
@@ -37,7 +37,7 @@ const call = <T>(fn: () => T): Promise<T> => {
 
 export interface CreateBitmarkEngineOptions {
   /**
-   * The variant the host already loaded (PLAN-020 D7). The package never
+   * The variant the host already loaded (PLAN-022 D7). The package never
    * calls `init` on a module it was given: a second `init` swaps the
    * variant, which could silently downgrade the host. Default:
    * `bitmark-json`, so the markup panes stay off until told otherwise.
@@ -47,9 +47,9 @@ export interface CreateBitmarkEngineOptions {
 
 /**
  * An engine over a parser module that runs on the main thread. The module's
- * synchronous calls are wrapped as promises (PLAN-020 D14).
+ * synchronous calls are wrapped as promises (PLAN-022 D14).
  */
-// @awa-impl: PLAN-021-Step1 (main-thread engine over a raw module)
+// @awa-impl: PLAN-023-Step1 (main-thread engine over a raw module)
 export const createBitmarkEngine = (
   module: RawParserModule,
   options: CreateBitmarkEngineOptions = {},

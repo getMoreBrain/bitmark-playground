@@ -1,4 +1,4 @@
-// Smoke check of the real playground during PLAN-021 Phase 1 (needs its Vite
+// Smoke check of the real playground during PLAN-023 Phase 1 (needs its Vite
 // dev server on :4604). Loads the parser from jsDelivr, as the playground does.
 import { expect, test } from '@playwright/test';
 

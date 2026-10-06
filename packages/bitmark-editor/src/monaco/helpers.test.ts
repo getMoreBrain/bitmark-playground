@@ -40,7 +40,7 @@ const item = (over: Partial<CompletionItem> = {}): CompletionItem =>
   }) as CompletionItem;
 
 describe('monacoKind', () => {
-  // @awa-test: PLAN-021-Step2 (LSP kinds onto Monaco's)
+  // @awa-test: PLAN-023-Step2 (LSP kinds onto Monaco's)
   it('maps the LSP numbering onto Monaco’s own', () => {
     expect(monacoKind(monaco, LSP.Class)).toBe(K.Class);
     expect(monacoKind(monaco, LSP.Property)).toBe(K.Property);

@@ -69,11 +69,11 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    // One React and one Monaco (PLAN-020 D8): never the package folder's dev copies.
+    // One React and one Monaco (PLAN-022 D8): never the package folder's dev copies.
     dedupe: ['react', 'react-dom', 'monaco-editor'],
     alias: [
       {
-        // The workspace package, from source (PLAN-021 Step 9).
+        // The workspace package, from source (PLAN-023 Step 9).
         find: /^@gmb\/bitmark-editor$/,
         replacement: path.resolve(__dirname, 'packages/bitmark-editor/src/index.ts'),
       },

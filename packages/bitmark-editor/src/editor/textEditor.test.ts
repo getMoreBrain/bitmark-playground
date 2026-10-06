@@ -28,7 +28,7 @@ describe('createChangeFilter', () => {
   });
 });
 
-describe('createTextEditor (PLAN-021 Step 6)', () => {
+describe('createTextEditor (PLAN-023 Step 6)', () => {
   const setup = (value = 'start') => {
     const fake = createFakeMonaco();
     const onInput = vi.fn();
@@ -43,13 +43,13 @@ describe('createTextEditor (PLAN-021 Step 6)', () => {
     return { fake, text, onInput, model: text.model as FakeModel, state: fake.editors[0]! };
   };
 
-  // @awa-test: PLAN-021-Step6 (the model lives under the package scheme, D5)
+  // @awa-test: PLAN-023-Step6 (the model lives under the package scheme, D5)
   it('creates its model under the package URI scheme', () => {
     const { model } = setup();
     expect(model.uri.toString()).toMatch(/^bitmark-editor:\/\/editor-\d+\/json\.json$/);
   });
 
-  // @awa-test: PLAN-021-Step6 (user edits reported once per distinct value)
+  // @awa-test: PLAN-023-Step6 (user edits reported once per distinct value)
   it('reports user edits, once per distinct value', () => {
     const { model, onInput } = setup();
     model.setText('one');
@@ -58,7 +58,7 @@ describe('createTextEditor (PLAN-021 Step 6)', () => {
     expect(onInput.mock.calls.map((c) => c[0])).toEqual(['one', 'two']);
   });
 
-  // @awa-test: PLAN-021-Step6 (a programmatic value never echoes as input)
+  // @awa-test: PLAN-023-Step6 (a programmatic value never echoes as input)
   it('does not report its own programmatic value as input', () => {
     const { text, onInput } = setup();
     expect(text.setValue('generated')).toBe(true);
@@ -66,7 +66,7 @@ describe('createTextEditor (PLAN-021 Step 6)', () => {
     expect(onInput).not.toHaveBeenCalled();
   });
 
-  // @awa-test: PLAN-021-Step6 (a focused editor is never overwritten)
+  // @awa-test: PLAN-023-Step6 (a focused editor is never overwritten)
   it('leaves a focused editor alone', () => {
     const { text, state } = setup();
     state.focused = true;
@@ -74,7 +74,7 @@ describe('createTextEditor (PLAN-021 Step 6)', () => {
     expect(text.getValue()).toBe('start');
   });
 
-  // @awa-test: PLAN-021-Step6 (regeneration keeps undo, D16)
+  // @awa-test: PLAN-023-Step6 (regeneration keeps undo, D16)
   it('keeps the undo history through regeneration', () => {
     const { text, model } = setup('a');
     model.setText('typed');

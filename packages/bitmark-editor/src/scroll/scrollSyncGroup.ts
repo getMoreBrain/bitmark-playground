@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-ScrollSyncGroup
+// @awa-component: PLAN-023-ScrollSyncGroup
 import type * as MonacoApi from 'monaco-editor';
 
 import { mapScrollTop, ScrollGeometry } from './mapScrollTop';
@@ -53,7 +53,7 @@ interface Pane {
 }
 
 /**
- * Link the scrolling of any number of panes by bit (PLAN-020 D9,
+ * Link the scrolling of any number of panes by bit (PLAN-022 D9,
  * generalising PLAN-018 from two slots):
  * - the member the user scrolls leads; every other linked member follows,
  *   keeping the same bit at its top;
@@ -63,7 +63,7 @@ interface Pane {
  *   the others re-sync;
  * - with no leader yet, the first linked member leads.
  */
-// @awa-impl: PLAN-021-Step5 (the N-way scroll group)
+// @awa-impl: PLAN-023-Step5 (the N-way scroll group)
 export const createScrollSyncGroup = (): ScrollSyncGroup => {
   const panes: Pane[] = [];
   let leader: Pane | undefined;

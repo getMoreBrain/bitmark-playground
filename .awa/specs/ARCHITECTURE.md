@@ -94,7 +94,7 @@ src/generated/                    # Auto-generated build metadata
 packages/bitmark-editor/          # @gmb/bitmark-editor (bun workspace package; lifts out unchanged)
 packages/bitmark-editor/src/      # engine/, monaco/, session/, panes/, scroll/, theme/, editor/, elements/, react/, bundled/
 packages/bitmark-editor/examples/ # Maintained examples (static site, /esm consumer) with browser checks
-packages/bitmark-editor/spikes/   # PLAN-021 Phase 0 spikes and browser checks (throwaway)
+packages/bitmark-editor/spikes/   # PLAN-023 Phase 0 spikes and browser checks (throwaway)
 packages/bitmark-editor-angular/  # Angular CLI workspace: @gmb/bitmark-editor-angular and its cosmic-shaped example
 scripts/                          # Build-time scripts
 public/                           # Static assets
@@ -174,7 +174,7 @@ CONSTRAINTS
 
 ### Editor Package Layer
 
-`@gmb/bitmark-editor`: the bitmark and JSON editors as a framework-agnostic package (PLAN-020, PLAN-021), consumed by the playground and by other hosts.
+`@gmb/bitmark-editor`: the bitmark and JSON editors as a framework-agnostic package (PLAN-022, PLAN-023), consumed by the playground and by other hosts.
 
 RESPONSIBILITIES
 
@@ -282,4 +282,4 @@ Core markup-to-JSON and JSON-to-markup conversion is functional. Deployed to Git
 - 1.0.0 (2026-02-17): Initial architecture
 - 1.1.0 (2026-09-09): Tree-sitter highlighting replaced by the WASM parser's semantic tokens (PLAN-016)
 - 1.2.0 (2026-09-29): Linked scrolling between the bitmark and output panes, by bit, from the parser's bit spans (PLAN-018)
-- 1.3.0 (2026-10-06): The editors extracted into `@gmb/bitmark-editor` and `@gmb/bitmark-editor-angular` (PLAN-020, PLAN-021); the build described as it is (Vite, Bun workspaces); the parser-loading rule allows host injection
+- 1.3.0 (2026-10-06): The editors extracted into `@gmb/bitmark-editor` and `@gmb/bitmark-editor-angular` (PLAN-022, PLAN-023); the build described as it is (Vite, Bun workspaces); the parser-loading rule allows host injection

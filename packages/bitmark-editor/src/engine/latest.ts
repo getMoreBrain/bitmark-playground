@@ -1,10 +1,10 @@
-// @awa-component: PLAN-021-Engine
+// @awa-component: PLAN-023-Engine
 
 /** The result of a run that a newer one replaced before it started. */
 export const SUPERSEDED: unique symbol = Symbol('superseded');
 
 /**
- * Latest-wins scheduling for one caller (PLAN-020 D14): at most one run in
+ * Latest-wins scheduling for one caller (PLAN-022 D14): at most one run in
  * flight; while it runs, only the newest request waits, and any request it
  * replaces resolves `SUPERSEDED` without running. So a burst of edits never
  * builds a backlog, however slow each run is.
@@ -12,7 +12,7 @@ export const SUPERSEDED: unique symbol = Symbol('superseded');
  * Results that arrive for an older input are the caller's to drop (tag them
  * with the model version).
  */
-// @awa-impl: PLAN-021-Step1a (latest-wins coalescing per caller)
+// @awa-impl: PLAN-023-Step1a (latest-wins coalescing per caller)
 export const createLatestRunner = <A extends unknown[], R>(run: (...args: A) => Promise<R>) => {
   let inFlight: Promise<unknown> | undefined;
   let waiting:

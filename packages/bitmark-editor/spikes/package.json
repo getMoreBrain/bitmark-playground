@@ -2,7 +2,7 @@
   "name": "bitmark-editor-spikes",
   "private": true,
   "type": "module",
-  "description": "PLAN-020 Phase 0 spikes. Throwaway; not published.",
+  "description": "PLAN-022 Phase 0 spikes. Throwaway; not published.",
   "scripts": {
     "build:bundled": "node bundled/build.mjs",
     "serve": "node serve.mjs",

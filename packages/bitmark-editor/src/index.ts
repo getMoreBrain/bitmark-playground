@@ -1,4 +1,4 @@
-// @gmb/bitmark-editor: the framework-free core (PLAN-020 D3).
+// @gmb/bitmark-editor: the framework-free core (PLAN-022 D3).
 export * from './editor';
 export * from './engine';
 export * from './json/jsonText';

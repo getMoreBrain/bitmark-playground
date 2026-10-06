@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-MonacoServices
+// @awa-component: PLAN-023-MonacoServices
 import { DEFAULT_PARSER_VERSION } from '../engine/loadBitmarkEngine';
 import { log } from '../log';
 import type { Monaco } from './types';
@@ -6,14 +6,14 @@ import type { Monaco } from './types';
 /**
  * Every model the package creates lives under this URI scheme, so the
  * bitmark JSON schema can apply to them alone and never to the host's own
- * JSON editors (PLAN-020 D5).
+ * JSON editors (PLAN-022 D5).
  */
 export const BITMARK_MODEL_SCHEME = 'bitmark-editor';
 
 /**
  * The schema's `fileMatch` for the package's models. Monaco's matcher needs
  * the double-star glob: a single `*` does not cross `/`, so
- * `bitmark-editor://*` silently matches nothing (found in PLAN-021 Phase 0).
+ * `bitmark-editor://*` silently matches nothing (found in PLAN-023 Phase 0).
  */
 export const BITMARK_MODEL_FILE_MATCH = `${BITMARK_MODEL_SCHEME}://**`;
 
@@ -74,7 +74,7 @@ export const loadBitmarkJsonSchema = async (url: string): Promise<unknown | unde
  * host whose every JSON model is bitmark JSON (the playground) may widen
  * `fileMatch`. Returns false when this Monaco has no JSON language.
  */
-// @awa-impl: PLAN-021-Step3 (the schema scoped to the package's model URIs)
+// @awa-impl: PLAN-023-Step3 (the schema scoped to the package's model URIs)
 export const bindBitmarkJsonSchema = (
   monaco: Monaco,
   schema: unknown,

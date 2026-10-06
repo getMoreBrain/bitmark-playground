@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-MonacoServices
+// @awa-component: PLAN-023-MonacoServices
 import type { Hover } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 
@@ -70,7 +70,7 @@ export interface SetupBitmarkMonacoOptions {
 }
 
 /**
- * Register bitmark on a Monaco instance (PLAN-020 D8): the language, the
+ * Register bitmark on a Monaco instance (PLAN-022 D8): the language, the
  * token stylesheet, and the completion and hover providers. Idempotent per
  * instance. The providers answer only for models bound to an engine
  * (`bindModelEngine`), so they never touch the host's own editors (D5).
@@ -78,8 +78,8 @@ export interface SetupBitmarkMonacoOptions {
  * Workers and the suggest / hover contributions belong to whoever owns this
  * Monaco: the host for `/esm`, the package for `/bundled`.
  */
-// @awa-impl: PLAN-021-Step4 (setupBitmarkMonaco on the injected instance)
-// @awa-impl: PLAN-021-Step2 (providers find the engine through the model)
+// @awa-impl: PLAN-023-Step4 (setupBitmarkMonaco on the injected instance)
+// @awa-impl: PLAN-023-Step2 (providers find the engine through the model)
 export const setupBitmarkMonaco = ({ monaco }: SetupBitmarkMonacoOptions): void => {
   if (setUp.has(monaco)) return;
   setUp.add(monaco);

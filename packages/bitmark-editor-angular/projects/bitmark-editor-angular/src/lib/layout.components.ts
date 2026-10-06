@@ -1,13 +1,13 @@
-// @awa-component: PLAN-021-AngularWrapper
+// @awa-component: PLAN-023-AngularWrapper
 import { Component, computed, contentChildren, effect, input, model, untracked } from '@angular/core';
 
 import { BmPaneComponent } from './pane.component';
 
 /**
  * `<bm-tabs>`: a tab strip over its `bm-pane` children; only the active one
- * is mounted (PLAN-020 D9). WAI-ARIA tabs keys (D16).
+ * is mounted (PLAN-022 D9). WAI-ARIA tabs keys (D16).
  */
-// @awa-impl: PLAN-021-Step13a (bm-tabs)
+// @awa-impl: PLAN-023-Step13a (bm-tabs)
 @Component({
   selector: 'bm-tabs',
   standalone: true,
@@ -58,8 +58,8 @@ export class BmTabsComponent {
   }
 }
 
-/** `<bm-split direction="row|column">`: children side by side or stacked (PLAN-020 D9). */
-// @awa-impl: PLAN-021-Step13a (bm-split)
+/** `<bm-split direction="row|column">`: children side by side or stacked (PLAN-022 D9). */
+// @awa-impl: PLAN-023-Step13a (bm-split)
 @Component({
   selector: 'bm-split',
   standalone: true,

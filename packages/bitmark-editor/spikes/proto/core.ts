@@ -1,5 +1,5 @@
 /**
- * PLAN-020 Phase 0 prototype core. Throwaway: it exists to prove the
+ * PLAN-022 Phase 0 prototype core. Throwaway: it exists to prove the
  * injection and build decisions (D4, D8, D12) before Phase 1, not to be
  * the package. It never imports `monaco-editor` at runtime (D8).
  */

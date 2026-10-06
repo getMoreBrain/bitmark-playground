@@ -85,13 +85,13 @@ export interface LastEditSlice {
   readonly label: string;
   /**
    * Where the edit happened: the playground's own editors, or a package
-   * pane of the session (PLAN-021 Step 14, which keeps the two from echoing).
+   * pane of the session (PLAN-023 Step 14, which keeps the two from echoing).
    */
   readonly origin: 'playground' | 'session';
   readonly updates: number;
 }
 
-/** The package panes whose regeneration time the tab bar shows (PLAN-021 Step 14). */
+/** The package panes whose regeneration time the tab bar shows (PLAN-023 Step 14). */
 export type TimedPane = 'tableHtml' | 'text' | XmlVariant;
 
 export interface BitmarkState {

@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: build the `/bundled` prototype into bundled/dist.
+// PLAN-022 Phase 0: build the `/bundled` prototype into bundled/dist.
 import { build } from 'esbuild';
 import { statSync, readdirSync } from 'node:fs';
 import path from 'node:path';

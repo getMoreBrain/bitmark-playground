@@ -2,7 +2,7 @@
   "name": "bitmark-editor-examples",
   "private": true,
   "type": "module",
-  "description": "Maintained examples of @gmb/bitmark-editor, with browser checks (PLAN-021 Step 15).",
+  "description": "Maintained examples of @gmb/bitmark-editor, with browser checks (PLAN-023 Step 15).",
   "scripts": {
     "serve": "node serve.mjs",
     "test": "node esm/check.mjs && playwright test",

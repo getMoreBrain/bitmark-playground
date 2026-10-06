@@ -3,7 +3,7 @@
 // pixels tall and nothing wraps.
 import type * as monaco from 'monaco-editor';
 
-// A copy of src/test/fakeEditor.ts: src/lib may not import outside itself (PLAN-020 D6).
+// A copy of src/test/fakeEditor.ts: src/lib may not import outside itself (PLAN-022 D6).
 
 export const LINE_HEIGHT = 10;
 

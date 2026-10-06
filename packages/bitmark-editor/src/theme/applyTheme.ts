@@ -1,10 +1,10 @@
-// @awa-component: PLAN-021-Theme
+// @awa-component: PLAN-023-Theme
 import type { Monaco } from '../monaco/types';
 import { THEME_CLASS, TokenKey, TokenStyle, tokenVar } from './tokens';
 
 export type ThemeBase = 'dark' | 'light';
 
-/** A theme built on `dark`, `light` or `auto`, with token overrides (PLAN-020 D11). */
+/** A theme built on `dark`, `light` or `auto`, with token overrides (PLAN-022 D11). */
 export interface CustomTheme {
   base: ThemeBase | 'auto';
   /** A Monaco theme the host registered with `defineTheme`. Default: `vs-dark` / `vs`. */
@@ -47,7 +47,7 @@ const PROPS: { key: keyof TokenStyle; name: 'color' | 'weight' | 'style' | 'deco
  * picks the palette's variables, a custom theme's overrides go on the
  * element itself, and `auto` follows `prefers-color-scheme` live.
  */
-// @awa-impl: PLAN-021-Step5a (dark, light, auto and custom themes)
+// @awa-impl: PLAN-023-Step5a (dark, light, auto and custom themes)
 export const applyBitmarkTheme = (
   element: HTMLElement,
   theme: BitmarkTheme,

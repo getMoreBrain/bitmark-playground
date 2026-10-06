@@ -1,4 +1,4 @@
-# Hand-off: the docs site switches to the package (PLAN-021 Step 18)
+# Hand-off: the docs site switches to the package (PLAN-023 Step 18)
 
 For a branch in the parser repo (`docs-site/`, Eleventy). Not started: it
 is work in another repository, and it needs the package on jsDelivr (a

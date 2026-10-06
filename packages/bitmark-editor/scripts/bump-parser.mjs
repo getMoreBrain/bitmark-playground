@@ -1,4 +1,4 @@
-// Bump the pinned default parser version (PLAN-020 D13) to the latest
+// Bump the pinned default parser version (PLAN-022 D13) to the latest
 // @gmb/bitmark-parser on npm: the DEFAULT_PARSER_VERSION constant and the
 // dev dependency. Prints the new version, or nothing when already current.
 // `--check` only reports. Run by .github/workflows/bitmark-editor-parser-bump.yml.

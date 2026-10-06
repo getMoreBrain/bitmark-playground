@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-ScrollSyncGroup
+// @awa-component: PLAN-023-ScrollSyncGroup
 import type * as MonacoApi from 'monaco-editor';
 
 import { createLatestRunner, SUPERSEDED } from '../engine/latest';
@@ -18,10 +18,10 @@ const warnedNoStart = new WeakSet<BitmarkEngine>();
 /**
  * Where each bit starts in a bitmark pane's text: the parser's `splitBits`
  * `start` (PLAN-018 D1), split asynchronously once per content version
- * (PLAN-020 D14). `onChange` is called when new starts land, so the scroll
+ * (PLAN-022 D14). `onChange` is called when new starts land, so the scroll
  * group can re-measure. Bitmark that is broken still splits, at each `[.`.
  */
-// @awa-impl: PLAN-021-Step5 (async split starts per pane, from the pane's engine)
+// @awa-impl: PLAN-023-Step5 (async split starts per pane, from the pane's engine)
 export const createSplitBitStarts = (
   editor: Pick<
     MonacoApi.editor.ICodeEditor,

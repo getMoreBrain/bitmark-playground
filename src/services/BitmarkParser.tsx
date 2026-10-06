@@ -104,9 +104,9 @@ interface IBitmarkParserContext {
   hover: typeof hoverFn | undefined;
   version: string;
   /**
-   * The same parser as an async engine (PLAN-021 Step 1), for code moving
+   * The same parser as an async engine (PLAN-023 Step 1), for code moving
    * to `src/lib`. The raw functions above stay until the playground runs on
-   * the package (PLAN-021 Step 14).
+   * the package (PLAN-023 Step 14).
    */
   engine: BitmarkEngine | undefined;
 }
@@ -144,7 +144,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const moduleUrl = engineUrl(window.location.search, import.meta.env.BASE_URL, _cacheBuster);
 
-    // @awa-impl: PLAN-021-Step1 (the provider loads through the lib's load path)
+    // @awa-impl: PLAN-023-Step1 (the provider loads through the lib's load path)
     const load = async () => {
       try {
         // Stage 1: the smallest variant, so the editor is live as soon as

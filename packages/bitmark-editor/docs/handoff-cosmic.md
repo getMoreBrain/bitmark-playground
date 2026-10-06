@@ -1,4 +1,4 @@
-# Hand-off: cosmic proof of concept (PLAN-021 Step 17)
+# Hand-off: cosmic proof of concept (PLAN-023 Step 17)
 
 For a branch in `getMoreBrain/cosmic` (`gmb.web`). Not started: it is work
 in another repository, and it needs the packages as a prerelease or local

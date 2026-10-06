@@ -77,8 +77,8 @@ const flush = async () => {
   for (let i = 0; i < 5; i++) await Promise.resolve();
 };
 
-describe('setupBitmarkMonaco (PLAN-020 D8)', () => {
-  // @awa-test: PLAN-021-Step4 (idempotent per Monaco instance)
+describe('setupBitmarkMonaco (PLAN-022 D8)', () => {
+  // @awa-test: PLAN-023-Step4 (idempotent per Monaco instance)
   it('registers the language and providers once per Monaco instance', () => {
     const a = createFakeMonaco();
     setupBitmarkMonaco({ monaco: a.monaco });
@@ -91,7 +91,7 @@ describe('setupBitmarkMonaco (PLAN-020 D8)', () => {
     expect(b.providers.completion).toHaveLength(1);
   });
 
-  // @awa-test: PLAN-021-Step2 (providers answer only for models bound to an engine)
+  // @awa-test: PLAN-023-Step2 (providers answer only for models bound to an engine)
   it('answers completion and hover only for a model bound to an engine, with that engine', async () => {
     const { monaco, providers } = createFakeMonaco();
     setupBitmarkMonaco({ monaco });
@@ -129,11 +129,11 @@ describe('setupBitmarkMonaco (PLAN-020 D8)', () => {
   });
 });
 
-describe('attachBitmarkEditor (PLAN-020 D14)', () => {
+describe('attachBitmarkEditor (PLAN-022 D14)', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  // @awa-test: PLAN-021-Step2 (highlights on attach, re-highlights after edits, debounced)
+  // @awa-test: PLAN-023-Step2 (highlights on attach, re-highlights after edits, debounced)
   it('highlights on attach, and once per burst of edits', async () => {
     const { monaco } = createFakeMonaco();
     const engine = fakeEngine();
@@ -151,7 +151,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     services.dispose();
   });
 
-  // @awa-test: PLAN-021-Step2 (a result for an older text is dropped)
+  // @awa-test: PLAN-023-Step2 (a result for an older text is dropped)
   it('drops a highlight result that arrives after the text changed', async () => {
     const { monaco } = createFakeMonaco();
     let release!: (v: unknown) => void;
@@ -167,7 +167,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     expect(ed.decorations()).toEqual([]);
   });
 
-  // @awa-test: PLAN-021-Step2 (markers from diagnostics; cleared on dispose)
+  // @awa-test: PLAN-023-Step2 (markers from diagnostics; cleared on dispose)
   it('marks from diagnostics, debounced, and clears on dispose', async () => {
     const fake = createFakeMonaco();
     const model = createFakeModel('[.article');
@@ -184,7 +184,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     expect(ed.listenerCount()).toBe(0);
   });
 
-  // @awa-test: PLAN-021-Step2 (the engine can arrive later)
+  // @awa-test: PLAN-023-Step2 (the engine can arrive later)
   it('clears until an engine is set, then highlights and marks', async () => {
     const fake = createFakeMonaco();
     const model = createFakeModel('bad');
@@ -198,7 +198,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     expect(fake.markersOf(model)).toHaveLength(1);
   });
 
-  // @awa-test: PLAN-021-Step2 (an engine without diagnostics marks nothing)
+  // @awa-test: PLAN-023-Step2 (an engine without diagnostics marks nothing)
   it('marks nothing when the engine has no diagnostics', async () => {
     const fake = createFakeMonaco();
     const model = createFakeModel('bad');
@@ -210,7 +210,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     expect(fake.markersOf(model)).toEqual([]);
   });
 
-  // @awa-test: PLAN-021-Step2 (a failing parser clears instead of crashing)
+  // @awa-test: PLAN-023-Step2 (a failing parser clears instead of crashing)
   it('survives a failing parser', async () => {
     const { monaco } = createFakeMonaco();
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -226,7 +226,7 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
     spy.mockRestore();
   });
 
-  // @awa-test: PLAN-021-Step4 (capability checks warn once, never crash)
+  // @awa-test: PLAN-023-Step4 (capability checks warn once, never crash)
   it('warns once when the injected Monaco lacks the suggest or hover contribution', () => {
     const { monaco } = createFakeMonaco();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -239,8 +239,8 @@ describe('attachBitmarkEditor (PLAN-020 D14)', () => {
   });
 });
 
-describe('the bitmark JSON schema (PLAN-020 D5)', () => {
-  // @awa-test: PLAN-021-Step3 (scoped to the package's models by default)
+describe('the bitmark JSON schema (PLAN-022 D5)', () => {
+  // @awa-test: PLAN-023-Step3 (scoped to the package's models by default)
   it('binds the schema to the package model scheme only, unless the host widens it', () => {
     const fake = createFakeMonaco();
     expect(bindBitmarkJsonSchema(fake.monaco, { type: 'array' })).toBe(true);
@@ -252,7 +252,7 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     expect(fake.setDiagnosticsOptions.mock.calls[1]![0].schemas[0].fileMatch).toEqual(['*']);
   });
 
-  // @awa-test: PLAN-021-Step3 (the host's own JSON settings and schemas are kept, D5)
+  // @awa-test: PLAN-023-Step3 (the host's own JSON settings and schemas are kept, D5)
   it('merges into the host’s JSON options instead of replacing them', () => {
     const fake = createFakeMonaco();
     const set = vi.fn();
@@ -275,7 +275,7 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     expect(options.schemas[1].fileMatch).toEqual([BITMARK_MODEL_FILE_MATCH]);
   });
 
-  // @awa-test: PLAN-021-Step3 (Monaco 0.55+: the top-level monaco.json; languages.json a stub)
+  // @awa-test: PLAN-023-Step3 (Monaco 0.55+: the top-level monaco.json; languages.json a stub)
   it('binds through the top-level monaco.json when languages.json is only a stub', () => {
     const fake = createFakeMonaco();
     const top = vi.fn();
@@ -287,14 +287,14 @@ describe('the bitmark JSON schema (PLAN-020 D5)', () => {
     expect(top).toHaveBeenCalled();
   });
 
-  // @awa-test: PLAN-021-Step4 (no JSON language: false, no crash)
+  // @awa-test: PLAN-023-Step4 (no JSON language: false, no crash)
   it('reports false on a Monaco without the JSON language', () => {
     const fake = createFakeMonaco();
     delete (fake.monaco.languages as { json?: unknown }).json;
     expect(bindBitmarkJsonSchema(fake.monaco, {})).toBe(false);
   });
 
-  // @awa-test: PLAN-021-Step3 (a failed fetch leaves syntax checking only)
+  // @awa-test: PLAN-023-Step3 (a failed fetch leaves syntax checking only)
   it('loads the schema, or gives undefined when it cannot', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fetchMock = vi

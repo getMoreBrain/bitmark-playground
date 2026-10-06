@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-WorkerEngine
+// @awa-component: PLAN-023-WorkerEngine
 import type { EngineCapabilities, Feature } from '../types';
 
 /**

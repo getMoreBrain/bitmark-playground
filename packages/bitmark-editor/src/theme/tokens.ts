@@ -1,5 +1,5 @@
 // @awa-component: PLAN-016-BitmarkTheme
-// @awa-component: PLAN-021-Theme
+// @awa-component: PLAN-023-Theme
 import type { SemanticTokenModifier, SemanticTokenType } from '@gmb/bitmark-parser';
 
 /** Monaco theme name used by every editor in the playground. */
@@ -56,7 +56,7 @@ export const DARK_PALETTE: Palette = {
   comment: '#8e908c',
 };
 
-/** Light: the same roles, darkened for contrast on white (PLAN-020 D11). */
+/** Light: the same roles, darkened for contrast on white (PLAN-022 D11). */
 export const LIGHT_PALETTE: Palette = {
   sigil: '#9a6700',
   bitType: '#116329',
@@ -198,7 +198,7 @@ export const tokenVar = (
 /**
  * The theme layer under the host's variable: `.bm-theme-dark` /
  * `.bm-theme-light` set these, never `tokenVar`'s, so a host variable set on
- * any ancestor always wins (PLAN-020 D12: a site maps the tokens onto its
+ * any ancestor always wins (PLAN-022 D12: a site maps the tokens onto its
  * own design tokens).
  */
 const themeVar = (key: TokenKey): string =>

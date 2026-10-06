@@ -1,11 +1,11 @@
-// @awa-component: PLAN-021-Elements
+// @awa-component: PLAN-023-Elements
 import type { Monaco } from '../monaco/types';
 import type { EngineSource } from '../session/types';
 
 /**
  * Page-wide defaults for the elements: where Monaco and the engine come
  * from when an element is not given them as properties. `/bundled` sets
- * the Monaco loader to its own lazily-loaded copy (PLAN-020 D4, D12).
+ * the Monaco loader to its own lazily-loaded copy (PLAN-022 D4, D12).
  */
 let monacoLoader: (() => Promise<Monaco>) | undefined;
 let defaultEngine: (() => EngineSource) | undefined;

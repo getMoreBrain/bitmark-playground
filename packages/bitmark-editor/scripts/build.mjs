@@ -1,6 +1,6 @@
-// Build @gmb/bitmark-editor (PLAN-021 Step 11):
+// Build @gmb/bitmark-editor (PLAN-023 Step 11):
 //   dist/esm/      the core, elements, React adapter and engine worker; no
-//                  Monaco inside (the host injects it, PLAN-020 D8)
+//                  Monaco inside (the host injects it, PLAN-022 D8)
 //   dist/types/    type declarations
 //   dist/bundled/  the elements with their own Monaco (D4): a small loader,
 //                  Monaco as monaco.js + monaco.css, the worker files

@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Engine
+// @awa-component: PLAN-023-Engine
 import type * as Parser from '@gmb/bitmark-parser';
 import type {
   BitEntry,
@@ -61,7 +61,7 @@ export interface EngineCapabilities {
 }
 
 /**
- * The parser, as the editor uses it (PLAN-020 D2, D7, D14).
+ * The parser, as the editor uses it (PLAN-022 D2, D7, D14).
  *
  * Every call returns a promise, so a worker engine and a main-thread engine
  * share one interface. A call the parser cannot answer resolves `undefined`

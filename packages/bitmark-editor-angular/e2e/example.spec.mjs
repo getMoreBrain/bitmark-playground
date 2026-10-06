@@ -1,4 +1,4 @@
-// The Angular example, shaped like cosmic (PLAN-021 Step 15a): the CI test
+// The Angular example, shaped like cosmic (PLAN-023 Step 15a): the CI test
 // for cosmic's setup, which cosmic itself has none of.
 import { expect, test } from '@playwright/test';
 

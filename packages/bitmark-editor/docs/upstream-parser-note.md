@@ -1,4 +1,4 @@
-# A note for the parser repo (PLAN-020 D16)
+# A note for the parser repo (PLAN-022 D16)
 
 Optional, not blocking. Of the three asks in the plan, two are already met
 by `@gmb/bitmark-parser` 7.7.0+: its published types carry the editor

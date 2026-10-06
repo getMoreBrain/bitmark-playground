@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-PlaygroundSession
+// @awa-component: PLAN-023-PlaygroundSession
 import type {
   BitmarkEngine,
   BitmarkPane as Pane,
@@ -17,7 +17,7 @@ import { bitmarkState, TimedPane, XmlVariant } from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
 
 /**
- * The playground on the package (PLAN-021 Step 14): one session whose
+ * The playground on the package (PLAN-023 Step 14): one session whose
  * document is the bitmark the left editor shows. The WASM JSON tabs, HTML,
  * Text, the XML tabs, Info and Mappings are its panes. The left editor, the
  * Original (bpg) JSON tab, WASM Check, Diff and Lexer stay the playground's,
@@ -45,7 +45,7 @@ const MESSAGES = {
 const shownBitmark = (): string => bitmarkState[bitmarkState.activeMarkupTab].markup;
 
 /** The session for the whole playground. Mount once, inside `BitmarkParserProvider`. */
-// @awa-impl: PLAN-021-Step14 (the playground's session)
+// @awa-impl: PLAN-023-Step14 (the playground's session)
 export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactElement => {
   const { engine, loadError } = useBitmarkParser();
   // Created once; the engine arrives after the first load stage.
@@ -83,7 +83,7 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
 };
 
 /** Keep the session and the playground's state in step, both ways. */
-// @awa-impl: PLAN-021-Step14 (playground → session; session → playground)
+// @awa-impl: PLAN-023-Step14 (playground → session; session → playground)
 const SessionSync = (): null => {
   const session = useBitmarkSession();
   const converter = useBitmarkConverter();
@@ -229,7 +229,7 @@ const TABS: Record<SessionTab, TabSpec> = {
 };
 
 /** One session pane for a playground tab or panel. */
-// @awa-impl: PLAN-021-Step14 (session panes as playground tabs; session → playground)
+// @awa-impl: PLAN-023-Step14 (session panes as playground tabs; session → playground)
 export const SessionPaneTab = ({
   tab,
   className,

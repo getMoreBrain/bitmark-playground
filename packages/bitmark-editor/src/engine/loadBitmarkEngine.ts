@@ -1,11 +1,11 @@
-// @awa-component: PLAN-021-Engine
+// @awa-component: PLAN-023-Engine
 import type { Feature } from '@gmb/bitmark-parser';
 
 import { createBitmarkEngine } from './createBitmarkEngine';
 import { BitmarkEngine, RawParserModule } from './types';
 
 /**
- * The parser version loaded when the host names none (PLAN-020 D13): one
+ * The parser version loaded when the host names none (PLAN-022 D13): one
  * exact version per release, so the editor behaves the same wherever it is
  * installed and the CDN serves it as immutable. Bumped by an automated PR.
  */
@@ -30,9 +30,9 @@ const modules = new Map<string, Promise<LoadedParserModule>>();
  * that hover and completion show) in the background. Resolves after stage 1.
  * Cached per URL: one module, one initialisation.
  *
- * This is the load path, where the package owns the module (PLAN-020 D7).
+ * This is the load path, where the package owns the module (PLAN-022 D7).
  */
-// @awa-impl: PLAN-021-Step1 (two-stage load, per-URL cache)
+// @awa-impl: PLAN-023-Step1 (two-stage load, per-URL cache)
 export const loadBitmarkModule = (
   url: string,
   options: { feature?: Feature; importModule?: (url: string) => Promise<unknown> } = {},
@@ -74,7 +74,7 @@ export interface LoadBitmarkEngineOptions {
  * Load the parser and wrap it as an engine. The engine is ready after stage
  * 1 (`bitmark-json`) and switches its `feature` when stage 2 lands.
  */
-// @awa-impl: PLAN-021-Step1 (the load path)
+// @awa-impl: PLAN-023-Step1 (the load path)
 export const loadBitmarkEngine = async (
   options: LoadBitmarkEngineOptions = {},
 ): Promise<BitmarkEngine> => {

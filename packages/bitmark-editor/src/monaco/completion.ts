@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-MonacoServices
+// @awa-component: PLAN-023-MonacoServices
 import type { CompletionItem, CompletionList, Position } from '@gmb/bitmark-parser';
 import type * as MonacoApi from 'monaco-editor';
 

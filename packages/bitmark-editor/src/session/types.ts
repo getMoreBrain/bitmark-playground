@@ -1,4 +1,4 @@
-// @awa-component: PLAN-021-Session
+// @awa-component: PLAN-023-Session
 import type { TextEditor } from '../editor/textEditor';
 import type { BitmarkEngine, Feature, LoadBitmarkEngineOptions, RawParserModule } from '../engine';
 import type { Monaco } from '../monaco/types';
@@ -8,10 +8,10 @@ import type { BitmarkTheme } from '../theme/applyTheme';
 /** Where an edit came from, for the mapping report (a host's own editor, say). */
 export type EditOrigin = Omit<LastEdit, 'count'>;
 
-/** The pane kinds (PLAN-020 D1, D9). */
+/** The pane kinds (PLAN-022 D1, D9). */
 export type PaneType = 'bitmark' | 'json' | 'html' | 'xml' | 'text' | 'info' | 'mappings';
 
-/** The UI strings, all replaceable (PLAN-020 D12: the docs site has six locales). */
+/** The UI strings, all replaceable (PLAN-022 D12: the docs site has six locales). */
 export interface BitmarkEditorMessages {
   loading: string;
   /** A markup pane on an engine without the markup formats (`bitmark-json`). */
@@ -25,7 +25,7 @@ export interface BitmarkEditorMessages {
 }
 
 /**
- * How the session gets its parser (PLAN-020 D2, D7): an engine (or a promise
+ * How the session gets its parser (PLAN-022 D2, D7): an engine (or a promise
  * of one); a raw module the host already initialised, with the variant it
  * declared; or options to load one (the default: jsDelivr at the pinned
  * version).
@@ -37,7 +37,7 @@ export type EngineSource =
   | LoadBitmarkEngineOptions;
 
 export interface BitmarkSessionOptions {
-  /** The Monaco to create the panes on (PLAN-020 D8): the host's, or the bundled one. */
+  /** The Monaco to create the panes on (PLAN-022 D8): the host's, or the bundled one. */
   monaco: Monaco;
   engine?: EngineSource;
   /** The initial bitmark. */

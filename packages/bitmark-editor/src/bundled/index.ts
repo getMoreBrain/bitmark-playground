@@ -1,6 +1,6 @@
-// @awa-component: PLAN-021-Bundled
+// @awa-component: PLAN-023-Bundled
 /**
- * `/bundled` (PLAN-020 D4, D8, D12): the custom elements with their own
+ * `/bundled` (PLAN-022 D4, D8, D12): the custom elements with their own
  * Monaco, for hosts without one. Loads straight from a CDN with no bundler:
  * - this file is small; Monaco (`monaco.js`, `monaco.css`) loads from the
  *   asset base when the first session starts;
@@ -24,7 +24,7 @@ let assetBase = new URL('./', import.meta.url).href;
  * Default: beside this file. Set it when a host bundler moved this file
  * into its own chunk and copied the rest elsewhere.
  */
-// @awa-impl: PLAN-021-Step11 (asset base)
+// @awa-impl: PLAN-023-Step11 (asset base)
 export const setBitmarkAssetBase = (base: string): void => {
   assetBase = new URL(base.endsWith('/') ? base : `${base}/`, location.href).href;
 };
@@ -51,7 +51,7 @@ const moduleWorker = (url: string) =>
 type Env = { getWorker?: unknown; getWorkerUrl?: unknown };
 const g = self as unknown as { MonacoEnvironment?: Env };
 
-// @awa-impl: PLAN-021-Step11 (the MonacoEnvironment guard, D8)
+// @awa-impl: PLAN-023-Step11 (the MonacoEnvironment guard, D8)
 export const hostMonacoDetected = !!g.MonacoEnvironment;
 if (hostMonacoDetected) {
   log.warn(
@@ -59,7 +59,7 @@ if (hostMonacoDetected) {
       'Not overwriting the host worker setup.',
   );
 } else {
-  // @awa-impl: PLAN-021-Step11 (CDN-safe workers)
+  // @awa-impl: PLAN-023-Step11 (CDN-safe workers)
   g.MonacoEnvironment = {
     getWorker: (_id: string, label: string) =>
       classicWorker(asset(label === 'json' ? 'json.worker.js' : 'editor.worker.js')),
@@ -84,7 +84,7 @@ export const loadBundledMonaco = (): Promise<Monaco> => {
 };
 
 /**
- * A worker engine (PLAN-020 D14) whose workers run `/bundled`'s engine
+ * A worker engine (PLAN-022 D14) whose workers run `/bundled`'s engine
  * worker script, loading the parser at `url`.
  */
 export const createBundledWorkerEngine = (

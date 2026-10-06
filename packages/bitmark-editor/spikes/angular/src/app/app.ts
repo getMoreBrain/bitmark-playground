@@ -1,4 +1,4 @@
-// PLAN-020 Phase 0: Angular 21 shaped like cosmic (D10). NgModule bootstrap,
+// PLAN-022 Phase 0: Angular 21 shaped like cosmic (D10). NgModule bootstrap,
 // zone change detection, Monaco 0.46 AMD loaded from assets as
 // `window.monaco` (as ngx-monaco-editor-v2 does), and the parser bundled and
 // initialised by the app with `bitmark-json`, then injected (D7, D8).

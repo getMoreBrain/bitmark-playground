@@ -10,14 +10,14 @@ import { subscribeKey } from 'valtio/utils';
 import { uiState } from '../state/uiState';
 
 /**
- * The playground's one scroll group (PLAN-021 Step 5): the bitmark editor and
+ * The playground's one scroll group (PLAN-023 Step 5): the bitmark editor and
  * whichever right-hand tab is mounted. "Link scrolling" (`uiState.linkScroll`)
  * links or unlinks every member at once.
  */
 let group: ScrollSyncGroup = createScrollSyncGroup();
 
 /** Add a pane to the playground's group, linked as the toggle says. */
-// @awa-impl: PLAN-021-Step5 (the playground's panes join one group)
+// @awa-impl: PLAN-023-Step5 (the playground's panes join one group)
 export const joinScrollSync = (
   editor: ScrollSyncEditor,
   bitStarts: () => readonly number[],
@@ -28,7 +28,7 @@ subscribeKey(uiState, 'linkScroll', (on) => {
   for (const member of group.members()) member.setLinked(on);
 });
 
-/** The playground's group, for the session's panes to join (PLAN-021 Step 14). */
+/** The playground's group, for the session's panes to join (PLAN-023 Step 14). */
 export const playgroundScrollGroup = (): ScrollSyncGroup => group;
 
 /** A fresh group. Only for tests. */

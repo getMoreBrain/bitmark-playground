@@ -1,5 +1,5 @@
 // Two origins, so the package and the parser are cross-origin as on jsDelivr
-// (PLAN-020 D12):
+// (PLAN-022 D12):
 //   http://localhost:4611  the host site (static/, and angular/dist when built)
 //   http://localhost:4612  the "CDN": /pkg/ → the package's dist, /parser/ → the parser package
 import { createReadStream, existsSync, statSync } from 'node:fs';

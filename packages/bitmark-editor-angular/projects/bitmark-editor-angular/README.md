@@ -1,7 +1,7 @@
 # @gmb/bitmark-editor-angular
 
 Angular components for [`@gmb/bitmark-editor`](../../../bitmark-editor/README.md)
-(PLAN-020 D10): `bm-session`, `bm-pane`, `bm-tabs`, `bm-split`, with forms
+(PLAN-022 D10): `bm-session`, `bm-pane`, `bm-tabs`, `bm-split`, with forms
 support. Angular 21+.
 
 ```ts

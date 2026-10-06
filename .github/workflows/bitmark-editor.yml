@@ -1,6 +1,6 @@
-# CI for @gmb/bitmark-editor and @gmb/bitmark-editor-angular (PLAN-021 Step 16).
+# CI for @gmb/bitmark-editor and @gmb/bitmark-editor-angular (PLAN-023 Step 16).
 # No publishing from this repo: the packages are published once they have
-# their own repository (PLAN-020 D6). Their package.json files are ready for it.
+# their own repository (PLAN-022 D6). Their package.json files are ready for it.
 name: bitmark-editor
 
 on:
