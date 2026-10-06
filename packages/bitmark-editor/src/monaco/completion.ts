@@ -62,8 +62,10 @@ export const replacedPrefixLength = (before: string, label: string): number => {
  * The options every completion query carries (parser PLAN-225 D9): a
  * bit-type item inserts the bit's template (its usual tags, body and card
  * structure) as a snippet, from the name onward, instead of the name alone.
- * A parser older than 7.9 ignores it.
+ * A parser older than 7.9.0 (the first published release with templates)
+ * ignores it.
  */
+// @awa-impl: PLAN-021-Step1 (bit templates on every query)
 export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
 
 /**
@@ -71,6 +73,7 @@ export const COMPLETE_OPTIONS = { bitTemplate: true } as const;
  * auto-closed when a bit-type snippet carries its own (`article]⏎…`), so
  * the bracket is not doubled.
  */
+// @awa-impl: PLAN-021-Step1 (the replaced-suffix rule, D2)
 export const replacedSuffixLength = (after: string, item: CompletionItem): number =>
   item.kind === LSP.Class &&
   item.insertTextFormat === 2 &&

@@ -111,7 +111,8 @@ describe('toMonacoSuggestion', () => {
   });
 });
 
-// @awa-test: PLAN-023-Step2 (bit templates: the auto-closed `]`, as main's PLAN-021)
+// @awa-test: PLAN-023-Step2 (bit templates: the auto-closed `]`)
+// @awa-test: PLAN-021-Step1 (COMPLETE_OPTIONS, replacedSuffixLength)
 describe('bit templates', () => {
   const at = { lineNumber: 1, column: 6 };
   const bit = item({

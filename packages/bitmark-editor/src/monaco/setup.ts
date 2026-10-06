@@ -73,6 +73,7 @@ const injectHighlightCss = (): void => {
  * language declares; a bit template then replaces that `]`
  * (`replacedSuffixLength`).
  */
+// @awa-impl: PLAN-021-Step3 (the bracket pair, D4)
 export const BITMARK_LANGUAGE_CONFIGURATION: MonacoApi.languages.LanguageConfiguration = {
   brackets: [['[', ']']],
   autoClosingPairs: [{ open: '[', close: ']' }],

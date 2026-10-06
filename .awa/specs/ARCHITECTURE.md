@@ -282,4 +282,4 @@ Core markup-to-JSON and JSON-to-markup conversion is functional. Deployed to Git
 - 1.0.0 (2026-02-17): Initial architecture
 - 1.1.0 (2026-09-09): Tree-sitter highlighting replaced by the WASM parser's semantic tokens (PLAN-016)
 - 1.2.0 (2026-09-29): Linked scrolling between the bitmark and output panes, by bit, from the parser's bit spans (PLAN-018)
-- 1.3.0 (2026-10-06): The editors extracted into `@gmb/bitmark-editor` and `@gmb/bitmark-editor-angular` (PLAN-022, PLAN-023); the build described as it is (Vite, Bun workspaces); the parser-loading rule allows host injection
+- 1.3.0 (2026-10-06): The editors extracted into `@gmb/bitmark-editor` and `@gmb/bitmark-editor-angular` (PLAN-022, PLAN-023); the build described as it is (Vite, Bun workspaces); the parser-loading rule allows host injection; main's typed-text scroll positions (PLAN-020) and bit templates with the `[` `]` pair (PLAN-021) carried into the package

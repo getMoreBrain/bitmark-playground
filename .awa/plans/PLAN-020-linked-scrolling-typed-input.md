@@ -80,3 +80,8 @@ they are.
 ## References
 
 - Code: src/scrollSync/convertWithBitStarts.ts, src/services/{BitmarkConverter,TableHtmlRunner,XmlRunner}.tsx, src/components/bitmark/{TableHtmlPanel,XmlPanel}.tsx, src/state/bitmarkState.ts
+- Moved (PLAN-023 Step 14a): the WASM JSON, HTML and XML panes are now the
+  editor package's, so Steps 2 and 3 live in
+  packages/bitmark-editor/src/{engine/createBitmarkEngine,panes/panes,session/session}.ts.
+  The Original JSON tab keeps src/scrollSync/convertWithBitStarts.ts and
+  src/services/BitmarkConverter.tsx.

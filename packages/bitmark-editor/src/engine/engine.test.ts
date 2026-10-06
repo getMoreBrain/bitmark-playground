@@ -113,8 +113,9 @@ describe('createBitmarkEngine (injection, PLAN-022 D7)', () => {
     ).resolves.toEqual({ output: 'out:x', bitStarts: undefined });
   });
 
-  // @awa-test: PLAN-023-Step1 (bit starts from parser 7.9's outputStart, and the older start)
-  it('reads outputStart (parser 7.9+) and start (older) from the bit spans', async () => {
+  // @awa-test: PLAN-023-Step1 (bit starts from parser 7.8's outputStart, and the older start)
+  // @awa-test: PLAN-020-Step1 (both starts; none from spans without them)
+  it('reads outputStart (parser 7.8+) and start (older) from the bit spans', async () => {
     const module = fakeModule();
     module.convertWithDetails = vi.fn(() => ({
       output: 'out',

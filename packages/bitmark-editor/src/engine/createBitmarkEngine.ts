@@ -17,8 +17,8 @@ export const throwIfParserError = (out: string): string => {
 };
 
 /**
- * Where a bit span starts in the output: `outputStart` from parser 7.9
- * (which added `inputStart`), `start` before it.
+ * Where a bit span starts in the output: `outputStart` from parser 7.8
+ * (PLAN-223, which added `inputStart`), `start` before it.
  */
 export const spanOutputStart = (span: { outputStart?: number; start?: number }): number =>
   (span.outputStart ?? span.start)!;
@@ -106,6 +106,7 @@ export const createBitmarkEngine = (
         return {
           output: throwIfParserError(output),
           bitStarts: bitSpans?.spans.map(spanOutputStart),
+          // @awa-impl: PLAN-020-Step1 (where each bit starts in the input)
           inputStarts: offsets(bitSpans?.spans.map((span) => span.inputStart)),
         };
       }),

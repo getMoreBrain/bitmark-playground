@@ -96,7 +96,8 @@ describe('setupBitmarkMonaco (PLAN-022 D8)', () => {
     expect(b.providers.completion).toHaveLength(1);
   });
 
-  // @awa-test: PLAN-023-Step4 (the `[` `]` pair auto-closes, as main's PLAN-021 D4)
+  // @awa-test: PLAN-023-Step4 (the `[` `]` pair auto-closes)
+  // @awa-test: PLAN-021-Step3 (the language configuration, D4)
   it('declares the bracket pair on the language it registers, and only that one', () => {
     const a = createFakeMonaco();
     setupBitmarkMonaco({ monaco: a.monaco });

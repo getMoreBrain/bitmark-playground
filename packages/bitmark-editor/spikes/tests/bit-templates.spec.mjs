@@ -2,6 +2,7 @@
 // playground's bitmark editor (needs its Vite dev server on :4604).
 import { expect, test } from '@playwright/test';
 
+// @awa-test: PLAN-021-Step1, PLAN-021-Step3
 test('`[` auto-closes, and a bit type completes to its template', async ({ page }) => {
   await page.goto('http://localhost:4604/bitmark-playground/?tab=wasm');
   await expect(page.locator('.markup-editor .bm-tok-bitType').first()).toBeVisible({ timeout: 30_000 });

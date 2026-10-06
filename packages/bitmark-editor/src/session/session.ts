@@ -154,7 +154,8 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       (out) => {
         if (disposed || out === SUPERSEDED || seq !== editSeq) return;
         commit(out.bitmark, c, { inputFormat: c.inputFormat, content: text, label: c.label });
-        // @awa-impl: PLAN-023-Step7 (typed text links its scrolling by bit, main's PLAN-020)
+        // @awa-impl: PLAN-023-Step7 (typed text links its scrolling by bit)
+        // @awa-impl: PLAN-020-Step2, PLAN-020-Step3 (pinned in the edited pane, D1; none on failure, D2)
         c.pinInput(text, out.inputStarts);
       },
       (err: unknown) => {

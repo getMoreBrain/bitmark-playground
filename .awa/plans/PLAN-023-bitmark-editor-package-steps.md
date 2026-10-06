@@ -491,8 +491,9 @@ and to the package in Phase 2.
 
 - The default parser is 7.9.0 (D13), and the playground's dev dependency
   is too.
-- Parser 7.9.0 renamed a bit span's `start` to `outputStart` (and added
-  `inputStart`). Both the package and the playground read `outputStart`,
+- Parser 7.8.0 renamed a bit span's `start` to `outputStart` (and added
+  `inputStart`; parser PLAN-223). This branch went from 7.7.0 to 7.9.0, so
+  it first met the rename there. Both the package and the playground read `outputStart`,
   falling back to `start`. Before the fix, the live playground (which loads
   `@latest`) had no bit positions for HTML, XML and Text, so their scroll
   linking was proportional. A real-parser test now asserts numeric starts.

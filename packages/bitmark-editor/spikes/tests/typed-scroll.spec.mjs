@@ -10,6 +10,7 @@ const parser = createRequire(import.meta.url)('../../../../node_modules/@gmb/bit
 // would let its auto-closing brackets rewrite it.
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
+// @awa-test: PLAN-020-Step2 (pasted JSON scrolls in step with its bitmark, by bit)
 test('typed JSON keeps linked scrolling by bit', async ({ page }) => {
   await parser.init?.();
   const bits = 40;
@@ -47,5 +48,48 @@ test('typed JSON keeps linked scrolling by bit', async ({ page }) => {
   console.log('TYPED json shows', shown.join(','), 'bitmark shows', left.join(','));
   expect(top).toBeGreaterThanOrEqual(2);
   // The same bit at the top of both (proportional scrolling drifts by several).
+  expect(Math.abs(Math.min(...left) - top)).toBeLessThanOrEqual(1);
+});
+
+// @awa-test: PLAN-020-Step3 (pasted HTML scrolls in step with its bitmark, by bit)
+test('typed HTML keeps linked scrolling by bit', async ({ page }) => {
+  await parser.init?.();
+  const bits = 40;
+  const doc = Array.from({ length: bits }, (_, i) => `[.article]\nMarker${i}`).join('\n\n');
+  const lines = parser
+    .convert(doc, { inputFormat: 'bitmark', outputFormat: 'html' })
+    .trimEnd()
+    .split('\n');
+  // Uneven: the first half one line a bit, the rest spread over many lines.
+  const html =
+    lines
+      .map((l, i) => (i < bits / 2 ? l : l.replace('><p>', '>\n\n\n\n<p>').replace('</p><', '</p>\n\n\n\n<')))
+      .join('\n') + '\n';
+
+  await page.goto('http://localhost:4604/bitmark-playground/?tab=wasm');
+  await expect(page.locator('.markup-editor .bm-tok-bitType').first()).toBeVisible({ timeout: 30_000 });
+  await page.getByRole('tab', { name: /^HTML/ }).last().click();
+  const right = page.locator('.json-editor .monaco-editor').first();
+  await expect(page.locator('.json-editor .view-lines')).toContainText('bitmark-bit', { timeout: 15_000 });
+  await right.click();
+  await page.evaluate((t) => navigator.clipboard.writeText(t), html);
+  await page.keyboard.press('Control+A');
+  await page.keyboard.press('Control+V');
+  await page.keyboard.press('Control+Home');
+  await expect(page.locator('.markup-editor .view-lines')).toContainText('Marker0', { timeout: 10_000 });
+  await page.waitForTimeout(800);
+  const visible = async (pane) =>
+    [...(await page.locator(`${pane} .view-lines`).innerText()).matchAll(/Marker(\d+)/g)].map((m) => Number(m[1]));
+  await right.hover();
+  for (let i = 0; i < 8; i++) {
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(80);
+  }
+  await page.waitForTimeout(800);
+  const shown = await visible('.json-editor');
+  const top = Math.min(...shown);
+  const left = await visible('.markup-editor');
+  console.log('TYPED html shows', shown.join(','), 'bitmark shows', left.join(','));
+  expect(top).toBeGreaterThanOrEqual(2);
   expect(Math.abs(Math.min(...left) - top)).toBeLessThanOrEqual(1);
 });

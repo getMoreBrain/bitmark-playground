@@ -56,6 +56,8 @@ export const createJsonPane = (
       inputFormat: 'json',
       editable: true,
       scroll: 'pinned',
+      // @awa-impl: PLAN-020-Step2 (typed JSON: the positions its conversion read)
+      // @awa-impl: PLAN-020-Step3 (typed HTML and XML: the positions their conversion read)
       toBitmark: async (engine, text) => {
         // The engine recovers leniently from malformed JSON: check the
         // syntax first, so the user sees the real error (a SyntaxError).
