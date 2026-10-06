@@ -120,7 +120,11 @@ const SessionSync = (): null => {
       if (origin === 'session') {
         // That edit is in the session already; only a tab switch shows
         // another bitmark (not an edit).
-        if (switched) session.setBitmark(doc, false);
+        // Never while a session pane has focus: that would replace what is
+        // being typed there (its own commit then brings the two in step).
+        if (switched && !document.activeElement?.closest('.bm-pane')) {
+          session.setBitmark(doc, false);
+        }
         return;
       }
       // Before the first edit (the initial document) there is no origin.
@@ -139,7 +143,11 @@ const SessionSync = (): null => {
 /** The right-hand tabs (and bottom panels) that are session panes. */
 export type SessionTab = 'wasm' | 'wasmFull' | TimedPane | 'info' | 'mappings';
 
-/** The right-hand (JSON side) tabs that are session panes, in tab order. */
+/**
+ * The right-hand (JSON side) tabs that are session panes, in tab order.
+ * `timed` ones stay mounted (hidden) when inactive, so their tab duration
+ * stays current; the others mount only while shown.
+ */
 export const RIGHT_SESSION_TABS = [
   'wasm',
   'wasmFull',
@@ -148,6 +156,9 @@ export const RIGHT_SESSION_TABS = [
   'xmlNiso',
   'xmlNisoEs',
 ] as const satisfies readonly SessionTab[];
+
+/** Whether a tab's pane stays mounted while hidden (it has a tab duration). */
+export const keepsMounted = (tab: SessionTab): boolean => TABS[tab].timed !== undefined;
 
 interface TabSpec {
   type: 'json' | 'html' | 'xml' | 'text' | 'info' | 'mappings';
@@ -235,12 +246,26 @@ export const SessionPaneTab = ({
 }): ReactElement => {
   const ui = useSnapshot(uiState);
   const spec = TABS[tab];
+  const paneRef = useRef<Pane>();
   const onPane = useCallback(
     (pane: Pane | undefined) => {
+      paneRef.current = pane;
       if (pane && spec.route) routes.set(pane, spec.route);
     },
     [spec],
   );
+  // Shown again: lay out first (it was 0×0 while hidden), then rejoin the
+  // scroll linking, so it follows to the right bit.
+  const [laidOut, setLaidOut] = useState(!hidden);
+  useEffect(() => {
+    if (hidden) {
+      setLaidOut(false);
+      return;
+    }
+    paneRef.current?.layout();
+    const frame = requestAnimationFrame(() => setLaidOut(true));
+    return () => cancelAnimationFrame(frame);
+  }, [hidden]);
   const onRender = useCallback(
     ({ durationMs }: { durationMs: number }) => {
       if (spec.timed) bitmarkState.setPaneDuration(spec.timed, durationMs / 1000);
@@ -254,7 +279,7 @@ export const SessionPaneTab = ({
       mode={spec.mode}
       mapping={spec.mapping}
       label={spec.label}
-      scrollSync={spec.scroll === false || hidden ? false : ui.linkScroll}
+      scrollSync={spec.scroll === false || hidden || !laidOut ? false : ui.linkScroll}
       onPane={onPane}
       onRender={onRender}
       className={className}

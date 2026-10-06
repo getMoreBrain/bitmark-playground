@@ -8,6 +8,7 @@ import { App } from './App';
 vi.mock('./session/PlaygroundSession', () => ({
   RIGHT_SESSION_TABS: [],
   PlaygroundSession: ({ children }: { children: React.ReactNode }) => children,
+  keepsMounted: () => true,
   SessionPaneTab: () => null,
 }));
 

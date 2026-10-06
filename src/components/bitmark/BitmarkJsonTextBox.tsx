@@ -11,7 +11,7 @@ import { useSnapshot } from 'valtio';
 
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
-import { RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/PlaygroundSession';
+import { keepsMounted, RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/PlaygroundSession';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { WasmCheckPanel } from './WasmCheckPanel';
@@ -55,8 +55,10 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
   );
 
   // @awa-impl: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
-  // All stay mounted (the inactive ones hidden), so each tab's duration stays current.
-  const sessionPanes = RIGHT_SESSION_TABS.map((tab) => (
+  // The timed ones stay mounted (hidden when inactive), so each tab's duration stays current.
+  const sessionPanes = RIGHT_SESSION_TABS.filter(
+    (tab) => tab === activeTab || keepsMounted(tab),
+  ).map((tab) => (
     <SessionPaneTab
       key={tab}
       tab={tab}

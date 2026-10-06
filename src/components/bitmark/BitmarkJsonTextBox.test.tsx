@@ -13,6 +13,7 @@ import { BitmarkJsonTextBox } from './BitmarkJsonTextBox';
 // The session panes are the package's (tested there); here only which tab shows one.
 vi.mock('../../session/PlaygroundSession', () => ({
   RIGHT_SESSION_TABS: ['wasm', 'wasmFull', 'tableHtml', 'text', 'xmlNiso', 'xmlNisoEs'],
+  keepsMounted: () => true,
   SessionPaneTab: ({ tab, hidden }: { tab: string; hidden: boolean }) =>
     hidden ? null : <div data-testid="session-pane" data-tab={tab} />,
 }));
