@@ -11,12 +11,10 @@ import { useSnapshot } from 'valtio';
 
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
+import { SessionPaneTab } from '../../session/PlaygroundSession';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
-import { TableHtmlPanel } from './TableHtmlPanel';
-import { TextPanel } from './TextPanel';
 import { WasmCheckPanel } from './WasmCheckPanel';
-import { XmlPanel } from './XmlPanel';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   //
@@ -35,37 +33,23 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
 
   const activeTab = bitmarkStateSnap.activeJsonTab;
 
-  // @awa-impl: PLAN-018-Step7 (the JSON tabs link to the bitmark editor's scrolling)
-  // Hooks run on every render; the other tabs link in their own panels.
-  const jsonSlice =
-    activeTab === 'js' || activeTab === 'wasm' || activeTab === 'wasmFull'
-      ? bitmarkStateSnap[activeTab]
-      : undefined;
+  // @awa-impl: PLAN-018-Step7 (the Original JSON tab links to the bitmark editor's scrolling)
+  // Hooks run on every render; the session panes link themselves.
   const { onMount, onUnmount } = usePinnedScrollSync(
-    jsonSlice?.jsonAsString ?? '',
-    jsonSlice?.jsonBitStarts,
+    bitmarkStateSnap.js.jsonAsString,
+    bitmarkStateSnap.js.jsonBitStarts,
   );
 
   // At least one parser must be loaded
   const anyLoadSuccess = jsLoadSuccess || wasmLoadSuccess;
   const allLoadError = jsLoadError && wasmLoadError;
 
-  // @awa-impl: PLAN-008-Step3 (edited tab = active JSON tab; special tabs are not JSON editors)
+  // @awa-impl: PLAN-008-Step3 (the Original JSON tab; the WASM JSON tabs are session panes)
   const onInput = useCallback(
     async (json: string) => {
-      const tab = bitmarkState.activeJsonTab;
-      if (
-        tab === 'wasmCheck' ||
-        tab === 'tableHtml' ||
-        tab === 'text' ||
-        tab === 'xmlNiso' ||
-        tab === 'xmlNisoEs'
-      ) {
-        return;
-      }
       // @awa-impl: PLAN-014-Step3 (record the edited window for the mapping report)
-      bitmarkState.setLastEdit('json', json, `${TAB_LABEL[tab]} JSON`);
-      await jsonToMarkup(tab, json);
+      bitmarkState.setLastEdit('json', json, `${TAB_LABEL.js} JSON`);
+      await jsonToMarkup('js', json);
     },
     [jsonToMarkup],
   );
@@ -80,42 +64,12 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     );
   }
 
-  // @awa-impl: PLAN-007-Step5 (render TableHtmlPanel when tableHtml tab is active)
-  if (activeTab === 'tableHtml') {
-    return (
-      <TableHtmlPanel
-        html={bitmarkStateSnap.tableHtml.html}
-        bitStarts={bitmarkStateSnap.tableHtml.htmlBitStarts}
-        errorAsString={bitmarkStateSnap.tableHtml.htmlErrorAsString}
-      />
-    );
+  // @awa-impl: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are the package's panes)
+  if (activeTab !== 'js') {
+    return <SessionPaneTab tab={activeTab} className={restProps.className ?? undefined} />;
   }
 
-  // @awa-impl: PLAN-011-Step5 (render TextPanel when text tab is active)
-  if (activeTab === 'text') {
-    return (
-      <TextPanel
-        text={bitmarkStateSnap.text.text}
-        bitStarts={bitmarkStateSnap.text.textBitStarts}
-        errorAsString={bitmarkStateSnap.text.textErrorAsString}
-      />
-    );
-  }
-
-  // @awa-impl: PLAN-013-Step5 (render XmlPanel when an XML tab is active)
-  if (activeTab === 'xmlNiso' || activeTab === 'xmlNisoEs') {
-    const xmlSlice = bitmarkStateSnap[activeTab];
-    return (
-      <XmlPanel
-        variant={activeTab}
-        xml={xmlSlice.xml}
-        bitStarts={xmlSlice.xmlBitStarts}
-        errorAsString={xmlSlice.xmlErrorAsString}
-      />
-    );
-  }
-
-  const activeSlice = bitmarkStateSnap[activeTab];
+  const activeSlice = bitmarkStateSnap.js;
 
   if (anyLoadSuccess) {
     const opts = {

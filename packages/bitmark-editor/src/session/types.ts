@@ -5,6 +5,9 @@ import type { Monaco } from '../monaco/types';
 import type { ScrollSyncGroup } from '../scroll/scrollSyncGroup';
 import type { BitmarkTheme } from '../theme/applyTheme';
 
+/** Where an edit came from, for the mapping report (a host's own editor, say). */
+export type EditOrigin = Omit<LastEdit, 'count'>;
+
 /** The pane kinds (PLAN-020 D1, D9). */
 export type PaneType = 'bitmark' | 'json' | 'html' | 'xml' | 'text' | 'info' | 'mappings';
 
@@ -53,6 +56,11 @@ export interface BitmarkSessionOptions {
    * the loaded engine, or on the CDN at the engine's version.
    */
   schema?: unknown;
+  /**
+   * Join this scroll group instead of the session's own, so that a host's
+   * own editors and the session's panes link together (the playground).
+   */
+  scrollGroup?: ScrollSyncGroup;
   messages?: Partial<Omit<BitmarkEditorMessages, 'labels'>> & {
     labels?: Partial<Record<PaneType, string>>;
   };
@@ -111,8 +119,13 @@ export interface BitmarkSession {
   readonly ready: Promise<BitmarkEngine>;
   readonly messages: BitmarkEditorMessages;
   getBitmark(): string;
-  /** Replace the document (counts as a bitmark edit labelled "API"). */
-  setBitmark(text: string): void;
+  /**
+   * Replace the document. By default it counts as a bitmark edit labelled
+   * "API"; `origin` says where it really came from (for the mapping
+   * report), and `false` says it is not an edit at all (the mapping report
+   * keeps the last one).
+   */
+  setBitmark(text: string, origin?: EditOrigin | false): void;
   /** The document as JSON text (computed on demand). */
   getJson(options?: { mode?: 'optimized' | 'full' }): Promise<string>;
   readonly lastEdit: LastEdit | undefined;

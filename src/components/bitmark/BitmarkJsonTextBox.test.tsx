@@ -2,13 +2,18 @@
 /** @jsxImportSource theme-ui */
 import { render, screen } from '@testing-library/react';
 import { ThemeUIProvider } from 'theme-ui';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BitmarkParserContext } from '../../services/BitmarkParser';
 import { BitmarkParserGeneratorContext } from '../../services/BitmarkParserGenerator';
 import { bitmarkState } from '../../state/bitmarkState';
 import { theme } from '../../theme/theme';
 import { BitmarkJsonTextBox } from './BitmarkJsonTextBox';
+
+// The session panes are the package's (tested there); here only which tab shows one.
+vi.mock('../../session/PlaygroundSession', () => ({
+  SessionPaneTab: ({ tab }: { tab: string }) => <div data-testid="session-pane" data-tab={tab} />,
+}));
 
 const fakeParserGenerator = {
   loadSuccess: true,
@@ -54,8 +59,6 @@ describe('BitmarkJsonTextBox', () => {
   beforeEach(() => {
     bitmarkState.setActiveJsonTab('js');
     bitmarkState.setWasmCheck('', undefined, undefined);
-    bitmarkState.setTableHtml('', undefined, undefined);
-    bitmarkState.setText('', undefined, undefined);
   });
 
   afterEach(() => {
@@ -78,39 +81,15 @@ describe('BitmarkJsonTextBox', () => {
     expect(editor).toHaveAttribute('data-default-value', '[.article] round-tripped');
   });
 
-  // @awa-test: PLAN-007-Step5 (BitmarkJsonTextBox swaps to TableHtmlPanel for tableHtml tab)
-  it('renders the TableHtmlPanel (language=html) when activeJsonTab is tableHtml', () => {
-    bitmarkState.setTableHtml('<table><tr><td>x</td></tr></table>', undefined, undefined);
-    bitmarkState.setActiveJsonTab('tableHtml');
-
-    render(<BitmarkJsonTextBox />, { wrapper });
-    const editor = screen.getByTestId('monaco-editor');
-    expect(editor).toHaveAttribute('language', 'html');
-    expect(editor).toHaveAttribute('data-default-value', '<table><tr><td>x</td></tr></table>');
-  });
-
-  // @awa-test: PLAN-011-Step5 (BitmarkJsonTextBox swaps to TextPanel for text tab)
-  it('renders the TextPanel (language=plaintext) when activeJsonTab is text', () => {
-    bitmarkState.setText('Hello plain text', undefined, undefined);
-    bitmarkState.setActiveJsonTab('text');
-
-    render(<BitmarkJsonTextBox />, { wrapper });
-    const editor = screen.getByTestId('monaco-editor');
-    expect(editor).toHaveAttribute('language', 'plaintext');
-    expect(editor).toHaveAttribute('data-default-value', 'Hello plain text');
-  });
-
-  // @awa-test: PLAN-013-Step5 (BitmarkJsonTextBox swaps to XmlPanel for each XML tab)
-  it.each(['xmlNiso', 'xmlNisoEs'] as const)(
-    'renders the XmlPanel (language=xml) when activeJsonTab is %s',
-    (variant) => {
-      bitmarkState.setXml(variant, `<bit type="${variant}" />`, undefined, undefined);
-      bitmarkState.setActiveJsonTab(variant);
+  // @awa-test: PLAN-021-Step14 (the WASM JSON tabs and the HTML/Text/XML tabs are session panes)
+  it.each(['wasm', 'wasmFull', 'tableHtml', 'text', 'xmlNiso', 'xmlNisoEs'] as const)(
+    'renders a session pane when activeJsonTab is %s',
+    (tab) => {
+      bitmarkState.setActiveJsonTab(tab);
 
       render(<BitmarkJsonTextBox />, { wrapper });
-      const editor = screen.getByTestId('monaco-editor');
-      expect(editor).toHaveAttribute('language', 'xml');
-      expect(editor).toHaveAttribute('data-default-value', `<bit type="${variant}" />`);
+      expect(screen.getByTestId('session-pane')).toHaveAttribute('data-tab', tab);
+      expect(screen.queryByTestId('monaco-editor')).toBeNull();
     },
   );
 });

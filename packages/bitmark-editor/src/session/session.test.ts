@@ -466,3 +466,46 @@ describe('second review fixes', () => {
     expect(text(json)).toBe(theirs);
   });
 });
+
+describe('host integration options (PLAN-021 Step 14)', () => {
+  // @awa-test: PLAN-021-Step14 (setBitmark with an origin or as no edit at all)
+  it('records a host edit’s origin, and leaves the last edit alone for `false`', async () => {
+    const { session, el } = setup();
+    const mappings = createMappingsPane(el(), session);
+    session.setBitmark('[.article]\nOriginal', {
+      inputFormat: 'bitmark',
+      content: '[.article]\nOriginal',
+      label: 'Original bitmark',
+    });
+    expect(session.lastEdit).toMatchObject({ label: 'Original bitmark', inputFormat: 'bitmark' });
+    await vi.waitFor(() => expect(text(mappings)).toContain('Last edited: Original bitmark'));
+    const count = session.lastEdit!.count;
+    session.setBitmark('[.article]\nTab switch', false);
+    expect(session.getBitmark()).toBe('[.article]\nTab switch');
+    expect(session.lastEdit!.count).toBe(count);
+    expect(session.lastEdit!.label).toBe('Original bitmark');
+  });
+
+  // @awa-test: PLAN-021-Step14 (a host's scroll group)
+  it('joins the host’s scroll group when given one', async () => {
+    const { createScrollSyncGroup } = await import('../scroll/scrollSyncGroup');
+    const group = createScrollSyncGroup();
+    const { session, el } = setup({ scrollGroup: group });
+    createJsonPane(el(), session);
+    createHtmlPane(el(), session);
+    createInfoPane(el(), session); // not in scroll sync
+    expect(group.members()).toHaveLength(2);
+  });
+
+  // @awa-test: PLAN-021-Step14 (onRender reports each shown regeneration)
+  it('reports how long each shown regeneration took', async () => {
+    const { session, el } = setup();
+    const onRender = vi.fn();
+    const bitmark = createBitmarkPane(el(), session);
+    createHtmlPane(el(), session, { onRender });
+    await vi.waitFor(() => expect(onRender).toHaveBeenCalledTimes(1));
+    type(bitmark, '[.article]\nAgain');
+    await vi.waitFor(() => expect(onRender).toHaveBeenCalledTimes(2));
+    expect(onRender.mock.calls[0]![0].durationMs).toBeGreaterThanOrEqual(0);
+  });
+});

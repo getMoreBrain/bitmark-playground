@@ -68,51 +68,6 @@ export interface JsRoundTripSlice {
   readonly updates: number;
 }
 
-// @awa-component: PLAN-007-TableHtmlSlice
-export interface TableHtmlSlice {
-  readonly html: string;
-  readonly htmlError: Error | undefined;
-  /**
-   * Where each bit starts in the html (UTF-16 offsets), recorded by
-   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the html was
-   * typed by the user, so no positions are known for it.
-   */
-  readonly htmlBitStarts: readonly number[] | undefined;
-  readonly htmlErrorAsString: string | undefined;
-  readonly htmlDurationSec: number | undefined;
-  readonly htmlUpdates: number;
-}
-
-// @awa-component: PLAN-011-TextSlice
-export interface TextSlice {
-  readonly text: string;
-  readonly textError: Error | undefined;
-  /**
-   * Where each bit starts in the text (UTF-16 offsets), recorded by
-   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the text was
-   * typed by the user, so no positions are known for it.
-   */
-  readonly textBitStarts: readonly number[] | undefined;
-  readonly textErrorAsString: string | undefined;
-  readonly textDurationSec: number | undefined;
-  readonly textUpdates: number;
-}
-
-// @awa-component: PLAN-013-XmlSlice
-export interface XmlSlice {
-  readonly xml: string;
-  readonly xmlError: Error | undefined;
-  /**
-   * Where each bit starts in the xml (UTF-16 offsets), recorded by
-   * whatever wrote it (PLAN-018 D1, D4). `undefined` when the xml was
-   * typed by the user, so no positions are known for it.
-   */
-  readonly xmlBitStarts: readonly number[] | undefined;
-  readonly xmlErrorAsString: string | undefined;
-  readonly xmlDurationSec: number | undefined;
-  readonly xmlUpdates: number;
-}
-
 // @awa-component: PLAN-014-LastEditSlice
 /**
  * The window the user last edited — the input to the mapping report.
@@ -128,30 +83,16 @@ export interface LastEditSlice {
   readonly content: string;
   /** Human label for the window, shown above the report. */
   readonly label: string;
+  /**
+   * Where the edit happened: the playground's own editors, or a package
+   * pane of the session (PLAN-021 Step 14, which keeps the two from echoing).
+   */
+  readonly origin: 'playground' | 'session';
   readonly updates: number;
 }
 
-// @awa-component: PLAN-015-InfoSlice
-/**
- * Concatenated `info({ infoType: 'bit', bit })` output for each distinct bit
- * name in the current WASM (new parser) JSON. Shown read-only in the Info tab.
- */
-export interface InfoSlice {
-  readonly output: string;
-  readonly outputError: Error | undefined;
-  readonly outputErrorAsString: string | undefined;
-  readonly outputDurationSec: number | undefined;
-  readonly outputUpdates: number;
-}
-
-// @awa-component: PLAN-014-MappingsSlice
-export interface MappingsSlice {
-  readonly report: string;
-  readonly reportError: Error | undefined;
-  readonly reportErrorAsString: string | undefined;
-  readonly reportDurationSec: number | undefined;
-  readonly reportUpdates: number;
-}
+/** The package panes whose regeneration time the tab bar shows (PLAN-021 Step 14). */
+export type TimedPane = 'tableHtml' | 'text' | XmlVariant;
 
 export interface BitmarkState {
   readonly js: ParserSlice;
@@ -159,13 +100,9 @@ export interface BitmarkState {
   readonly wasmFull: ParserSlice;
   readonly wasmCheck: WasmCheckSlice;
   readonly jsRoundTrip: JsRoundTripSlice;
-  readonly tableHtml: TableHtmlSlice;
-  readonly text: TextSlice;
-  readonly xmlNiso: XmlSlice;
-  readonly xmlNisoEs: XmlSlice;
   readonly lastEdit: LastEditSlice;
-  readonly info: InfoSlice;
-  readonly mappings: MappingsSlice;
+  /** Each timed pane's last regeneration time, in seconds. */
+  readonly paneDurations: Readonly<Record<TimedPane, number | undefined>>;
   readonly activeMarkupTab: ParserType;
   readonly activeJsonTab: JsonTabType;
   setJson(
@@ -192,47 +129,20 @@ export interface BitmarkState {
     error: Error | undefined,
     durationSec?: number,
   ): void;
-  setTableHtml(
-    html: string | undefined,
-    htmlError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ): void;
-  setText(
-    text: string | undefined,
-    textError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ): void;
-  setXml(
-    variant: XmlVariant,
-    xml: string | undefined,
-    xmlError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ): void;
   setActiveMarkupTab(tab: ParserType): void;
   setActiveJsonTab(tab: JsonTabType): void;
   /** Set the edited tab's markup verbatim (raw user input; clears markup error). */
   setEditedMarkup(parser: ParserType, markup: string): void;
   /** Set the edited tab's JSON verbatim (raw user input; clears JSON error). */
   setEditedJson(parser: ParserType, json: string): void;
-  /**
-   * Set an XML tab's document verbatim (raw user input).
-   *
-   * Unlike `setXml`, this does NOT touch the duration: the user typed this XML,
-   * the app did not generate it, so the tab's generation time is left as-is
-   * (mirrors `setEditedMarkup` / `setEditedJson`).
-   */
-  setEditedXml(variant: XmlVariant, xml: string, xmlError: Error | undefined): void;
   /** Record the window the user just edited (drives the mapping report). */
-  setLastEdit(inputFormat: string, content: string, label: string): void;
-  setMappings(
-    report: string | undefined,
-    reportError: Error | undefined,
-    durationSec?: number,
+  setLastEdit(
+    inputFormat: string,
+    content: string,
+    label: string,
+    origin?: 'playground' | 'session',
   ): void;
-  setInfo(output: string | undefined, outputError: Error | undefined, durationSec?: number): void;
+  setPaneDuration(pane: TimedPane, durationSec: number): void;
 }
 
 const createParserSlice = (): ParserSlice => ({
@@ -269,36 +179,6 @@ const createJsRoundTripSlice = (): JsRoundTripSlice => ({
   updates: 0,
 });
 
-// @awa-component: PLAN-007-TableHtmlSlice
-const createTableHtmlSlice = (): TableHtmlSlice => ({
-  html: '',
-  htmlError: undefined,
-  htmlBitStarts: undefined,
-  htmlErrorAsString: undefined,
-  htmlDurationSec: undefined,
-  htmlUpdates: 0,
-});
-
-// @awa-component: PLAN-013-XmlSlice
-const createXmlSlice = (): XmlSlice => ({
-  xml: '',
-  xmlError: undefined,
-  xmlBitStarts: undefined,
-  xmlErrorAsString: undefined,
-  xmlDurationSec: undefined,
-  xmlUpdates: 0,
-});
-
-// @awa-component: PLAN-011-TextSlice
-const createTextSlice = (): TextSlice => ({
-  text: '',
-  textError: undefined,
-  textBitStarts: undefined,
-  textErrorAsString: undefined,
-  textDurationSec: undefined,
-  textUpdates: 0,
-});
-
 // @awa-impl: PLAN-002-Step9 (tab query param)
 // @awa-impl: PLAN-004-Step2 (hydrate from storage, URL param wins)
 const getTabFromUrl = (): ParserType | null => {
@@ -319,24 +199,12 @@ const bitmarkState = proxy<BitmarkState>({
   wasmFull: createParserSlice(),
   wasmCheck: createWasmCheckSlice(),
   jsRoundTrip: createJsRoundTripSlice(),
-  tableHtml: createTableHtmlSlice(),
-  text: createTextSlice(),
-  xmlNiso: createXmlSlice(),
-  xmlNisoEs: createXmlSlice(),
-  lastEdit: { inputFormat: '', content: '', label: '', updates: 0 },
-  info: {
-    output: '',
-    outputError: undefined,
-    outputErrorAsString: undefined,
-    outputDurationSec: undefined,
-    outputUpdates: 0,
-  },
-  mappings: {
-    report: '',
-    reportError: undefined,
-    reportErrorAsString: undefined,
-    reportDurationSec: undefined,
-    reportUpdates: 0,
+  lastEdit: { inputFormat: '', content: '', label: '', origin: 'playground', updates: 0 },
+  paneDurations: {
+    tableHtml: undefined,
+    text: undefined,
+    xmlNiso: undefined,
+    xmlNisoEs: undefined,
   },
   activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
   activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
@@ -463,110 +331,6 @@ const bitmarkState = proxy<BitmarkState>({
     slice.updates += 1;
   },
 
-  // @awa-impl: PLAN-007-Step1 (setTableHtml setter)
-  // html and error are independent: html is always stored when provided (so the
-  // editable editor is never clobbered), while error is set/cleared separately.
-  // On error with html undefined (e.g. bitmark -> HTML failed), the last good
-  // html is preserved.
-  setTableHtml: (
-    html: string | undefined,
-    htmlError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ) => {
-    const slice = bitmarkState.tableHtml as Writable<TableHtmlSlice>;
-
-    if (html !== undefined) {
-      slice.html = html;
-      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
-      slice.htmlBitStarts = bitStarts;
-    }
-
-    if (htmlError) {
-      slice.htmlError = htmlError;
-      try {
-        slice.htmlErrorAsString = JSON.stringify(
-          htmlError,
-          Object.getOwnPropertyNames(htmlError),
-          2,
-        );
-      } catch (_e) {
-        slice.htmlErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.htmlError = undefined;
-      slice.htmlErrorAsString = undefined;
-    }
-    slice.htmlDurationSec = durationSec;
-    slice.htmlUpdates += 1;
-  },
-
-  // @awa-impl: PLAN-011-Step1 (setText setter; read-only WASM-opt-bitmark -> text view)
-  setText: (
-    text: string | undefined,
-    textError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ) => {
-    const slice = bitmarkState.text as Writable<TextSlice>;
-
-    if (textError) {
-      slice.textError = textError;
-      try {
-        slice.textErrorAsString = JSON.stringify(
-          textError,
-          Object.getOwnPropertyNames(textError),
-          2,
-        );
-      } catch (_e) {
-        slice.textErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.text = text ?? '';
-      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
-      slice.textBitStarts = bitStarts;
-      slice.textError = undefined;
-      slice.textErrorAsString = undefined;
-    }
-    slice.textDurationSec = durationSec;
-    slice.textUpdates += 1;
-  },
-
-  // @awa-impl: PLAN-013-Step1 (setXml setter, per XML mapping variant)
-  // xml and error are independent: xml is always stored when provided (so the
-  // editable editor is never clobbered), while error is set/cleared separately.
-  // On error with xml undefined (e.g. bitmark -> XML failed), the last good
-  // xml is preserved. Mirrors setTableHtml.
-  setXml: (
-    variant: XmlVariant,
-    xml: string | undefined,
-    xmlError: Error | undefined,
-    durationSec?: number,
-    bitStarts?: readonly number[],
-  ) => {
-    const slice = bitmarkState[variant] as Writable<XmlSlice>;
-
-    if (xml !== undefined) {
-      slice.xml = xml;
-      // @awa-impl: PLAN-018-Step2 (positions travel with their text)
-      slice.xmlBitStarts = bitStarts;
-    }
-
-    if (xmlError) {
-      slice.xmlError = xmlError;
-      try {
-        slice.xmlErrorAsString = JSON.stringify(xmlError, Object.getOwnPropertyNames(xmlError), 2);
-      } catch (_e) {
-        slice.xmlErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.xmlError = undefined;
-      slice.xmlErrorAsString = undefined;
-    }
-    slice.xmlDurationSec = durationSec;
-    slice.xmlUpdates += 1;
-  },
-
   setActiveMarkupTab: (tab: ParserType) => {
     (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
   },
@@ -593,85 +357,23 @@ const bitmarkState = proxy<BitmarkState>({
   },
 
   // @awa-impl: PLAN-014-Step1 (record the last edited window)
-  setLastEdit: (inputFormat: string, content: string, label: string) => {
+  setLastEdit: (
+    inputFormat: string,
+    content: string,
+    label: string,
+    origin: 'playground' | 'session' = 'playground',
+  ) => {
     const slice = bitmarkState.lastEdit as Writable<LastEditSlice>;
     slice.inputFormat = inputFormat;
     slice.content = content;
     slice.label = label;
+    slice.origin = origin;
     slice.updates += 1;
   },
 
-  // @awa-impl: PLAN-014-Step1 (setMappings setter)
-  setMappings: (
-    report: string | undefined,
-    reportError: Error | undefined,
-    durationSec?: number,
-  ) => {
-    const slice = bitmarkState.mappings as Writable<MappingsSlice>;
-
-    if (reportError) {
-      slice.reportError = reportError;
-      try {
-        slice.reportErrorAsString = JSON.stringify(
-          reportError,
-          Object.getOwnPropertyNames(reportError),
-          2,
-        );
-      } catch (_e) {
-        slice.reportErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.report = report ?? '';
-      slice.reportError = undefined;
-      slice.reportErrorAsString = undefined;
-    }
-    slice.reportDurationSec = durationSec;
-    slice.reportUpdates += 1;
-  },
-
-  // @awa-impl: PLAN-015-Step1 (setInfo setter)
-  setInfo: (output: string | undefined, outputError: Error | undefined, durationSec?: number) => {
-    const slice = bitmarkState.info as Writable<InfoSlice>;
-
-    if (outputError) {
-      slice.outputError = outputError;
-      try {
-        slice.outputErrorAsString = JSON.stringify(
-          outputError,
-          Object.getOwnPropertyNames(outputError),
-          2,
-        );
-      } catch (_e) {
-        slice.outputErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.output = output ?? '';
-      slice.outputError = undefined;
-      slice.outputErrorAsString = undefined;
-    }
-    slice.outputDurationSec = durationSec;
-    slice.outputUpdates += 1;
-  },
-
-  // @awa-impl: PLAN-013-Step1 (setEditedXml; user input, duration untouched)
-  setEditedXml: (variant: XmlVariant, xml: string, xmlError: Error | undefined) => {
-    const slice = bitmarkState[variant] as Writable<XmlSlice>;
-    slice.xml = xml;
-    // @awa-impl: PLAN-018-Step2 (typed text: no known positions)
-    slice.xmlBitStarts = undefined;
-
-    if (xmlError) {
-      slice.xmlError = xmlError;
-      try {
-        slice.xmlErrorAsString = JSON.stringify(xmlError, Object.getOwnPropertyNames(xmlError), 2);
-      } catch (_e) {
-        slice.xmlErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.xmlError = undefined;
-      slice.xmlErrorAsString = undefined;
-    }
-    slice.xmlUpdates += 1;
+  setPaneDuration: (pane: TimedPane, durationSec: number) => {
+    (bitmarkState.paneDurations as Writable<Record<TimedPane, number | undefined>>)[pane] =
+      durationSec;
   },
 });
 

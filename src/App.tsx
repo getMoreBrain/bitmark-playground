@@ -16,13 +16,9 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
-import { InfoRunner } from './services/InfoRunner';
 import { JsRoundTripRunner } from './services/JsRoundTripRunner';
-import { MappingsRunner } from './services/MappingsRunner';
-import { TableHtmlRunner } from './services/TableHtmlRunner';
-import { TextRunner } from './services/TextRunner';
 import { WasmCheckRunner } from './services/WasmCheckRunner';
-import { XmlRunner } from './services/XmlRunner';
+import { PlaygroundSession, SessionPaneTab } from './session/PlaygroundSession';
 import { bitmarkState } from './state/bitmarkState';
 import { uiState } from './state/uiState';
 import { theme } from './theme/theme';
@@ -34,6 +30,7 @@ const initialMarkup = '[.article]\nHello World!';
 // @awa-impl: PLAN-002-Step5 (tab bar integration)
 // @awa-impl: PLAN-002-Step7 (provider nesting)
 // @awa-impl: PLAN-003-Step6 (App integration)
+// @awa-impl: PLAN-021-Step14 (the playground's session wraps the layout)
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
@@ -142,13 +139,13 @@ function App() {
             wasmCheckDuration={snap.wasmCheck.markupDurationSec}
             wasmCheckLed={wasmCheckLed}
             showTableHtml
-            tableHtmlDuration={snap.tableHtml.htmlDurationSec}
+            tableHtmlDuration={snap.paneDurations.tableHtml}
             showText
-            textDuration={snap.text.textDurationSec}
+            textDuration={snap.paneDurations.text}
             showXmlNiso
-            xmlNisoDuration={snap.xmlNiso.xmlDurationSec}
+            xmlNisoDuration={snap.paneDurations.xmlNiso}
             showXmlNisoEs
-            xmlNisoEsDuration={snap.xmlNisoEs.xmlDurationSec}
+            xmlNisoEsDuration={snap.paneDurations.xmlNisoEs}
           />
           <Flex sx={{ flexGrow: 1 }} />
           <SettingsMenu />
@@ -189,9 +186,9 @@ function App() {
         language="bitmark"
         lexerOutput={snap.wasm.lexerOutput}
         showInfo
-        infoOutput={snap.info.outputErrorAsString ?? snap.info.output}
+        infoPane={<SessionPaneTab tab="info" />}
         showMappings
-        mappingsOutput={snap.mappings.reportErrorAsString ?? snap.mappings.report}
+        mappingsPane={<SessionPaneTab tab="mappings" />}
       />
       <OutputPanel
         label="JSON"
@@ -211,52 +208,48 @@ function App() {
         <BitmarkParserProvider>
           <WasmCheckRunner />
           <JsRoundTripRunner />
-          <TableHtmlRunner />
-          <TextRunner />
-          <MappingsRunner />
-          <InfoRunner />
-          <XmlRunner variant="xmlNiso" />
-          <XmlRunner variant="xmlNisoEs" />
-          <Flex
-            sx={{
-              flexDirection: 'column',
-              height: '100vh',
-              width: '100vw',
-              backgroundColor: 'background',
-            }}
-          >
-            {/* Always render ResizableLayout so the editor panels keep a stable
-                tree position — toggling the Diff/Lex panels must not remount the
-                editors (which would reset their content). */}
-            <ResizableLayout
-              top={editorPanels}
-              bottom={bottomPanels}
-              showBottom={uiSnap.showDiffLex}
-              bottomHeight={uiSnap.bottomPanelHeight}
-              collapsed={uiSnap.bottomPanelCollapsed}
-              onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
-              onToggleCollapse={() =>
-                uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
-              }
-            />
+          <PlaygroundSession>
             <Flex
               sx={{
-                justifyContent: 'space-between',
-                flexShrink: 0,
+                flexDirection: 'column',
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: 'background',
               }}
             >
-              <Version
-                sx={{
-                  variant: 'text.copyright',
-                }}
+              {/* Always render ResizableLayout so the editor panels keep a stable
+                tree position — toggling the Diff/Lex panels must not remount the
+                editors (which would reset their content). */}
+              <ResizableLayout
+                top={editorPanels}
+                bottom={bottomPanels}
+                showBottom={uiSnap.showDiffLex}
+                bottomHeight={uiSnap.bottomPanelHeight}
+                collapsed={uiSnap.bottomPanelCollapsed}
+                onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
+                onToggleCollapse={() =>
+                  uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
+                }
               />
-              <Copyright
+              <Flex
                 sx={{
-                  variant: 'text.copyright',
+                  justifyContent: 'space-between',
+                  flexShrink: 0,
                 }}
-              />
+              >
+                <Version
+                  sx={{
+                    variant: 'text.copyright',
+                  }}
+                />
+                <Copyright
+                  sx={{
+                    variant: 'text.copyright',
+                  }}
+                />
+              </Flex>
             </Flex>
-          </Flex>
+          </PlaygroundSession>
         </BitmarkParserProvider>
       </BitmarkParserGeneratorProvider>
     </ThemeUIProvider>

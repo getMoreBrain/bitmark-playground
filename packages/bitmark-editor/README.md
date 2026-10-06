@@ -130,8 +130,9 @@ and hover, and one for conversions.
 | Mappings | `createMappingsPane` | `mappings` | read-only | no |
 
 Pane options: `readOnly`, `scrollSync`, `label`, `editorOptions` (passed to
-Monaco), and `errorSlot` (an element or a callback that also receives the
-pane's error message). At runtime: `pane.setReadOnly()`,
+Monaco), `errorSlot` (an element or a callback that also receives the
+pane's error message), and `onRender` (called with `{ durationMs }` after
+each conversion the pane shows). At runtime: `pane.setReadOnly()`,
 `pane.setScrollSync()`, `session.setScrollSync([panes])`.
 
 On an error, the edited pane keeps your text, shows the error and gets a
@@ -141,7 +142,7 @@ stale. A pane's content is never replaced by an error.
 ## Session options
 
 `createBitmarkSession({ monaco, engine?, value?, debounceMs?, theme?,
-applyMonacoTheme?, schema?, messages? })`
+applyMonacoTheme?, schema?, messages?, scrollGroup? })`
 
 - `debounceMs`: wait for a pause in typing before converting (default 0).
 - `theme`: `'dark'` (default), `'light'`, `'auto'` (follows the OS), or
@@ -151,6 +152,11 @@ applyMonacoTheme?, schema?, messages? })`
   from beside the engine, or from the CDN at the engine's version. It
   applies only to the package's own models, never to your JSON editors.
 - `messages`: every UI string, including the pane labels.
+- `scrollGroup`: an existing scroll group for the panes to join, so that
+  editors of your own scroll with them (`createScrollSyncGroup()`).
+- `session.setBitmark(text, origin?)`: sets the document from your code.
+  `origin` (`{ inputFormat, content, label }`) names the edit for the
+  Mappings pane; `false` means it is not an edit (a document switch).
 - Events: `session.on('change' | 'error' | 'ready', …)`. The elements
   dispatch the same as DOM events.
 

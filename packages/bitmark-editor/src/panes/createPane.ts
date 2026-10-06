@@ -48,6 +48,8 @@ export interface PaneOptions {
   errorSlot?: HTMLElement | ((message: string | undefined) => void);
   /** The pane's label (ARIA, mapping report). Default: the session's messages. */
   label?: string;
+  /** After each regeneration that is shown: how long it took (e.g. for a host's timing display). */
+  onRender?: (info: { durationMs: number }) => void;
 }
 
 /** Marker owner for a failed conversion of the edited pane (D15). */
@@ -156,7 +158,11 @@ export const createPane = (
     });
   }
 
-  const regenerate = createLatestRunner((engine: BitmarkEngine) => spec.fromSession!(engine, s));
+  const regenerate = createLatestRunner(async (engine: BitmarkEngine) => {
+    const started = performance.now();
+    const out = await spec.fromSession!(engine, s);
+    return { ...out, durationMs: performance.now() - started };
+  });
 
   /**
    * This pane made the document's current text (it was the last edit's
@@ -207,6 +213,7 @@ export const createPane = (
         state.stale = false;
         if (show(out.text, force)) markers?.pin(out.text, out.bitStarts);
         showBanner();
+        options.onRender?.({ durationMs: out.durationMs });
       },
       (err: unknown) => {
         if (disposed) return;

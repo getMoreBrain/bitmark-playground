@@ -180,7 +180,7 @@ describe('OutputPanel', () => {
         activeTab="info"
         onTabChange={() => {}}
         showInfo
-        infoOutput="BIT INFO: article"
+        infoPane={<pre>BIT INFO: article</pre>}
       />,
       { wrapper },
     );
@@ -194,7 +194,7 @@ describe('OutputPanel', () => {
         activeTab="mappings"
         onTabChange={() => {}}
         showMappings
-        mappingsOutput="MAPPING REPORT  input: bitmark → json"
+        mappingsPane={<pre>MAPPING REPORT input: bitmark → json</pre>}
       />,
       { wrapper },
     );

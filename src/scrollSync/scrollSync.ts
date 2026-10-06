@@ -28,6 +28,9 @@ subscribeKey(uiState, 'linkScroll', (on) => {
   for (const member of group.members()) member.setLinked(on);
 });
 
+/** The playground's group, for the session's panes to join (PLAN-021 Step 14). */
+export const playgroundScrollGroup = (): ScrollSyncGroup => group;
+
 /** A fresh group. Only for tests. */
 export const resetScrollSync = (): void => {
   group = createScrollSyncGroup();

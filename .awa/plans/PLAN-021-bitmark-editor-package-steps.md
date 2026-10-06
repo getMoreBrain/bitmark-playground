@@ -244,12 +244,39 @@ and to the package in Phase 2.
 
 ### Phase 3 — Consumers
 
-- [ ] Step 14 — The playground runs on the package:
+- [x] Step 14 — The playground runs on the package:
   - the bitmark editor, the WASM JSON tabs, the HTML, XML and Text tabs, and
     the bottom Info and Mappings panels are package panes on one session;
   - bpg (Original), the diff, WASM Check and the lexer stay in the
     playground, connected through the session's events;
   - remove the code that moved.
+  - Done (`src/session/PlaygroundSession.tsx`):
+    - Session panes: WASM JSON, WASM (full) JSON, HTML, Text, both XML
+      tabs, and the bottom-left Info and Mappings tabs. Removed: the
+      TableHtml, Text, XML, Info and Mappings runners, panels and state
+      slices, and `convertWithBitStarts`.
+    - Kept in the playground: the bitmark editor too. Its tabs (Original,
+      WASM, WASM full) each hold a parser's own bitmark, which a single
+      session document can't. The session's document is the active tab's
+      bitmark.
+    - Playground → session: an edit calls `setBitmark(doc, origin)`, with the
+      origin for the mapping report; a left-tab switch calls
+      `setBitmark(doc, false)`.
+    - Session → playground: a pane edit runs the playground's own pipeline
+      (`jsonToMarkup` or `markupToJson`), so the other parser tabs, WASM
+      Check, the LED and the lexer stay current.
+    - Package additions: the `scrollGroup` session option (the panes join the
+      playground's group), the `origin` argument to `setBitmark`, and the
+      pane `onRender` timing (the tab bar durations).
+    - One React and one Monaco in the dev server: `resolve.dedupe`, with
+      `tsconfig` paths for type checking.
+    - Errors show in the pane's banner, and the last good content stays
+      (D15). This replaces the old in-pane error dump.
+    - Checked: `spikes/tests/playground-session.spec.mjs`, and the PLAN-018
+      smoke checks (scroll linking by bit). Playground `tsc`, tests (167)
+      and lint pass (lint's only errors are the existing ones in the
+      `.claude/` and `CLAUDE.md` markdown). The package's typecheck, lint and
+      tests (175) pass.
 - [ ] Step 15 — Promote the spikes to maintained examples in
   `packages/bitmark-editor/examples/`: `static` (no bundler, CDN
   `/bundled`, shaped like the docs site) and `angular`. Each
@@ -404,7 +431,7 @@ and to the package in Phase 2.
     HTML), and a pane switched out of sync scrolls alone;
   - an edit in the HTML pane updates the bitmark and JSON panes;
   - no console errors.
-- [ ] Playground regression: the PLAN-018 browser checks still pass.
+- [x] Playground regression: the PLAN-018 browser checks still pass.
 
 ### Documentation
 
@@ -468,7 +495,7 @@ Two independent code reviews, then the full matrix again.
   declarations.
 - [ ] The static and Angular examples build in CI and pass the
   browser checks, each with both a loaded and an injected engine.
-- [ ] The playground runs on the package with no loss of information (its
+- [x] The playground runs on the package with no loss of information (its
   error dump moves outside the panes, D15); its lint,
   `tsc` and tests pass.
 - [ ] Panes are placed freely by the host; any combination works, edits

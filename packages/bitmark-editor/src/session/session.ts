@@ -24,6 +24,7 @@ import type {
   BitmarkPane,
   BitmarkSession,
   BitmarkSessionOptions,
+  EditOrigin,
   EngineSource,
   LastEdit,
   PaneControl,
@@ -87,7 +88,7 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
   const { monaco } = options;
   setupBitmarkMonaco({ monaco });
   const messages = resolveMessages(options.messages);
-  const scrollGroup = createScrollSyncGroup();
+  const scrollGroup = options.scrollGroup ?? createScrollSyncGroup();
   const controls: PaneControl[] = [];
   const listeners: { [K in keyof SessionEvents]: Set<(e: SessionEvents[K]) => void> } = {
     change: new Set(),
@@ -125,11 +126,11 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       ? applyBitmarkTheme(document.createElement('div'), theme, { monaco, applyMonacoTheme: true })
       : undefined;
 
-  const commit = (text: string, source: PaneControl | undefined, edit: Omit<LastEdit, 'count'>) => {
+  const commit = (text: string, source: PaneControl | undefined, edit: EditOrigin | undefined) => {
     editSeq++;
     bitmark = text;
     version++;
-    lastEdit = { ...edit, count: ++editCount };
+    if (edit) lastEdit = { ...edit, count: ++editCount };
     source?.showSourceError(undefined);
     // An API change (no source pane) replaces the text even where the user
     // has focus: it is the new document, not an echo of their typing.
@@ -192,8 +193,14 @@ export const createBitmarkSession = (options: BitmarkSessionOptions): BitmarkSes
       return lastEdit;
     },
     getBitmark: () => bitmark,
-    setBitmark: (text) =>
-      commit(text, undefined, { inputFormat: 'bitmark', content: text, label: 'API' }),
+    setBitmark: (text, origin) =>
+      commit(
+        text,
+        undefined,
+        origin === false
+          ? undefined
+          : (origin ?? { inputFormat: 'bitmark', content: text, label: 'API' }),
+      ),
     getJson: async (opts) => {
       const e = engine ?? (await ready);
       return (await e.bitmarkToJsonText(bitmark, { mode: opts?.mode })).text;

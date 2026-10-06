@@ -118,6 +118,8 @@ export interface BitmarkPaneProps {
   style?: CSSProperties;
   /** The pane, once mounted. */
   onPane?: (pane: Pane | undefined) => void;
+  /** After each regeneration that is shown: how long it took. */
+  onRender?: (info: { durationMs: number }) => void;
 }
 
 /** One pane of the nearest `<BitmarkSession>`, in a `<div>` the host sizes. */
@@ -134,15 +136,24 @@ export const BitmarkPane = (props: BitmarkPaneProps): ReactElement => {
     className,
     style,
     onPane,
+    onRender,
   } = props;
   const session = useBitmarkSession();
   const ref = useRef<HTMLDivElement>(null);
   const paneRef = useRef<Pane>();
+  const onRenderRef = useRef(onRender);
+  onRenderRef.current = onRender;
 
   useEffect(() => {
     const el = ref.current;
     if (!session || !el) return;
-    const options = { readOnly, scrollSync, label, editorOptions };
+    const options = {
+      readOnly,
+      scrollSync,
+      label,
+      editorOptions,
+      onRender: (info: { durationMs: number }) => onRenderRef.current?.(info),
+    };
     const pane =
       type === 'bitmark'
         ? createBitmarkPane(el, session, options)
