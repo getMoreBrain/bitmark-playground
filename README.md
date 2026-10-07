@@ -24,6 +24,13 @@ package, in this repo's workspace:
 The playground uses the package from source. Both packages are at 0.1.0
 and not yet published.
 
+> **Moved:** the packages' development now happens in
+> [getMoreBrain/bitmark-editor](https://github.com/getMoreBrain/bitmark-editor).
+> The copies in `packages/` are frozen at that repo's starting point (8297e94) and will be
+> removed once the playground uses the published package. Send changes
+> there, not here.
+
+
 
 ## Available Scripts
 
