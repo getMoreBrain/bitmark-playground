@@ -1,0 +1,94 @@
+import debounce from 'lodash/debounce';
+import { useEffect } from 'react';
+import { subscribe } from 'valtio';
+
+import { bitmarkState } from '../state/bitmarkState';
+import { StringUtils } from '../utils/StringUtils';
+import { OLD_PARSER_DEBOUNCE_MS } from './BitmarkConverter';
+import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
+
+const useWasmCheckRunner = (): void => {
+  const { bitmarkParserGenerator, loadSuccess } = useBitmarkParserGenerator();
+
+  useEffect(() => {
+    if (!loadSuccess || !bitmarkParserGenerator) return;
+
+    let lastJson: string | null = null;
+    let cancelled = false;
+    // Monotonic run id: a slower earlier convert must not overwrite a later one.
+    let runId = 0;
+    let latestRunId = 0;
+
+    const run = async (json: string) => {
+      if (json === '') {
+        bitmarkState.setWasmCheck('', undefined, undefined);
+        return;
+      }
+
+      const thisRun = ++runId;
+
+      let markup: unknown;
+      let markupError: Error | undefined;
+
+      // Run id (not Date.now()) keys the marks — two runs starting in the same
+      // millisecond would otherwise share names and mismeasure.
+      const startMark = `wasmCheck-j2m-start-${thisRun}`;
+      const endMark = `wasmCheck-j2m-end-${thisRun}`;
+      performance.mark(startMark);
+
+      try {
+        markup = await bitmarkParserGenerator.convert(json, {
+          bitmarkOptions: {
+            prettifyJson: true,
+          },
+        });
+        if (!StringUtils.isString(markup)) {
+          throw new Error('Expected string');
+        }
+      } catch (e) {
+        markupError = e as Error;
+      }
+
+      performance.mark(endMark);
+      const convertTimeSecs =
+        performance.measure(`wasmCheck-jsonToMarkup-${thisRun}`, startMark, endMark).duration /
+        1000;
+
+      if (cancelled || thisRun < latestRunId) return;
+      latestRunId = thisRun;
+
+      bitmarkState.setWasmCheck(markup as string | undefined, markupError, convertTimeSecs);
+    };
+
+    const runAfterPause = debounce((json: string) => void run(json), OLD_PARSER_DEBOUNCE_MS);
+
+    const evaluate = () => {
+      const json = bitmarkState.wasm.jsonAsString;
+      if (json === lastJson) return;
+      lastJson = json;
+      runAfterPause(json);
+    };
+
+    // Run once with the current value (in case wasm.jsonAsString was set
+    // before the parser became ready, or before this hook mounted).
+    lastJson = bitmarkState.wasm.jsonAsString;
+    void run(lastJson);
+
+    const unsubscribe = subscribe(bitmarkState.wasm, evaluate);
+
+    return () => {
+      cancelled = true;
+      runAfterPause.cancel();
+      unsubscribe();
+    };
+  }, [bitmarkParserGenerator, loadSuccess]);
+};
+
+// Renderless component that drives the WASM Check round-trip. Mount once
+// inside `BitmarkParserGeneratorProvider` so the hook can read its context.
+const WasmCheckRunner = (): null => {
+  useWasmCheckRunner();
+  return null;
+};
+
+export { useWasmCheckRunner, WasmCheckRunner };
