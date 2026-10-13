@@ -1,0 +1,56 @@
+# Deploys the site to GitHub Pages when a release tag is pushed, then creates the GitHub release.
+# Release commits and tags are created by the export bot; the release notes are the tag's commit
+# message.
+
+name: Deploy
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write # GitHub Pages deployment
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Release notes
+        run: git log -1 --format=%b "$GITHUB_REF_NAME" > release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          draft: false
