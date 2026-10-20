@@ -11,10 +11,11 @@ export interface PersistedSettings {
   leftOutputTab: OutputTab;
   rightOutputTab: OutputTab;
   linkScroll: boolean;
+  toggleTags: boolean;
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 10;
+export const CURRENT_VERSION = 11;
 
 const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
 const VALID_JSON_TABS: readonly string[] = [
@@ -85,9 +86,16 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v9 → v10: 'linkScroll' added, on by default
   if (obj.v === 9) {
-    obj.v = CURRENT_VERSION;
+    obj.v = 10;
     obj.linkScroll = true;
-    // Fall through to v10 validation
+    // Fall through
+  }
+
+  // Migrate v10 → v11: 'toggleTags' added, off by default
+  if (obj.v === 10) {
+    obj.v = CURRENT_VERSION;
+    obj.toggleTags = false;
+    // Fall through to v11 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
@@ -102,7 +110,8 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
       VALID_OUTPUT_TABS.includes(obj.leftOutputTab) &&
       typeof obj.rightOutputTab === 'string' &&
       VALID_OUTPUT_TABS.includes(obj.rightOutputTab) &&
-      typeof obj.linkScroll === 'boolean'
+      typeof obj.linkScroll === 'boolean' &&
+      typeof obj.toggleTags === 'boolean'
     ) {
       return obj as unknown as PersistedSettings;
     }

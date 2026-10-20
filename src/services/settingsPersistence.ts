@@ -16,6 +16,7 @@ function collectSettings(): PersistedSettings {
     leftOutputTab: uiState.leftOutputTab,
     rightOutputTab: uiState.rightOutputTab,
     linkScroll: uiState.linkScroll,
+    toggleTags: uiState.toggleTags,
   };
 }
 

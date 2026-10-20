@@ -25,7 +25,7 @@
         "@eslint/js": "^9.28.0",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@gmb/bitmark-parser": "^7.9.0",
+        "@gmb/bitmark-parser": "^7.11.0",
         "@gmb/bitmark-parser-generator": "^5.26.0",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -216,19 +216,19 @@
 
     "@gmb/bitmark-editor": ["@gmb/bitmark-editor@0.1.0", "", { "peerDependencies": { "@gmb/bitmark-parser": ">=7.7.0 <8", "monaco-editor": ">=0.46.0 <1", "react": ">=18" }, "optionalPeers": ["@gmb/bitmark-parser", "monaco-editor", "react"] }, "sha512-3sHrrh5HmpFC8kMHXWmPuy8tgsNqkAuE2jLrXaN0fhGOLfmRBXrS6lFKVH7G0scZ00eTnVGy+JTB9/v/Iw4f4w=="],
 
-    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@7.9.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "7.9.0", "@gmb/bitmark-parser-darwin-x64": "7.9.0", "@gmb/bitmark-parser-linux-arm64": "7.9.0", "@gmb/bitmark-parser-linux-x64": "7.9.0", "@gmb/bitmark-parser-win32-x64": "7.9.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-7taMBz9I/3KaAAYuLRqnDy6IPZMWcaPJUamKPB38xwtPF2ABJN9/M+qMOC9LeiLxFrN2ilssiWu0v9YCZk1iRQ=="],
+    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@7.11.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "7.11.0", "@gmb/bitmark-parser-darwin-x64": "7.11.0", "@gmb/bitmark-parser-linux-arm64": "7.11.0", "@gmb/bitmark-parser-linux-x64": "7.11.0", "@gmb/bitmark-parser-win32-x64": "7.11.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-nyhyl3E4/oNt8TJGo9TicmnkJN8vH4S9JKL+Gsf22ukOFNF737D22T2UQjkXpPEPBE0emSLxKPUxOLzFImDQUA=="],
 
-    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@7.9.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-RQ5hMbREdUCBSQIjObDFWz4iBF0u/8o7S16Ufb8m4KSO+aHBEcjffQmJn/vIJ84G/NW2LYGrswdVWR1iQC9djg=="],
+    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@7.11.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-zJ6MzWYhv2g1TQCxX+NvWe923cGOotHww1tQwL/xopB8RDbhrbXxJVgKlmM6RTK8WRixrGdHZYMQzJ0LDnQhEQ=="],
 
-    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@7.9.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-oClta9yj5oWbWsoLnHQV6hLLJt567uMyL3hkQD86RNMeBMQFpnRQkJcMC1Bwtsmi3AevATQnQ6vX9/xRsqBdxA=="],
+    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@7.11.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-ioZPuEsKvaK5BQEljfVY6uk154qyBNPRfNm4wHdTJk9Dtn0L/WFYF7zCGVlAWVrqDpbj9KpKEeGxZ2Pku9DG3A=="],
 
     "@gmb/bitmark-parser-generator": ["@gmb/bitmark-parser-generator@5.26.0", "", { "dependencies": { "@ncoderz/superenum": "^1.0.0", "@types/fs-extra": "^11.0.4", "commander": "^14.0.3", "fs-extra": "^11.3.4" }, "bin": { "bitmark-parser": "bin/run" } }, "sha512-i1Mii1Di56LzK9R3T3qbljZU6iAt/etXdZtuaqcd2pAvAd+yCPrA7DF28OWlsg8O95espUQyVOox1g7Gs6t4ng=="],
 
-    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@7.9.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-pwHNTze2UZ0ae00ELAN86MRem87KtMf8V0AfLqATuC2O1v5Sv3AOqsqNCYuQIaM7PzeaYp2gR0nPaVkVYJ/zkA=="],
+    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@7.11.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-fJ8u0eH2k+adDe8fibyOglnrJJEqv0R22bXe1eCi16RoPrs8Kb72qBGU7rYV70vgVmMwScGv+adjG3ZntEET+Q=="],
 
-    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@7.9.0", "", { "os": "linux", "cpu": "x64" }, "sha512-PCP1b2Hkr7W+lpibWGl9HzWbnB0wgX0Wn2AdDnibN4XFTsA1DNRZWCr41nKr+sKPg9gHHH8JZKxgahR7nH51mg=="],
+    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@7.11.0", "", { "os": "linux", "cpu": "x64" }, "sha512-VMMP04ox0ZEZyGWSd+LQwwyDpGepc9zHnr361HhgqLO+u/ZOqsNA8r7/QGFq+Jb6jYJdaUuF+ohMK1Pf8OTSHw=="],
 
-    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@7.9.0", "", { "os": "win32", "cpu": "x64" }, "sha512-MF17XHE+Rg2wsNH7yNx/WMYY7qxgZz8/hUl7L6zF9IYo3dsil3HA1eQ+WCHyYSMkVJnJkcL5n8w0qitiYHroNA=="],
+    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@7.11.0", "", { "os": "win32", "cpu": "x64" }, "sha512-VmPRviubwkRsh2Apq9r2vodVgA556L7Ye84PeuVyE9TrvQ0aAXO9L9nxibDdzHjIBBnLWjznD34mdv/Qv3CDYQ=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

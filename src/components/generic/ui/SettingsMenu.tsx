@@ -125,6 +125,35 @@ const SettingsMenu = () => {
               Link scrolling
             </Label>
           </Flex>
+
+          <Text
+            sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mt: 2, mb: 1, display: 'block' }}
+          >
+            Parser
+          </Text>
+
+          <Flex sx={{ alignItems: 'center', gap: 2 }}>
+            <Label
+              title="WASM parsers: write inline marks as toggle tags, e.g. (+bold)x(-bold)"
+              sx={{
+                cursor: 'pointer',
+                fontSize: 1,
+                color: 'text',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                width: 'auto',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={snap.toggleTags}
+                onChange={(e) => uiState.setToggleTags(e.target.checked)}
+                style={{ accentColor: '#7dc13a' }}
+              />
+              Toggle tags
+            </Label>
+          </Flex>
         </Box>
       )}
     </Box>

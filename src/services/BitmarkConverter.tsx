@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 
 import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState, ParserType } from '../state/bitmarkState';
+import { uiState } from '../state/uiState';
 import { StringUtils } from '../utils/StringUtils';
 import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
@@ -64,6 +65,8 @@ export interface BitmarkConverter {
   wasmLoadError: boolean;
   markupToJson: (editedTab: ParserType, markup: string) => Promise<void>;
   jsonToMarkup: (editedTab: ParserType, json: string) => Promise<void>;
+  /** Re-write the WASM tabs' bitmark from their JSON (PLAN-025 D4). */
+  regenerateWasmMarkup: () => Promise<void>;
 }
 
 const useBitmarkConverter = (): BitmarkConverter => {
@@ -133,12 +136,14 @@ const useBitmarkConverter = (): BitmarkConverter => {
         } else {
           if (!wasmConvert) return null;
           const mode = parser === 'wasm' ? 'optimized' : 'full';
+          // A parser older than 7.11 ignores `inlineStyle` (PLAN-025 D3).
+          const inlineStyle = uiState.toggleTags ? 'toggle' : 'classic';
           // Only the optimized run's positions are used (below).
           ({ output: markup, inputStarts } = convertWithBitStarts(
             wasmConvert,
             parser === 'wasm' ? wasmConvertWithDetails : undefined,
             json,
-            { inputFormat: 'json', outputFormat: 'bitmark', mode },
+            { inputFormat: 'json', outputFormat: 'bitmark', mode, inlineStyle },
           ));
         }
       } catch (e) {
@@ -262,6 +267,21 @@ const useBitmarkConverter = (): BitmarkConverter => {
     [jsonToMarkupFor, lexWasmOptimized],
   );
 
+  // Every WASM tab, the edited one included, from its own JSON. A tab with an
+  // error keeps its text: its JSON is a last good value, or its bitmark is.
+  const regenerateWasmMarkup = useCallback(async () => {
+    await Promise.allSettled(
+      WASM_PARSERS.map(async (parser) => {
+        const slice = bitmarkState[parser];
+        if (slice.jsonError || slice.markupError) return;
+        const r = await jsonToMarkupForParser(parser, slice.jsonAsString);
+        if (!r || r.error || r.markup === undefined) return;
+        bitmarkState.setMarkup(parser, r.markup, undefined, r.durationSec);
+      }),
+    );
+    lexWasmOptimized();
+  }, [jsonToMarkupForParser, lexWasmOptimized]);
+
   return {
     jsLoadSuccess,
     jsLoadError,
@@ -269,6 +289,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
     wasmLoadError,
     markupToJson,
     jsonToMarkup,
+    regenerateWasmMarkup,
   };
 };
 

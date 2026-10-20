@@ -1,7 +1,7 @@
 import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
 import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
@@ -11,6 +11,7 @@ import { SearchEditor, useSearchTarget } from '../../search';
 import { bitmarkLabel } from '../../search/labels';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { bitmarkState, TAB_LABEL } from '../../state/bitmarkState';
+import { uiState } from '../../state/uiState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
 
@@ -30,8 +31,15 @@ export interface BitmarkMarkupTextBoxProps extends MonacoTextAreaUncontrolledPro
 const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
   const { initialMarkup, options, ...restProps } = props;
   const bitmarkStateSnap = useSnapshot(bitmarkState);
-  const { jsLoadSuccess, jsLoadError, wasmLoadSuccess, wasmLoadError, markupToJson } =
-    useBitmarkConverter();
+  const {
+    jsLoadSuccess,
+    jsLoadError,
+    wasmLoadSuccess,
+    wasmLoadError,
+    markupToJson,
+    regenerateWasmMarkup,
+  } = useBitmarkConverter();
+  const { toggleTags } = useSnapshot(uiState);
   const services = useBitmarkEditorServices();
   const scrollSync = useSplitScrollSync();
   const [searchEditor, setSearchEditor] = useState<SearchEditor>();
@@ -75,6 +83,15 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
     if (!initialMarkup) return;
     void onInput(initialMarkup ?? '');
   }, [initialMarkup, onInput]);
+
+  // Re-write the WASM tabs when the toggle tags setting changes (PLAN-025 D4).
+  // Not on mount, nor when the converter's parsers load.
+  const shownToggleTags = useRef(toggleTags);
+  useEffect(() => {
+    if (shownToggleTags.current === toggleTags) return;
+    shownToggleTags.current = toggleTags;
+    void regenerateWasmMarkup();
+  }, [toggleTags, regenerateWasmMarkup]);
 
   if (anyLoadSuccess) {
     const opts = {

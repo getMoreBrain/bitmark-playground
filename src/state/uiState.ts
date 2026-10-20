@@ -20,6 +20,8 @@ export interface UiState {
   readonly settingsOpen: boolean;
   /** Whether the top panes scroll together, by bit (PLAN-018) */
   readonly linkScroll: boolean;
+  /** Whether the WASM parsers write inline marks as toggle tags (PLAN-025) */
+  readonly toggleTags: boolean;
 
   setShowDiffLex(value: boolean): void;
   setBottomPanelHeight(value: number): void;
@@ -28,6 +30,7 @@ export interface UiState {
   setRightOutputTab(tab: OutputTab): void;
   setSettingsOpen(value: boolean): void;
   setLinkScroll(value: boolean): void;
+  setToggleTags(value: boolean): void;
 }
 
 const stored = loadSettings();
@@ -40,6 +43,7 @@ const uiState = proxy<UiState>({
   rightOutputTab: stored?.rightOutputTab ?? 'diff',
   settingsOpen: false,
   linkScroll: stored?.linkScroll ?? true,
+  toggleTags: stored?.toggleTags ?? false,
 
   setShowDiffLex(value: boolean) {
     (uiState as Writable<UiState>).showDiffLex = value;
@@ -67,6 +71,10 @@ const uiState = proxy<UiState>({
 
   setLinkScroll(value: boolean) {
     (uiState as Writable<UiState>).linkScroll = value;
+  },
+
+  setToggleTags(value: boolean) {
+    (uiState as Writable<UiState>).toggleTags = value;
   },
 });
 

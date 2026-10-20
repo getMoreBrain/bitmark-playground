@@ -1,6 +1,8 @@
 # bitmark Playground
 
-![Deploy](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/deploy-pages.yml/badge.svg)
+[![Deploy](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/getMoreBrain/bitmark-playground/actions/workflows/deploy-pages.yml)
+[![Release](https://img.shields.io/github/v/release/getMoreBrain/bitmark-playground)](https://github.com/getMoreBrain/bitmark-playground/releases)
+[![License](https://img.shields.io/github/license/getMoreBrain/bitmark-playground)](./LICENSE)
 
 A web playground for parsing and generating [bitmark](https://docs.bitmark.cloud/).
 
