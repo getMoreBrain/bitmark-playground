@@ -1,6 +1,8 @@
 import { Text, TextProps } from 'theme-ui';
+import { useSnapshot } from 'valtio';
 
 import { useApplicationInfo } from '../../services/ApplicationInfo';
+import { uiState } from '../../state/uiState';
 
 export interface VersionProps extends TextProps {
   //
@@ -9,6 +11,7 @@ export interface VersionProps extends TextProps {
 const Version = (props: VersionProps) => {
   const { ...restProps } = props;
   const applicationInfo = useApplicationInfo();
+  const { showLegacy } = useSnapshot(uiState);
 
   const bpgVersionText = applicationInfo.bitmarkParserGeneratorVersion
     ? `v${applicationInfo.bitmarkParserGeneratorVersion}`
@@ -46,10 +49,15 @@ const Version = (props: VersionProps) => {
       <Text as="span" sx={{ color: bpColor }}>
         {bpVersionText}
       </Text>
-      , legacy-parser:{' '}
-      <Text as="span" sx={{ color: bpgColor }}>
-        {bpgVersionText}
-      </Text>
+      {/* Only while the legacy parser is on (PLAN-026 D13). */}
+      {showLegacy ? (
+        <>
+          , legacy-parser:{' '}
+          <Text as="span" sx={{ color: bpgColor }}>
+            {bpgVersionText}
+          </Text>
+        </>
+      ) : null}
     </Text>
   );
 };

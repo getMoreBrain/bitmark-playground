@@ -1,25 +1,59 @@
-import { jsonWithBitStarts } from '@gmb/bitmark-editor';
-import type { BitWrapperJson } from '@gmb/bitmark-parser-generator';
+import type { JsonText } from '@gmb/bitmark-editor';
 import { proxy } from 'valtio';
 
 import { loadSettings } from '../services/settingsStorage';
 import { Writable } from '../utils/TypeScriptUtils';
 
-export type ParserType = 'js' | 'wasm' | 'wasmFull';
+/** The parsers: the legacy bpg (`js`) and the WASM parser, in the mode Settings choose. */
+export type ParserType = 'js' | 'wasm';
 
-/** Display names for the parser tabs, matching the tab bar. */
-export const TAB_LABEL: Record<ParserType, string> = {
-  js: 'Original',
-  wasm: 'WASM',
-  wasmFull: 'WASM (full)',
-};
-/** Tab id for the JSON parser tab bar — adds the round-trip, HTML-table, text and XML views. */
-export type JsonTabType = ParserType | 'wasmCheck' | 'tableHtml' | 'text' | XmlVariant;
+/** Tab id for the bitmark (left) tab bar. */
+export type MarkupTabType = 'bitmark' | 'legacy';
+/** Tab id for the right-hand tab bar. */
+export type JsonTabType = 'json' | 'tableHtml' | XmlVariant | 'text' | 'legacy';
 /**
  * XML mapping variants. Each is its own JSON-side tab and its own state slice;
  * they differ only by the config mapping id passed to the parser's `convert`.
  */
 export type XmlVariant = 'xmlNiso' | 'xmlNisoEs';
+
+export const MARKUP_TAB_LABEL: Record<MarkupTabType, string> = {
+  bitmark: 'Bitmark',
+  legacy: 'Legacy Bitmark',
+};
+
+export const JSON_TAB_LABEL: Record<JsonTabType, string> = {
+  json: 'JSON',
+  tableHtml: 'HTML',
+  xmlNiso: 'XML (niso-iec)',
+  xmlNisoEs: 'XML (niso-iec-es)',
+  text: 'Text',
+  legacy: 'Legacy JSON',
+};
+
+/** Right-hand tabs that are never shown, nor computed (PLAN-026 D5). */
+export const DISABLED_JSON_TABS: readonly JsonTabType[] = ['xmlNisoEs'];
+
+const JSON_TABS: readonly JsonTabType[] = [
+  'json',
+  'legacy',
+  'tableHtml',
+  'xmlNiso',
+  'xmlNisoEs',
+  'text',
+];
+
+/** The left tabs on screen, in order; the Legacy tab only while it is shown (PLAN-026 D4). */
+export const markupTabs = (showLegacy: boolean): MarkupTabType[] =>
+  showLegacy ? ['bitmark', 'legacy'] : ['bitmark'];
+
+/** The right-hand tabs on screen, in order (PLAN-026 D4, D5). */
+export const jsonTabs = (showLegacy: boolean): JsonTabType[] =>
+  JSON_TABS.filter((tab) => !DISABLED_JSON_TABS.includes(tab) && (showLegacy || tab !== 'legacy'));
+
+/** The parser whose slice a Bitmark, JSON or Legacy tab shows (PLAN-026 D6). */
+export const tabParser = (tab: 'bitmark' | 'json' | 'legacy'): ParserType =>
+  tab === 'legacy' ? 'js' : 'wasm';
 
 export interface ParserSlice {
   readonly markup: string;
@@ -27,7 +61,8 @@ export interface ParserSlice {
   readonly markupErrorAsString: string | undefined;
   readonly markupDurationSec: number | undefined;
   readonly markupUpdates: number;
-  readonly json: BitWrapperJson[];
+  // Not the parsed bits: nothing reads them, and Valtio would proxy and
+  // snapshot every one on each edit (PLAN-029 D1).
   readonly jsonAsString: string;
   /**
    * Where each bit starts in the JSON text (UTF-16 offsets), recorded by
@@ -39,29 +74,6 @@ export interface ParserSlice {
   readonly jsonErrorAsString: string | undefined;
   readonly jsonDurationSec: number | undefined;
   readonly jsonUpdates: number;
-  readonly lexerOutput: string;
-}
-
-export interface WasmCheckSlice {
-  readonly markup: string;
-  readonly markupError: Error | undefined;
-  readonly markupErrorAsString: string | undefined;
-  readonly markupDurationSec: number | undefined;
-  readonly markupUpdates: number;
-}
-
-/**
- * The Original (bpg) JSON after a full round trip through bpg
- * (`json -> bitmark -> json`). Used as the WASM Check LED reference, so the Rust
- * parser is not penalised for fields bpg itself cannot express in markup.
- */
-export interface JsRoundTripSlice {
-  readonly json: BitWrapperJson[];
-  /** The `js.jsonAsString` this round trip was computed from (staleness guard). */
-  readonly sourceJsonAsString: string;
-  readonly error: Error | undefined;
-  readonly durationSec: number | undefined;
-  readonly updates: number;
 }
 
 /**
@@ -92,17 +104,20 @@ export type TimedPane = 'tableHtml' | 'text' | XmlVariant;
 export interface BitmarkState {
   readonly js: ParserSlice;
   readonly wasm: ParserSlice;
-  readonly wasmFull: ParserSlice;
-  readonly wasmCheck: WasmCheckSlice;
-  readonly jsRoundTrip: JsRoundTripSlice;
   readonly lastEdit: LastEditSlice;
+  /** The WASM lexer's tokens for the Bitmark tab, as JSON (PLAN-026 D8). */
+  readonly lexerOutput: string;
   /** Each timed pane's last regeneration time, in seconds. */
   readonly paneDurations: Readonly<Record<TimedPane, number | undefined>>;
-  readonly activeMarkupTab: ParserType;
+  readonly activeMarkupTab: MarkupTabType;
   readonly activeJsonTab: JsonTabType;
+  /**
+   * The JSON text a conversion wrote, with where each bit starts in it
+   * (PLAN-030 D5), or its error (the text keeps its last good value).
+   */
   setJson(
     parser: ParserType,
-    json: BitWrapperJson[] | undefined,
+    json: JsonText | undefined,
     jsonError: Error | undefined,
     durationSec?: number,
   ): void;
@@ -112,19 +127,8 @@ export interface BitmarkState {
     markupError: Error | undefined,
     durationSec?: number,
   ): void;
-  setLexerOutput(parser: ParserType, output: string): void;
-  setWasmCheck(
-    markup: string | undefined,
-    markupError: Error | undefined,
-    durationSec?: number,
-  ): void;
-  setJsRoundTrip(
-    sourceJsonAsString: string,
-    json: BitWrapperJson[] | undefined,
-    error: Error | undefined,
-    durationSec?: number,
-  ): void;
-  setActiveMarkupTab(tab: ParserType): void;
+  setLexerOutput(output: string): void;
+  setActiveMarkupTab(tab: MarkupTabType): void;
   setActiveJsonTab(tab: JsonTabType): void;
   /** Set the edited tab's markup verbatim (raw user input; clears markup error). */
   setEditedMarkup(parser: ParserType, markup: string): void;
@@ -151,50 +155,31 @@ const createParserSlice = (): ParserSlice => ({
   markupErrorAsString: undefined,
   markupDurationSec: undefined,
   markupUpdates: 0,
-  json: [],
   jsonAsString: '',
   jsonBitStarts: undefined,
   jsonError: undefined,
   jsonErrorAsString: undefined,
   jsonDurationSec: undefined,
   jsonUpdates: 0,
-  lexerOutput: '',
 });
 
-const createWasmCheckSlice = (): WasmCheckSlice => ({
-  markup: '',
-  markupError: undefined,
-  markupErrorAsString: undefined,
-  markupDurationSec: undefined,
-  markupUpdates: 0,
-});
-
-const createJsRoundTripSlice = (): JsRoundTripSlice => ({
-  json: [],
-  sourceJsonAsString: '',
-  error: undefined,
-  durationSec: undefined,
-  updates: 0,
-});
-
-const getTabFromUrl = (): ParserType | null => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const tab = searchParams.get('tab');
-  if (tab === 'wasm') return 'wasm';
-  if (tab === 'wasmFull') return 'wasmFull';
-  if (tab === 'js') return 'js';
-  return null;
+const URL_JSON_TABS: Record<string, JsonTabType> = {
+  json: 'json',
+  html: 'tableHtml',
+  'xml-niso-iec': 'xmlNiso',
+  text: 'text',
 };
 
+/** The right-hand tab named by `?tab=` (PLAN-026 D14); other values are ignored. */
+export const getJsonTabFromUrl = (search: string): JsonTabType | null =>
+  URL_JSON_TABS[new URLSearchParams(search).get('tab') ?? ''] ?? null;
+
 const storedSettings = loadSettings();
-const urlTab = getTabFromUrl();
+const urlTab = getJsonTabFromUrl(window.location.search);
 
 const bitmarkState = proxy<BitmarkState>({
   js: createParserSlice(),
   wasm: createParserSlice(),
-  wasmFull: createParserSlice(),
-  wasmCheck: createWasmCheckSlice(),
-  jsRoundTrip: createJsRoundTripSlice(),
   lastEdit: { inputFormat: '', content: '', label: '', origin: 'playground', updates: 0 },
   paneDurations: {
     tableHtml: undefined,
@@ -202,12 +187,13 @@ const bitmarkState = proxy<BitmarkState>({
     xmlNiso: undefined,
     xmlNisoEs: undefined,
   },
-  activeMarkupTab: urlTab ?? storedSettings?.activeMarkupTab ?? 'js',
-  activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'js',
+  lexerOutput: '',
+  activeMarkupTab: storedSettings?.activeMarkupTab ?? 'bitmark',
+  activeJsonTab: urlTab ?? storedSettings?.activeJsonTab ?? 'json',
 
   setJson: (
     parser: ParserType,
-    json: BitWrapperJson[] | undefined,
+    json: JsonText | undefined,
     jsonError: Error | undefined,
     durationSec?: number,
   ) => {
@@ -225,17 +211,10 @@ const bitmarkState = proxy<BitmarkState>({
         slice.jsonErrorAsString = 'Unknown';
       }
     } else {
-      slice.json = json ?? [];
-      try {
-        const { text, bitStarts } = jsonWithBitStarts(slice.json);
-        slice.jsonAsString = text;
-        slice.jsonBitStarts = bitStarts;
-        slice.jsonError = undefined;
-        slice.jsonErrorAsString = undefined;
-      } catch (e) {
-        slice.jsonError = e as Error;
-        slice.jsonErrorAsString = JSON.stringify(e, Object.getOwnPropertyNames(e), 2);
-      }
+      slice.jsonAsString = json?.text ?? '';
+      slice.jsonBitStarts = json?.bitStarts;
+      slice.jsonError = undefined;
+      slice.jsonErrorAsString = undefined;
     }
     slice.jsonDurationSec = durationSec;
     slice.jsonUpdates += 1;
@@ -269,60 +248,11 @@ const bitmarkState = proxy<BitmarkState>({
     slice.markupUpdates += 1;
   },
 
-  setLexerOutput: (parser: ParserType, output: string) => {
-    const slice = bitmarkState[parser] as Writable<ParserSlice>;
-    slice.lexerOutput = output;
+  setLexerOutput: (output: string) => {
+    (bitmarkState as Writable<BitmarkState>).lexerOutput = output;
   },
 
-  setWasmCheck: (
-    markup: string | undefined,
-    markupError: Error | undefined,
-    durationSec?: number,
-  ) => {
-    const slice = bitmarkState.wasmCheck as Writable<WasmCheckSlice>;
-
-    if (markupError) {
-      slice.markupError = markupError;
-      try {
-        slice.markupErrorAsString = JSON.stringify(
-          markupError,
-          Object.getOwnPropertyNames(markupError),
-          2,
-        );
-      } catch (_e) {
-        slice.markupErrorAsString = 'Unknown';
-      }
-    } else {
-      slice.markup = markup ?? '';
-      slice.markupError = undefined;
-      slice.markupErrorAsString = undefined;
-    }
-    slice.markupDurationSec = durationSec;
-    slice.markupUpdates += 1;
-  },
-
-  // `sourceJsonAsString` is always stored, including on error, so consumers can
-  // tell "reference failed for the current JSON" from "reference is stale".
-  setJsRoundTrip: (
-    sourceJsonAsString: string,
-    json: BitWrapperJson[] | undefined,
-    error: Error | undefined,
-    durationSec?: number,
-  ) => {
-    const slice = bitmarkState.jsRoundTrip as Writable<JsRoundTripSlice>;
-
-    slice.sourceJsonAsString = sourceJsonAsString;
-    if (error) {
-      slice.error = error;
-    } else {
-      slice.json = json ?? [];
-      slice.error = undefined;
-    }
-    slice.durationSec = durationSec;
-    slice.updates += 1;
-  },
-
-  setActiveMarkupTab: (tab: ParserType) => {
+  setActiveMarkupTab: (tab: MarkupTabType) => {
     (bitmarkState as Writable<BitmarkState>).activeMarkupTab = tab;
   },
 

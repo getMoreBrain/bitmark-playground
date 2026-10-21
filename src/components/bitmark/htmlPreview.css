@@ -1,0 +1,387 @@
+/*
+ * The Preview tab's stylesheet (PLAN-028): the parser's `html` output as a
+ * learner would see it, as light "paper" cards on the editors' dark
+ * background. Keys on the core's element
+ * and attribute names only; anything else falls back to plain HTML styling.
+ */
+
+:root {
+  /* The editors' background (Monaco's vs-dark) */
+  --page: #1e1e1e;
+  --page-text: #9ca3af;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #6d28d9;
+  --accent-soft: #f3e8ff;
+  --correct: #15803d;
+  --correct-soft: #dcfce7;
+  --hint: #92400e;
+  --hint-soft: #fef3c7;
+  --mark: #fef08a;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--page);
+}
+
+body {
+  margin: 0;
+  padding: 20px 16px 40px;
+  color: var(--text);
+  font:
+    16px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Status messages (loading, errors) */
+.preview-message {
+  max-width: 720px;
+  margin: 0 auto;
+  color: var(--page-text);
+}
+.preview-message.error {
+  color: #f87171;
+  white-space: pre-wrap;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+/* Bits: one card each, with a type badge */
+bitmark-bit {
+  display: block;
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto 20px;
+  padding: 36px 24px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 4px 12px rgb(0 0 0 / 0.04);
+  /* Long unbroken words wrap rather than widen the card */
+  overflow-wrap: anywhere;
+}
+bitmark-bit::before {
+  content: attr(data-type);
+  position: absolute;
+  top: 10px;
+  left: 24px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Tags: block lines by default, without nesting indents */
+bitmark-tag {
+  display: block;
+  margin: 6px 0;
+}
+
+/* Headings: titles by level (`#`, `##`, `###`, …) and heading nodes */
+bitmark-tag[data-name^='#'],
+bitmark-node[data-type='heading'] {
+  display: block;
+  margin: 4px 0 12px;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+bitmark-tag[data-name='##'] {
+  font-size: 1.3em;
+}
+bitmark-tag[data-name^='###'] {
+  font-size: 1.1em;
+}
+bitmark-node[data-type='heading'][data-level='2'] {
+  font-size: 1.3em;
+}
+bitmark-node[data-type='heading'][data-level='3'],
+bitmark-node[data-type='heading'][data-level='4'],
+bitmark-node[data-type='heading'][data-level='5'],
+bitmark-node[data-type='heading'][data-level='6'] {
+  font-size: 1.1em;
+}
+
+/* Instruction */
+bitmark-tag[data-name='!'] {
+  margin: 4px 0 14px;
+  padding: 6px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 6px 6px 0;
+  font-weight: 600;
+}
+
+/* Hint */
+bitmark-tag[data-name='?'] {
+  padding: 6px 12px;
+  background: var(--hint-soft);
+  color: var(--hint);
+  border-radius: 6px;
+  font-size: 0.92em;
+}
+bitmark-tag[data-name='?']::before {
+  content: 'Hint: ';
+  font-weight: 600;
+}
+
+/* Choices and items: `+` is correct; `-` is neutral (a sequence's items too) */
+bitmark-tag[data-name='+'],
+bitmark-tag[data-name='-'] {
+  margin: 6px 0;
+  padding: 0;
+}
+bitmark-tag[data-name='+']::before,
+bitmark-tag[data-name='-']::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3em;
+  height: 1.3em;
+  margin-right: 10px;
+  border-radius: 50%;
+  font-size: 0.8em;
+  vertical-align: -0.15em;
+}
+bitmark-tag[data-name='-']::before {
+  content: '';
+  border: 2px solid var(--line);
+}
+bitmark-tag[data-name='+']::before {
+  content: '✓';
+  background: var(--correct-soft);
+  border: 2px solid var(--correct);
+  color: var(--correct);
+  font-weight: 700;
+}
+
+/* Gaps: a blank with its solutions */
+bitmark-node[data-type='gap'] {
+  display: inline-block;
+  min-width: 4em;
+  margin: 0 2px;
+  padding: 0 6px;
+  border-bottom: 2px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px 4px 0 0;
+  color: var(--accent);
+  text-align: center;
+}
+bitmark-node[data-type='gap']::after {
+  content: attr(data-label);
+}
+
+/* Properties, item / lead, other resources: small muted chips */
+bitmark-tag[data-name^='@'],
+bitmark-tag[data-name='%'],
+bitmark-tag[data-name^='&'] {
+  display: inline-block;
+  margin: 0 6px 8px 0;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  word-break: break-all;
+}
+bitmark-tag[data-name^='@']::before,
+bitmark-tag[data-name^='&']::before {
+  content: attr(data-name) ': ';
+  font-weight: 600;
+}
+bitmark-tag[data-name='%'] bitmark-tag[data-name='%'] {
+  margin: 0 0 0 6px;
+}
+
+/* Image resources: the image (added by the preview) */
+bitmark-tag[data-name='&image'] {
+  display: block;
+  margin: 8px 0 14px;
+  padding: 0;
+  border: 0;
+  font-size: 0;
+}
+bitmark-tag[data-name='&image']::before {
+  content: none;
+}
+bitmark-tag[data-name='&image'] img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* Cards */
+bitmark-cardset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+bitmark-card {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+bitmark-side {
+  flex: 1 1 200px;
+  padding: 10px 14px;
+}
+bitmark-side + bitmark-side {
+  border-left: 1px solid var(--line);
+  background: #fafafa;
+}
+bitmark-variant {
+  display: block;
+}
+bitmark-variant + bitmark-variant {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+/* Content */
+p {
+  margin: 0 0 12px;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+a {
+  color: var(--accent);
+  text-underline-offset: 2px;
+}
+mark {
+  background: var(--mark);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+code,
+pre {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+code {
+  padding: 1px 5px;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+pre {
+  padding: 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+ul,
+ol {
+  margin: 0 0 12px;
+  padding-left: 1.4em;
+}
+li > p {
+  margin: 0;
+}
+blockquote {
+  margin: 0 0 12px;
+  padding: 2px 14px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+/* A wide table scrolls sideways inside its card */
+table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0 0 12px;
+  /* Cells keep whole words: a table too wide scrolls instead */
+  overflow-wrap: normal;
+}
+th,
+td {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+}
+th {
+  background: #f9fafb;
+}
+img {
+  max-width: 100%;
+}
+
+/* Chapters: section dividers on the page, not cards */
+bitmark-bit[data-type='chapter'] {
+  margin-top: 36px;
+  padding: 0 4px 4px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--page-text);
+}
+bitmark-bit[data-type='chapter']:first-child {
+  margin-top: 4px;
+}
+bitmark-bit[data-type='chapter']::before {
+  content: none;
+}
+/* The parser's defaults (`@toc`, `@progress`, …): not for the learner */
+bitmark-bit[data-type='chapter'] > bitmark-tag[data-name^='@'] {
+  display: none;
+}
+bitmark-bit[data-type='chapter'] > bitmark-tag[data-name^='#'] {
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: #f3f4f6;
+  font-size: 2em;
+  letter-spacing: -0.01em;
+}
+bitmark-bit[data-type='chapter'] > bitmark-tag[data-name='##'] {
+  font-size: 1.6em;
+  border-bottom-width: 1px;
+}
+bitmark-bit[data-type='chapter'] > bitmark-tag[data-name^='###'] {
+  font-size: 1.3em;
+  border-bottom-width: 1px;
+  border-bottom-color: #4b5563;
+}
+/* The chapter's number (`%`): a label above its title */
+bitmark-bit[data-type='chapter'] > bitmark-tag[data-name='%'] {
+  display: block;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  color: #a78bfa;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* Intro text: the space below the rule belongs to it */
+bitmark-bit[data-type='chapter'] > :not(bitmark-tag) {
+  margin-top: 14px;
+}
+bitmark-bit[data-type='chapter'] a {
+  color: #c4b5fd;
+}

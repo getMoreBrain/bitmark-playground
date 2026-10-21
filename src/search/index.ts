@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor';
 import { subscribe } from 'valtio';
 
 import { bitmarkState } from '../state/bitmarkState';
+import { uiState } from '../state/uiState';
 import { hiddenSources } from './hiddenSources';
 import { createSearchController, ScratchModel, SearchController } from './searchController';
 import { searchState } from './searchState';
@@ -21,7 +22,15 @@ export const getSearchController = (): SearchController =>
     // Created on first use, only when hidden tabs are searched.
     scratchModel: () => (scratch ??= monaco.editor.createModel('', 'plaintext')),
     hiddenSources: () => hiddenSources(searchTargets),
-    subscribeHidden: (listener) => subscribe(bitmarkState, listener),
+    // The tabs follow the state, and the Legacy tabs the settings.
+    subscribeHidden: (listener) => {
+      const offState = subscribe(bitmarkState, listener);
+      const offUi = subscribe(uiState, listener);
+      return () => {
+        offState();
+        offUi();
+      };
+    },
   }));
 
 export { searchState } from './searchState';

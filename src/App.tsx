@@ -1,58 +1,60 @@
 /** @jsxImportSource theme-ui */
 import './App.css';
 
-import { useMemo } from 'react';
 import { Flex, ThemeUIProvider } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { BitmarkJsonTextBox } from './components/bitmark/BitmarkJsonTextBox';
 import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox';
+import { HtmlPreview } from './components/bitmark/HtmlPreview';
+import { LexerPanel } from './components/bitmark/LexerPanel';
 import { OutputPanel } from './components/generic/ui/OutputPanel';
-import { ParserTabBar } from './components/generic/ui/ParserTabBar';
 import { ResizableLayout } from './components/generic/ui/ResizableLayout';
 import { SettingsMenu } from './components/generic/ui/SettingsMenu';
+import { TabBar } from './components/generic/ui/TabBar';
 import { SearchBar } from './components/search/SearchBar';
 import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
-import { JsRoundTripRunner } from './services/JsRoundTripRunner';
-import { WasmCheckRunner } from './services/WasmCheckRunner';
 import { PlaygroundSession, SessionPaneTab } from './session/PlaygroundSession';
-import { bitmarkState } from './state/bitmarkState';
-import { uiState } from './state/uiState';
+import {
+  bitmarkState,
+  JSON_TAB_LABEL,
+  jsonTabs,
+  JsonTabType,
+  MARKUP_TAB_LABEL,
+  markupTabs,
+  tabParser,
+} from './state/bitmarkState';
+import { OutputTab, uiState } from './state/uiState';
 import { theme } from './theme/theme';
-import { parserJsonMatch, WasmCheckLed } from './utils/parserJsonMatch';
-import { reorderJsonStringToReference } from './utils/reorderJsonKeys';
+import { NARROW_MEDIA, STACKED_PANEL_SX, useNarrowLayout } from './utils/narrowLayout';
 
-const initialMarkup = '[.article]\nHello World!';
+const initialMarkup = '[.p]\nHello (+bold)World(-bold)!';
+
+const LEFT_OUTPUT_TABS: { id: OutputTab; label: string }[] = [
+  { id: 'info', label: 'Info' },
+  { id: 'mappings', label: 'Mappings' },
+  { id: 'lexer', label: 'Lexer' },
+];
+const RIGHT_OUTPUT_TABS = [{ id: 'preview', label: 'Preview' }];
+
+const EDITOR_OPTIONS = {
+  wordWrap: 'on',
+  // At its top or bottom, the editor lets the page scroll (PLAN-027 D7).
+  scrollbar: { alwaysConsumeMouseWheel: false },
+} as const;
 
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
+  const narrow = useNarrowLayout();
 
-  // The LED reference is the bpg round-trip JSON, not the raw bpg parse: bpg's own
-  // json -> bitmark -> json loses fields markup cannot express, which the Rust
-  // parser can never produce and must not be marked red for.
-  const wasmCheckLed = useMemo<WasmCheckLed>(() => {
-    if (snap.js.jsonError || snap.wasm.jsonError || snap.jsRoundTrip.error) return 'neutral';
-    // Reference not yet recomputed for the current Original JSON — not comparable.
-    if (snap.jsRoundTrip.sourceJsonAsString !== snap.js.jsonAsString) return 'neutral';
-    return parserJsonMatch(snap.jsRoundTrip.json, snap.wasm.json);
-  }, [
-    snap.jsRoundTrip.json,
-    snap.jsRoundTrip.sourceJsonAsString,
-    snap.jsRoundTrip.error,
-    snap.js.jsonAsString,
-    snap.js.jsonError,
-    snap.wasm.json,
-    snap.wasm.jsonError,
-  ]);
-
-  const wasmJsonForDiff = useMemo(
-    () => reorderJsonStringToReference(snap.js.jsonAsString, snap.wasm.jsonAsString),
-    [snap.js.jsonAsString, snap.wasm.jsonAsString],
-  );
+  const jsonTabDuration = (tab: JsonTabType): number | undefined =>
+    tab === 'json' || tab === 'legacy'
+      ? snap[tabParser(tab)].jsonDurationSec
+      : snap.paneDurations[tab];
 
   const editorPanels = (
     <Flex
@@ -60,6 +62,8 @@ function App() {
         flexDirection: 'row',
         flexGrow: 1,
         minHeight: 0,
+        // Same elements in both layouts: only the CSS changes (PLAN-027 D5).
+        [NARROW_MEDIA]: { flexDirection: 'column', flexGrow: 0 },
       }}
     >
       <Flex
@@ -69,26 +73,18 @@ function App() {
           width: '50%',
           minHeight: 0,
           overflow: 'hidden',
+          ...STACKED_PANEL_SX,
         }}
       >
         <Flex sx={{ alignItems: 'flex-end', flexShrink: 0 }}>
-          <ParserTabBar
-            label="bitmark"
-            jsDuration={snap.js.markupDurationSec}
-            wasmDuration={snap.wasm.markupDurationSec}
-            wasmFullDuration={snap.wasmFull.markupDurationSec}
+          <TabBar
+            tabs={markupTabs(uiSnap.showLegacy).map((tab) => ({
+              id: tab,
+              label: MARKUP_TAB_LABEL[tab],
+              duration: snap[tabParser(tab)].markupDurationSec,
+            }))}
             activeTab={snap.activeMarkupTab}
-            onTabChange={(tab) => {
-              if (
-                tab !== 'wasmCheck' &&
-                tab !== 'tableHtml' &&
-                tab !== 'text' &&
-                tab !== 'xmlNiso' &&
-                tab !== 'xmlNisoEs'
-              ) {
-                bitmarkState.setActiveMarkupTab(tab);
-              }
-            }}
+            onTabChange={(tab) => bitmarkState.setActiveMarkupTab(tab)}
           />
         </Flex>
         <Flex
@@ -107,9 +103,7 @@ function App() {
               borderColor: 'accent',
             }}
             initialMarkup={initialMarkup}
-            options={{
-              wordWrap: 'on',
-            }}
+            options={EDITOR_OPTIONS}
           />
         </Flex>
       </Flex>
@@ -120,30 +114,24 @@ function App() {
           width: '50%',
           minHeight: 0,
           overflow: 'hidden',
+          ...STACKED_PANEL_SX,
         }}
       >
         <Flex sx={{ alignItems: 'flex-end', flexShrink: 0 }}>
-          <ParserTabBar
-            label="JSON"
-            jsDuration={snap.js.jsonDurationSec}
-            wasmDuration={snap.wasm.jsonDurationSec}
-            wasmFullDuration={snap.wasmFull.jsonDurationSec}
+          <TabBar
+            tabs={jsonTabs(uiSnap.showLegacy).map((tab) => ({
+              id: tab,
+              label: JSON_TAB_LABEL[tab],
+              duration: jsonTabDuration(tab),
+            }))}
             activeTab={snap.activeJsonTab}
             onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
-            showWasmCheck
-            wasmCheckDuration={snap.wasmCheck.markupDurationSec}
-            wasmCheckLed={wasmCheckLed}
-            showTableHtml
-            tableHtmlDuration={snap.paneDurations.tableHtml}
-            showText
-            textDuration={snap.paneDurations.text}
-            showXmlNiso
-            xmlNisoDuration={snap.paneDurations.xmlNiso}
-            showXmlNisoEs
-            xmlNisoEsDuration={snap.paneDurations.xmlNisoEs}
           />
           <Flex sx={{ flexGrow: 1 }} />
-          <SettingsMenu />
+          {/* Pinned: the tabs scroll, the cog does not (PLAN-027 D6). */}
+          <Flex sx={{ flexShrink: 0, alignSelf: 'stretch' }}>
+            <SettingsMenu />
+          </Flex>
         </Flex>
         <Flex
           sx={{
@@ -160,9 +148,7 @@ function App() {
               border: '1px solid',
               borderColor: 'accent',
             }}
-            options={{
-              wordWrap: 'on',
-            }}
+            options={EDITOR_OPTIONS}
           />
         </Flex>
       </Flex>
@@ -170,31 +156,26 @@ function App() {
   );
 
   const bottomPanels = (
-    <Flex sx={{ flexDirection: 'row', flexGrow: 1, minHeight: 0 }}>
+    <Flex
+      sx={{
+        flexDirection: 'row',
+        flexGrow: 1,
+        minHeight: 0,
+        [NARROW_MEDIA]: { flexDirection: 'column' },
+      }}
+    >
       <OutputPanel
-        label="bitmark"
+        tabs={LEFT_OUTPUT_TABS}
         activeTab={uiSnap.leftOutputTab}
         onTabChange={(tab) => uiState.setLeftOutputTab(tab)}
-        original={snap.js.markup}
-        modified={snap.wasm.markup}
-        language="bitmark"
-        lexerOutput={snap.wasm.lexerOutput}
-        showInfo
-        infoPane={<SessionPaneTab tab="info" />}
-        showMappings
-        mappingsPane={<SessionPaneTab tab="mappings" />}
-        searchArea="bottomLeft"
-      />
-      <OutputPanel
-        label="JSON"
-        activeTab={uiSnap.rightOutputTab}
-        onTabChange={(tab) => uiState.setRightOutputTab(tab)}
-        original={snap.js.jsonAsString}
-        modified={wasmJsonForDiff}
-        language="json"
-        lexerOutput={snap.wasmFull.lexerOutput}
-        searchArea="bottomRight"
-      />
+      >
+        {uiSnap.leftOutputTab === 'info' ? <SessionPaneTab tab="info" /> : null}
+        {uiSnap.leftOutputTab === 'mappings' ? <SessionPaneTab tab="mappings" /> : null}
+        {uiSnap.leftOutputTab === 'lexer' ? <LexerPanel /> : null}
+      </OutputPanel>
+      <OutputPanel tabs={RIGHT_OUTPUT_TABS} activeTab="preview" onTabChange={() => {}}>
+        <HtmlPreview />
+      </OutputPanel>
     </Flex>
   );
 
@@ -202,25 +183,26 @@ function App() {
     <ThemeUIProvider theme={theme}>
       <BitmarkParserGeneratorProvider>
         <BitmarkParserProvider>
-          <WasmCheckRunner />
-          <JsRoundTripRunner />
           <PlaygroundSession>
             <Flex
               sx={{
                 flexDirection: 'column',
                 height: '100vh',
-                width: '100vw',
+                width: '100%',
                 backgroundColor: 'background',
+                // Stacked: the page scrolls between the panels (PLAN-027 D3).
+                [NARROW_MEDIA]: { height: 'auto', minHeight: '100vh' },
               }}
             >
               <SearchBar />
               {/* Always render ResizableLayout so the editor panels keep a stable
-                tree position — toggling the Diff/Lex panels must not remount the
+                tree position — toggling the bottom panels must not remount the
                 editors (which would reset their content). */}
               <ResizableLayout
                 top={editorPanels}
                 bottom={bottomPanels}
-                showBottom={uiSnap.showDiffLex}
+                showBottom={uiSnap.showBottomPanels}
+                stacked={narrow}
                 bottomHeight={uiSnap.bottomPanelHeight}
                 collapsed={uiSnap.bottomPanelCollapsed}
                 onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
@@ -231,6 +213,8 @@ function App() {
               <Flex
                 sx={{
                   justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  columnGap: 3,
                   flexShrink: 0,
                 }}
               >

@@ -1,9 +1,46 @@
 /** @jsxImportSource theme-ui */
-import { useCallback, useEffect, useRef } from 'react';
+import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { Box, Flex, Label, Text } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { uiState } from '../../../state/uiState';
+import { LegacyParserHint } from './LegacyParserHint';
+
+interface OptionProps {
+  type: 'checkbox' | 'radio';
+  name?: string;
+  title?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  children: ReactNode;
+}
+
+/** One setting: a labelled checkbox or radio button. */
+const Option = ({ type, name, title, checked, onChange, children }: OptionProps) => (
+  <Flex sx={{ alignItems: 'center', gap: 2, mt: 1 }}>
+    <Label
+      title={title}
+      sx={{
+        cursor: 'pointer',
+        fontSize: 1,
+        color: 'text',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        width: 'auto',
+      }}
+    >
+      <input
+        type={type}
+        name={name}
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ accentColor: '#7dc13a' }}
+      />
+      {children}
+    </Label>
+  </Flex>
+);
 
 const SettingsMenu = () => {
   const snap = useSnapshot(uiState);
@@ -54,6 +91,8 @@ const SettingsMenu = () => {
         <Text sx={{ fontSize: 4, lineHeight: 1 }}>⚙</Text>
       </Flex>
 
+      <LegacyParserHint />
+
       {snap.settingsOpen && (
         <Box
           sx={{
@@ -82,49 +121,20 @@ const SettingsMenu = () => {
             UI
           </Text>
 
-          <Flex sx={{ alignItems: 'center', gap: 2 }}>
-            <Label
-              sx={{
-                cursor: 'pointer',
-                fontSize: 1,
-                color: 'text',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                width: 'auto',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={snap.showDiffLex}
-                onChange={(e) => uiState.setShowDiffLex(e.target.checked)}
-                style={{ accentColor: '#7dc13a' }}
-              />
-              Show diff / lex
-            </Label>
-          </Flex>
-
-          <Flex sx={{ alignItems: 'center', gap: 2, mt: 1 }}>
-            <Label
-              sx={{
-                cursor: 'pointer',
-                fontSize: 1,
-                color: 'text',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                width: 'auto',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={snap.linkScroll}
-                onChange={(e) => uiState.setLinkScroll(e.target.checked)}
-                style={{ accentColor: '#7dc13a' }}
-              />
-              Link scrolling
-            </Label>
-          </Flex>
+          <Option
+            type="checkbox"
+            checked={snap.showBottomPanels}
+            onChange={(checked) => uiState.setShowBottomPanels(checked)}
+          >
+            Show bottom panels
+          </Option>
+          <Option
+            type="checkbox"
+            checked={snap.linkScroll}
+            onChange={(checked) => uiState.setLinkScroll(checked)}
+          >
+            Link scrolling
+          </Option>
 
           <Text
             sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mt: 2, mb: 1, display: 'block' }}
@@ -132,28 +142,42 @@ const SettingsMenu = () => {
             Parser
           </Text>
 
-          <Flex sx={{ alignItems: 'center', gap: 2 }}>
-            <Label
-              title="WASM parsers: write inline marks as toggle tags, e.g. (+bold)x(-bold)"
-              sx={{
-                cursor: 'pointer',
-                fontSize: 1,
-                color: 'text',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                width: 'auto',
-              }}
+          <Flex sx={{ gap: 3 }}>
+            <Option
+              type="radio"
+              name="output"
+              title="WASM parser: optimised output"
+              checked={!snap.fullOutput}
+              onChange={(checked) => checked && uiState.setFullOutput(false)}
             >
-              <input
-                type="checkbox"
-                checked={snap.toggleTags}
-                onChange={(e) => uiState.setToggleTags(e.target.checked)}
-                style={{ accentColor: '#7dc13a' }}
-              />
-              Toggle tags
-            </Label>
+              Optimised
+            </Option>
+            <Option
+              type="radio"
+              name="output"
+              title="WASM parser: full output"
+              checked={snap.fullOutput}
+              onChange={(checked) => checked && uiState.setFullOutput(true)}
+            >
+              Full
+            </Option>
           </Flex>
+          <Option
+            type="checkbox"
+            title="WASM parser: write inline marks as toggle tags, e.g. (+bold)x(-bold)"
+            checked={snap.toggleTags}
+            onChange={(checked) => uiState.setToggleTags(checked)}
+          >
+            Toggle tags
+          </Option>
+          <Option
+            type="checkbox"
+            title="Show the deprecated bitmark-parser-generator's tabs"
+            checked={snap.showLegacy}
+            onChange={(checked) => uiState.setShowLegacy(checked)}
+          >
+            Legacy parser (bpg)
+          </Option>
         </Box>
       )}
     </Box>

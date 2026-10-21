@@ -13,19 +13,26 @@ import { playgroundScrollGroup } from '../scrollSync/scrollSync';
 import { SearchEditor, useSearchTarget } from '../search';
 import { BitmarkConverter, useBitmarkConverter } from '../services/BitmarkConverter';
 import { useBitmarkParser } from '../services/BitmarkParser';
-import { bitmarkState, TimedPane, XmlVariant } from '../state/bitmarkState';
+import {
+  bitmarkState,
+  DISABLED_JSON_TABS,
+  JSON_TAB_LABEL,
+  tabParser,
+  TimedPane,
+  XmlVariant,
+} from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
 
 /**
  * The playground on the package (PLAN-023 Step 14): one session whose
- * document is the bitmark the left editor shows. The WASM JSON tabs, HTML,
- * Text, the XML tabs, Info and Mappings are its panes. The left editor, the
- * Original (bpg) JSON tab, WASM Check, Diff and Lexer stay the playground's,
- * and the two sides meet here:
+ * document is the bitmark the left editor shows. The JSON tab, HTML, Text,
+ * the XML tabs, Info and Mappings are its panes. The left editor, the
+ * Legacy JSON tab and the Lexer stay the playground's, and the two sides
+ * meet here:
  * - a playground edit pushes the new bitmark into the session, with its
  *   origin (for the mapping report);
  * - an edit in a session pane goes back through the playground's own
- *   pipeline, so every parser tab, the lexer and the LED stay current.
+ *   pipeline, so every parser tab and the lexer stay current.
  */
 
 /**
@@ -36,13 +43,16 @@ import { uiState } from '../state/uiState';
 type PaneRoute = (text: string, change: SessionChange, converter: BitmarkConverter) => void;
 const routes = new WeakMap<Pane, PaneRoute>();
 
+/** At its top or bottom, a pane lets the page scroll (PLAN-027 D7). */
+const PANE_EDITOR_OPTIONS = { scrollbar: { alwaysConsumeMouseWheel: false } };
+
 const MESSAGES = {
   // The playground always loads the full parser; until it lands, say so.
   needsFullParser: 'Loading the full parser…',
 };
 
 /** The playground's document: the bitmark the left editor shows. */
-const shownBitmark = (): string => bitmarkState[bitmarkState.activeMarkupTab].markup;
+const shownBitmark = (): string => bitmarkState[tabParser(bitmarkState.activeMarkupTab)].markup;
 
 /** The session for the whole playground. Mount once, inside `BitmarkParserProvider`. */
 export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactElement => {
@@ -139,21 +149,17 @@ const SessionSync = (): null => {
 };
 
 /** The right-hand tabs (and bottom panels) that are session panes. */
-export type SessionTab = 'wasm' | 'wasmFull' | TimedPane | 'info' | 'mappings';
+export type SessionTab = 'json' | TimedPane | 'info' | 'mappings';
 
 /**
- * The right-hand (JSON side) tabs that are session panes, in tab order.
- * `timed` ones stay mounted (hidden) when inactive, so their tab duration
- * stays current; the others mount only while shown.
+ * The right-hand (JSON side) tabs that are session panes, in tab order;
+ * not the disabled ones (PLAN-026 D5). `timed` ones stay mounted (hidden)
+ * when inactive, so their tab duration stays current; the others mount only
+ * while shown.
  */
-export const RIGHT_SESSION_TABS = [
-  'wasm',
-  'wasmFull',
-  'tableHtml',
-  'text',
-  'xmlNiso',
-  'xmlNisoEs',
-] as const satisfies readonly SessionTab[];
+export const RIGHT_SESSION_TABS: readonly SessionTab[] = (
+  ['json', 'tableHtml', 'xmlNiso', 'xmlNisoEs', 'text'] as const
+).filter((tab) => !DISABLED_JSON_TABS.includes(tab));
 
 /** Whether a tab's pane stays mounted while hidden (it has a tab duration). */
 export const keepsMounted = (tab: SessionTab): boolean => TABS[tab].timed !== undefined;
@@ -161,27 +167,24 @@ export const keepsMounted = (tab: SessionTab): boolean => TABS[tab].timed !== un
 interface TabSpec {
   type: 'json' | 'html' | 'xml' | 'text' | 'info' | 'mappings';
   label: string;
-  mode?: 'optimized' | 'full';
   mapping?: string;
   route?: PaneRoute;
   timed?: TimedPane;
   scroll?: boolean;
 }
 
-/** A JSON edit goes through the playground's JSON pipeline for its tab. */
-const jsonRoute =
-  (tab: 'wasm' | 'wasmFull', label: string): PaneRoute =>
-  (json, _change, converter) => {
-    bitmarkState.setLastEdit('json', json, label, 'session');
-    void converter.jsonToMarkup(tab, json);
-  };
+/** A JSON edit goes through the playground's JSON pipeline. */
+const jsonRoute: PaneRoute = (json, _change, converter) => {
+  bitmarkState.setLastEdit('json', json, JSON_TAB_LABEL.json, 'session');
+  void converter.jsonToMarkup('wasm', json);
+};
 
 /** A markup-format edit (HTML, XML): its bitmark goes in as an edit of the left tab. */
 const markupRoute =
   (inputFormat: string, label: string): PaneRoute =>
   (text, change, converter) => {
     bitmarkState.setLastEdit(inputFormat, text, label, 'session');
-    void converter.markupToJson(bitmarkState.activeMarkupTab, change.bitmark);
+    void converter.markupToJson(tabParser(bitmarkState.activeMarkupTab), change.bitmark);
   };
 
 const XML_MAPPING: Record<XmlVariant, string> = {
@@ -189,25 +192,19 @@ const XML_MAPPING: Record<XmlVariant, string> = {
   xmlNisoEs: 'xml-niso-iec-es',
 };
 const XML_LABEL: Record<XmlVariant, string> = {
-  xmlNiso: 'XML (NISO-IEC)',
-  xmlNisoEs: 'XML (NISO-IEC-ES)',
+  xmlNiso: JSON_TAB_LABEL.xmlNiso,
+  xmlNisoEs: JSON_TAB_LABEL.xmlNisoEs,
 };
 
 const TABS: Record<SessionTab, TabSpec> = {
-  wasm: { type: 'json', label: 'WASM JSON', route: jsonRoute('wasm', 'WASM JSON') },
-  wasmFull: {
-    type: 'json',
-    mode: 'full',
-    label: 'WASM (full) JSON',
-    route: jsonRoute('wasmFull', 'WASM (full) JSON'),
-  },
+  json: { type: 'json', label: JSON_TAB_LABEL.json, route: jsonRoute },
   tableHtml: {
     type: 'html',
-    label: 'HTML',
+    label: JSON_TAB_LABEL.tableHtml,
     route: markupRoute('html', 'HTML'),
     timed: 'tableHtml',
   },
-  text: { type: 'text', label: 'Text', timed: 'text' },
+  text: { type: 'text', label: JSON_TAB_LABEL.text, timed: 'text' },
   xmlNiso: {
     type: 'xml',
     mapping: XML_MAPPING.xmlNiso,
@@ -282,10 +279,12 @@ export const SessionPaneTab = ({
     <BitmarkPane
       key={tab}
       type={spec.type}
-      mode={spec.mode}
+      // The JSON pane follows Settings' Output (PLAN-026 D2).
+      mode={spec.type === 'json' ? (ui.fullOutput ? 'full' : 'optimized') : undefined}
       mapping={spec.mapping}
       label={spec.label}
       scrollSync={spec.scroll === false || hidden || !laidOut ? false : ui.linkScroll}
+      editorOptions={PANE_EDITOR_OPTIONS}
       onPane={onPane}
       onRender={onRender}
       className={className}

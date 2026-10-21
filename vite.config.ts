@@ -91,4 +91,9 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: false,
   },
+  // Module workers: the parser's engine worker loads the parser with a
+  // dynamic `import()` (PLAN-030 D1).
+  worker: {
+    format: 'es',
+  },
 });

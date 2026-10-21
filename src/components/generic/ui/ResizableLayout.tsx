@@ -13,6 +13,12 @@ export interface ResizableLayoutProps {
    * top content is never unmounted/remounted when toggled.
    */
   showBottom: boolean;
+  /**
+   * Whether the panels are stacked (a narrow window, PLAN-027 D4): the
+   * sections take their content's height, the page scrolls, and the bottom
+   * has no drag handle and is never collapsed.
+   */
+  stacked?: boolean;
   /** Bottom panel height in pixels */
   bottomHeight: number;
   /** Whether the bottom panel is collapsed */
@@ -30,6 +36,7 @@ const ResizableLayout = ({
   top,
   bottom,
   showBottom,
+  stacked = false,
   bottomHeight,
   collapsed,
   onHeightChange,
@@ -76,15 +83,16 @@ const ResizableLayout = ({
         flexDirection: 'column',
         flexGrow: 1,
         minHeight: 0,
-        overflow: 'hidden',
+        overflow: stacked ? 'visible' : 'hidden',
       }}
     >
       {/* Top section */}
       <Box
         sx={{
-          flexGrow: 1,
+          flexGrow: stacked ? 0 : 1,
+          flexShrink: stacked ? 0 : 1,
           minHeight: 0,
-          overflow: 'hidden',
+          overflow: stacked ? 'visible' : 'hidden',
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -97,52 +105,54 @@ const ResizableLayout = ({
           never unmounted/remounted when the bottom is toggled. */}
       {showBottom && (
         <>
-          <Box
-            role="separator"
-            aria-orientation="horizontal"
-            aria-label={collapsed ? 'Expand bottom panels' : 'Resize bottom panels'}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onDoubleClick={handleDoubleClick}
-            sx={{
-              height: '6px',
-              cursor: 'row-resize',
-              backgroundColor: 'accent',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'background-color 0.15s',
-              '&:hover': {
-                backgroundColor: 'primary',
-              },
-            }}
-          >
-            {/* Chevron indicator */}
+          {!stacked && (
             <Box
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleCollapse();
-              }}
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label={collapsed ? 'Expand bottom panels' : 'Resize bottom panels'}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onDoubleClick={handleDoubleClick}
               sx={{
-                color: 'muted',
-                fontSize: '10px',
-                lineHeight: 1,
-                cursor: 'pointer',
-                userSelect: 'none',
-                '&:hover': { color: 'text' },
+                height: '6px',
+                cursor: 'row-resize',
+                backgroundColor: 'accent',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background-color 0.15s',
+                '&:hover': {
+                  backgroundColor: 'primary',
+                },
               }}
             >
-              {collapsed ? '▲' : '▼'}
+              {/* Chevron indicator */}
+              <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleCollapse();
+                }}
+                sx={{
+                  color: 'muted',
+                  fontSize: '10px',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { color: 'text' },
+                }}
+              >
+                {collapsed ? '▲' : '▼'}
+              </Box>
             </Box>
-          </Box>
+          )}
 
           {/* Bottom section */}
-          {!collapsed && (
+          {(stacked || !collapsed) && (
             <Box
               sx={{
-                height: `${bottomHeight}px`,
+                height: stacked ? 'auto' : `${bottomHeight}px`,
                 flexShrink: 0,
                 display: 'flex',
                 flexDirection: 'column',

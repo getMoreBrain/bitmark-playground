@@ -1,8 +1,18 @@
 import type { BitmarkParserGenerator } from '@gmb/bitmark-parser-generator';
 import { useScript } from '@uidotdev/usehooks';
-import { createContext, ReactElement, ReactNode, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { useSnapshot } from 'valtio';
 
 import { log } from '../logging/log';
+import { uiState } from '../state/uiState';
 
 const BITMARK_PARSER_GENERATOR_SCRIPT_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser-generator@${version}/dist/browser/bitmark-parser-generator.min.js';
@@ -31,51 +41,58 @@ const BitmarkParserGeneratorContext = createContext<IBitmarkParserGeneratorConte
 
 const useBitmarkParserGenerator = () => useContext(BitmarkParserGeneratorContext);
 
-const BitmarkParserGeneratorProvider = (
-  props: BitmarkParserGeneratorProviderProps,
-): ReactElement => {
+/**
+ * Loads bpg from the CDN, once mounted. Mounted only once the legacy parser
+ * has been turned on, and kept mounted after (PLAN-026 D1).
+ */
+const BitmarkParserGeneratorLoader = ({
+  onLoad,
+}: {
+  onLoad: (state: IBitmarkParserGeneratorContext) => void;
+}): null => {
   const searchParams = new URLSearchParams(window.location.search);
   const version = searchParams.get('v') ?? 'latest';
   const scriptUrl = useMemo(
     () => `${BITMARK_PARSER_GENERATOR_SCRIPT_URL.replace('${version}', version)}?_=${_cacheBuster}`,
     [version],
   );
-  const { children } = props;
   const loadStatus = useScript(scriptUrl);
-  const [state, setState] = useState<IBitmarkParserGeneratorContext>(defaultState);
 
-  if (!state.loadSuccess && !state.loadError) {
+  useEffect(() => {
     if (loadStatus === 'ready') {
-      // log.debug('BitmarkParserGeneratorProvider: Loaded OK');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bitmarkParserGeneratorLibrary = (window as any).bitmarkParserGenerator;
       if (!bitmarkParserGeneratorLibrary) {
-        setState({
-          loadSuccess: false,
-          loadError: true,
-          bitmarkParserGenerator: undefined,
-        });
-        return <></>;
+        onLoad({ loadSuccess: false, loadError: true, bitmarkParserGenerator: undefined });
+        return;
       }
       const { BitmarkParserGenerator } = bitmarkParserGeneratorLibrary;
-      const bitmarkParserGenerator = new BitmarkParserGenerator();
-      setState({
+      onLoad({
         loadSuccess: true,
         loadError: false,
-        bitmarkParserGenerator,
+        bitmarkParserGenerator: new BitmarkParserGenerator(),
       });
     } else if (loadStatus === 'error') {
       log.error('BitmarkParserGeneratorProvider: failed to load');
-      setState({
-        loadSuccess: false,
-        loadError: true,
-        bitmarkParserGenerator: undefined,
-      });
+      onLoad({ loadSuccess: false, loadError: true, bitmarkParserGenerator: undefined });
     }
-  }
+  }, [loadStatus, onLoad]);
+
+  return null;
+};
+
+const BitmarkParserGeneratorProvider = (
+  props: BitmarkParserGeneratorProviderProps,
+): ReactElement => {
+  const { children } = props;
+  const { showLegacy } = useSnapshot(uiState);
+  const [requested, setRequested] = useState(showLegacy);
+  if (showLegacy && !requested) setRequested(true);
+  const [state, setState] = useState<IBitmarkParserGeneratorContext>(defaultState);
 
   return (
     <BitmarkParserGeneratorContext.Provider value={state}>
+      {requested ? <BitmarkParserGeneratorLoader onLoad={setState} /> : null}
       {children}
     </BitmarkParserGeneratorContext.Provider>
   );

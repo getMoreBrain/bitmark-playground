@@ -26,6 +26,8 @@ const config = [
       'plans',
       '.github',
       '.awa',
+      // Agent skills, from upstream: an update would undo any lint fixes.
+      '.claude',
       'src/generated',
       '**/*.d.ts',
     ],

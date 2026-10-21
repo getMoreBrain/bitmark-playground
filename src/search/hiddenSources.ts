@@ -1,4 +1,5 @@
-import { bitmarkState, JsonTabType, ParserType } from '../state/bitmarkState';
+import { bitmarkState, jsonTabs, JsonTabType, markupTabs, tabParser } from '../state/bitmarkState';
+import { uiState } from '../state/uiState';
 import { bitmarkLabel, jsonTabLabel } from './labels';
 import type { SearchTargets } from './searchTargets';
 
@@ -12,34 +13,15 @@ export interface HiddenSource {
   activate(): void;
 }
 
-const MARKUP_TABS: readonly ParserType[] = ['js', 'wasm', 'wasmFull'];
-const JSON_TABS: readonly JsonTabType[] = [
-  'js',
-  'wasm',
-  'wasmFull',
-  'wasmCheck',
-  'tableHtml',
-  'text',
-  'xmlNiso',
-  'xmlNisoEs',
-];
-
 type State = Pick<
   typeof bitmarkState,
-  | 'activeMarkupTab'
-  | 'activeJsonTab'
-  | 'js'
-  | 'wasm'
-  | 'wasmFull'
-  | 'wasmCheck'
-  | 'setActiveMarkupTab'
-  | 'setActiveJsonTab'
+  'activeMarkupTab' | 'activeJsonTab' | 'js' | 'wasm' | 'setActiveMarkupTab' | 'setActiveJsonTab'
 >;
 
 /**
  * Where a hidden right-hand tab's text comes from. A mounted but hidden
  * session pane (HTML, Text, XML) gives its own model's text; every other tab
- * gives the playground state's text, which for a WASM JSON tab may be
+ * gives the playground state's text, which for the JSON tab may be
  * formatted differently from what its pane will show.
  */
 const jsonTabText = (
@@ -48,14 +30,11 @@ const jsonTabText = (
   targets: SearchTargets,
 ): (() => string) | undefined => {
   switch (tab) {
-    case 'js':
-      // As the Original JSON editor shows it.
+    case 'legacy':
+      // As the Legacy JSON editor shows it.
       return () => state.js.jsonErrorAsString ?? state.js.jsonAsString;
-    case 'wasm':
-    case 'wasmFull':
-      return () => state[tab].jsonAsString;
-    case 'wasmCheck':
-      return () => state.wasmCheck.markupErrorAsString ?? state.wasmCheck.markup;
+    case 'json':
+      return () => state.wasm.jsonAsString;
     default: {
       const pane = targets.hiddenPane(tab);
       return pane ? () => pane.editor.getModel()?.getValue() ?? '' : undefined;
@@ -63,22 +42,27 @@ const jsonTabText = (
   }
 };
 
-/** The top panes' tabs that are not shown, in tab order. */
+/** The top panes' tabs that are not shown, in tab order; only tabs in a tab bar. */
 export const hiddenSources = (
   targets: SearchTargets,
   state: State = bitmarkState,
+  showLegacy: boolean = uiState.showLegacy,
 ): HiddenSource[] => {
-  const left = MARKUP_TABS.filter((tab) => tab !== state.activeMarkupTab).map(
-    (tab): HiddenSource => ({
-      id: `hidden:left:${tab}`,
-      label: bitmarkLabel(tab),
-      area: 'left',
-      getText: () => state[tab].markupErrorAsString ?? state[tab].markup,
-      activate: () => state.setActiveMarkupTab(tab),
-    }),
-  );
-  const right = JSON_TABS.filter((tab) => tab !== state.activeJsonTab).flatMap(
-    (tab): HiddenSource[] => {
+  const left = markupTabs(showLegacy)
+    .filter((tab) => tab !== state.activeMarkupTab)
+    .map((tab): HiddenSource => {
+      const slice = state[tabParser(tab)];
+      return {
+        id: `hidden:left:${tab}`,
+        label: bitmarkLabel(tab),
+        area: 'left',
+        getText: () => slice.markupErrorAsString ?? slice.markup,
+        activate: () => state.setActiveMarkupTab(tab),
+      };
+    });
+  const right = jsonTabs(showLegacy)
+    .filter((tab) => tab !== state.activeJsonTab)
+    .flatMap((tab): HiddenSource[] => {
       const getText = jsonTabText(tab, state, targets);
       if (!getText) return [];
       return [
@@ -90,7 +74,6 @@ export const hiddenSources = (
           activate: () => state.setActiveJsonTab(tab),
         },
       ];
-    },
-  );
+    });
   return [...left, ...right];
 };

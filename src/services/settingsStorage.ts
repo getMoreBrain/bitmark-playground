@@ -1,34 +1,45 @@
 import { log } from '../logging/log';
-import type { JsonTabType, ParserType } from '../state/bitmarkState';
+import type { JsonTabType, MarkupTabType } from '../state/bitmarkState';
 import type { OutputTab } from '../state/uiState';
 
 export interface PersistedSettings {
   /** Schema version — bump on breaking changes */
   v: number;
-  activeMarkupTab: ParserType;
+  activeMarkupTab: MarkupTabType;
   activeJsonTab: JsonTabType;
-  showDiffLex: boolean;
+  showBottomPanels: boolean;
   leftOutputTab: OutputTab;
-  rightOutputTab: OutputTab;
   linkScroll: boolean;
   toggleTags: boolean;
+  fullOutput: boolean;
+  showLegacy: boolean;
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 11;
+export const CURRENT_VERSION = 12;
 
-const VALID_PARSER_TYPES: readonly string[] = ['js', 'wasm', 'wasmFull'];
-const VALID_JSON_TABS: readonly string[] = [
-  'js',
-  'wasm',
-  'wasmFull',
-  'wasmCheck',
-  'tableHtml',
-  'text',
-  'xmlNiso',
-  'xmlNisoEs',
-];
-const VALID_OUTPUT_TABS: readonly string[] = ['diff', 'lexer', 'info', 'mappings'];
+const VALID_MARKUP_TABS: readonly string[] = ['bitmark', 'legacy'];
+// Not 'xmlNisoEs': that tab is disabled (PLAN-026 D5).
+const VALID_JSON_TABS: readonly string[] = ['json', 'tableHtml', 'xmlNiso', 'text', 'legacy'];
+const VALID_OUTPUT_TABS: readonly string[] = ['info', 'mappings', 'lexer'];
+
+/**
+ * v11 → v12 (PLAN-026 D11): the parser tabs become Bitmark / JSON (the WASM
+ * mode is a setting), WASM Check, Diff and the bottom-right panel's tab go,
+ * the legacy parser is off.
+ */
+function migrateV11(obj: Record<string, unknown>): void {
+  obj.fullOutput = obj.activeMarkupTab === 'wasmFull';
+  obj.activeMarkupTab = 'bitmark';
+  if (['js', 'wasm', 'wasmFull', 'wasmCheck', 'xmlNisoEs'].includes(obj.activeJsonTab as string)) {
+    obj.activeJsonTab = 'json';
+  }
+  obj.showLegacy = false;
+  obj.showBottomPanels = obj.showDiffLex;
+  delete obj.showDiffLex;
+  if (obj.leftOutputTab === 'diff') obj.leftOutputTab = 'info';
+  delete obj.rightOutputTab;
+}
 
 function migrateSettings(raw: unknown): PersistedSettings | null {
   if (raw == null || typeof raw !== 'object') return null;
@@ -93,26 +104,38 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v10 → v11: 'toggleTags' added, off by default
   if (obj.v === 10) {
-    obj.v = CURRENT_VERSION;
+    obj.v = 11;
     obj.toggleTags = false;
-    // Fall through to v11 validation
+    // Fall through
+  }
+
+  // Migrate v11 → v12: the tab rework (PLAN-026)
+  if (obj.v === 11) {
+    obj.v = CURRENT_VERSION;
+    migrateV11(obj);
+    // Fall through to v12 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
     // Validate shape
     if (
       typeof obj.activeMarkupTab === 'string' &&
-      VALID_PARSER_TYPES.includes(obj.activeMarkupTab) &&
+      VALID_MARKUP_TABS.includes(obj.activeMarkupTab) &&
       typeof obj.activeJsonTab === 'string' &&
       VALID_JSON_TABS.includes(obj.activeJsonTab) &&
-      typeof obj.showDiffLex === 'boolean' &&
+      typeof obj.showBottomPanels === 'boolean' &&
       typeof obj.leftOutputTab === 'string' &&
       VALID_OUTPUT_TABS.includes(obj.leftOutputTab) &&
-      typeof obj.rightOutputTab === 'string' &&
-      VALID_OUTPUT_TABS.includes(obj.rightOutputTab) &&
       typeof obj.linkScroll === 'boolean' &&
-      typeof obj.toggleTags === 'boolean'
+      typeof obj.toggleTags === 'boolean' &&
+      typeof obj.fullOutput === 'boolean' &&
+      typeof obj.showLegacy === 'boolean'
     ) {
+      // A Legacy tab is only shown with the legacy parser (PLAN-026 D12).
+      if (!obj.showLegacy) {
+        if (obj.activeMarkupTab === 'legacy') obj.activeMarkupTab = 'bitmark';
+        if (obj.activeJsonTab === 'legacy') obj.activeJsonTab = 'json';
+      }
       return obj as unknown as PersistedSettings;
     }
     return null;

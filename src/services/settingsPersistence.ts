@@ -12,11 +12,12 @@ function collectSettings(): PersistedSettings {
     v: CURRENT_VERSION,
     activeMarkupTab: bitmarkState.activeMarkupTab,
     activeJsonTab: bitmarkState.activeJsonTab,
-    showDiffLex: uiState.showDiffLex,
+    showBottomPanels: uiState.showBottomPanels,
     leftOutputTab: uiState.leftOutputTab,
-    rightOutputTab: uiState.rightOutputTab,
     linkScroll: uiState.linkScroll,
     toggleTags: uiState.toggleTags,
+    fullOutput: uiState.fullOutput,
+    showLegacy: uiState.showLegacy,
   };
 }
 

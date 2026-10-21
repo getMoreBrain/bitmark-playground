@@ -1,51 +1,57 @@
-import type { LexToken } from '@gmb/bitmark-parser';
+import { createLatestRunner, JsonText, jsonWithBitStarts } from '@gmb/bitmark-editor';
 import type { BitWrapperJson, ConvertOptions } from '@gmb/bitmark-parser-generator';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect } from 'react';
 
-import { convertWithBitStarts } from '../scrollSync/convertWithBitStarts';
 import { bitmarkState, ParserType } from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
 import { StringUtils } from '../utils/StringUtils';
-import { throwIfParserError, useBitmarkParser } from './BitmarkParser';
+import { useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
 
-const WASM_PARSERS: readonly ParserType[] = ['wasm', 'wasmFull'];
+const WASM_PARSERS: readonly ParserType[] = ['wasm'];
 const OLD_PARSERS: readonly ParserType[] = ['js'];
 
 /** How long the old (bpg) parser waits for a pause in editing (PLAN-019 D2). */
 export const OLD_PARSER_DEBOUNCE_MS = 250;
 
 // Module level: every editor's converter shares it, so an edit in one tab
-// supersedes a pending one from another.
+// supersedes a pending one from another. A job that comes due after the
+// legacy parser was turned off does nothing (PLAN-026 D1).
 const scheduleOldParser = debounce(
-  (job: () => Promise<void>): Promise<void> => job(),
+  (job: () => Promise<void>): Promise<void> => (uiState.showLegacy ? job() : Promise.resolve()),
   OLD_PARSER_DEBOUNCE_MS,
 );
+
+/** Schedule a legacy parser (bpg) run, only while the legacy parser is on (PLAN-026 D1). */
+const scheduleLegacy = (job: () => Promise<void>): void => {
+  if (uiState.showLegacy) void scheduleOldParser(job);
+};
 
 /** Run the pending old-parser conversion now. For tests. */
 export const flushOldParser = (): Promise<void> => scheduleOldParser.flush() ?? Promise.resolve();
 
 // Per-direction JS (bpg) options (constant per direction).
-// Exported so other bpg consumers (e.g. JsRoundTripRunner) convert identically.
-export const JS_MARKUP_TO_JSON_OPTIONS: ConvertOptions = { jsonOptions: { enableWarnings: true } };
-export const JS_JSON_TO_MARKUP_OPTIONS: ConvertOptions = { bitmarkOptions: { prettifyJson: true } };
+const JS_MARKUP_TO_JSON_OPTIONS: ConvertOptions = { jsonOptions: { enableWarnings: true } };
+const JS_JSON_TO_MARKUP_OPTIONS: ConvertOptions = { bitmarkOptions: { prettifyJson: true } };
 
-// WASM lexer (7.x): the former `lex()` export is now the `lex` output format of
-// `convert`, which returns the token stream as a JSON array of `LexToken`.
+// WASM lexer (7.x): the `lex` output format of `convert`, which returns the
+// token stream as a JSON array.
 const WASM_LEX_OPTIONS = { inputFormat: 'bitmark', outputFormat: 'lex', pretty: true } as const;
 
-/** Render lexer tokens one per line, mirroring the pre-7 `lex()` text dump. */
-const formatLexTokens = (tokens: LexToken[]): string =>
-  tokens
-    .map(
-      (t) =>
-        `${t.kind} Span { start: ${t.span.start}, end: ${t.span.end} } ${JSON.stringify(t.text)}`,
-    )
-    .join('\n');
+/** The WASM parser's mode, from Settings (PLAN-026 D2). */
+const wasmMode = (): 'optimized' | 'full' => (uiState.fullOutput ? 'full' : 'optimized');
+
+/**
+ * The WASM parser's work, latest wins (PLAN-030 D6): its results arrive
+ * later (it runs in workers), so at most one run is in flight and only the
+ * newest waits; a run that a newer one replaced never runs. Module level:
+ * every editor's converter shares it, as they share the state they write.
+ */
+const runWasm = createLatestRunner((job: () => Promise<void>) => job());
 
 interface M2JResult {
-  json?: BitWrapperJson[];
+  json?: JsonText;
   error?: Error;
   durationSec: number;
 }
@@ -67,6 +73,10 @@ export interface BitmarkConverter {
   jsonToMarkup: (editedTab: ParserType, json: string) => Promise<void>;
   /** Re-write the WASM tabs' bitmark from their JSON (PLAN-025 D4). */
   regenerateWasmMarkup: () => Promise<void>;
+  /** Re-run the WASM parser in the mode Settings now choose (PLAN-026 D3). */
+  regenerateWasm: () => Promise<void>;
+  /** Run the legacy parser (bpg) on the shown bitmark (PLAN-026 D1). */
+  syncLegacy: () => void;
 }
 
 const useBitmarkConverter = (): BitmarkConverter => {
@@ -76,9 +86,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
     loadError: jsLoadError,
   } = useBitmarkParserGenerator();
   const {
-    bitmarkToObjects: wasmBitmarkToObjects,
-    convert: wasmConvert,
-    convertWithDetails: wasmConvertWithDetails,
+    engine,
     markupReady,
     loadSuccess: wasmLoadSuccess,
     loadError: wasmLoadError,
@@ -91,19 +99,19 @@ const useBitmarkConverter = (): BitmarkConverter => {
       const endMark = `${parser}-m2j-end-${Date.now()}`;
       performance.mark(startMark);
 
-      let json: BitWrapperJson[] | undefined;
+      let json: JsonText | undefined;
       let error: Error | undefined;
       try {
         if (parser === 'js') {
           if (!bitmarkParserGenerator) return null;
-          json = (await bitmarkParserGenerator.convert(markup, JS_MARKUP_TO_JSON_OPTIONS)) as
+          const bits = (await bitmarkParserGenerator.convert(markup, JS_MARKUP_TO_JSON_OPTIONS)) as
             | BitWrapperJson[]
             | undefined;
+          json = jsonWithBitStarts(bits ?? []);
         } else {
-          if (!wasmBitmarkToObjects) return null;
-          const mode = parser === 'wasm' ? 'optimized' : 'full';
-          // Typed API: returns entries as objects and throws on failure.
-          json = wasmBitmarkToObjects(markup, { mode }) as unknown as BitWrapperJson[];
+          if (!engine) return null;
+          // The JSON text and its bit starts, written in the worker (PLAN-030 D4).
+          json = await engine.bitmarkToJsonText(markup, { mode: wasmMode() });
         }
       } catch (e) {
         error = e as Error;
@@ -114,7 +122,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
         performance.measure(`${parser}-markupToJson`, startMark, endMark).duration / 1000;
       return { json, error, durationSec };
     },
-    [bitmarkParserGenerator, wasmBitmarkToObjects],
+    [bitmarkParserGenerator, engine],
   );
 
   // json -> markup for a single parser. Returns null when that parser is unavailable.
@@ -134,17 +142,15 @@ const useBitmarkConverter = (): BitmarkConverter => {
           if (!StringUtils.isString(out)) throw new Error('Expected string');
           markup = out as string;
         } else {
-          if (!wasmConvert) return null;
-          const mode = parser === 'wasm' ? 'optimized' : 'full';
+          if (!engine) return null;
           // A parser older than 7.11 ignores `inlineStyle` (PLAN-025 D3).
           const inlineStyle = uiState.toggleTags ? 'toggle' : 'classic';
-          // Only the optimized run's positions are used (below).
-          ({ output: markup, inputStarts } = convertWithBitStarts(
-            wasmConvert,
-            parser === 'wasm' ? wasmConvertWithDetails : undefined,
-            json,
-            { inputFormat: 'json', outputFormat: 'bitmark', mode, inlineStyle },
-          ));
+          ({ output: markup, inputStarts } = await engine.convertWithBitStarts(json, {
+            inputFormat: 'json',
+            outputFormat: 'bitmark',
+            mode: wasmMode(),
+            inlineStyle,
+          }));
         }
       } catch (e) {
         error = e as Error;
@@ -155,31 +161,24 @@ const useBitmarkConverter = (): BitmarkConverter => {
         performance.measure(`${parser}-jsonToMarkup`, startMark, endMark).duration / 1000;
       return { markup, inputStarts, error, durationSec };
     },
-    [bitmarkParserGenerator, wasmConvert, wasmConvertWithDetails],
+    [bitmarkParserGenerator, engine],
   );
 
-  // Lex the WASM optimized tab's markup into both lexer outputs:
-  // bitmark side = one token per line, JSON side = the token JSON.
+  // Lex the Bitmark tab's markup into the token JSON (PLAN-026 D8).
   // `lex` is a markup format: only the stage-2 (`full`) engine has it.
-  const lexWasmOptimized = useCallback(() => {
-    if (!wasmConvert || !markupReady) return;
-    const markup = bitmarkState.wasm.markup;
+  const lexWasm = useCallback(async () => {
+    if (!engine || !markupReady) return;
     try {
-      const tokensJson = throwIfParserError(wasmConvert(markup, WASM_LEX_OPTIONS));
-      const tokens = JSON.parse(tokensJson) as LexToken[];
-      bitmarkState.setLexerOutput('wasm', formatLexTokens(tokens));
-      bitmarkState.setLexerOutput('wasmFull', tokensJson);
+      bitmarkState.setLexerOutput(await engine.convert(bitmarkState.wasm.markup, WASM_LEX_OPTIONS));
     } catch (e) {
-      const message = `Lexer error: ${String(e)}`;
-      bitmarkState.setLexerOutput('wasm', message);
-      bitmarkState.setLexerOutput('wasmFull', message);
+      bitmarkState.setLexerOutput(`Lexer error: ${String(e)}`);
     }
-  }, [wasmConvert, markupReady]);
+  }, [engine, markupReady]);
 
   // Edits made while stage 1 was serving were not lexed: lex once stage 2 lands.
   useEffect(() => {
-    if (markupReady) lexWasmOptimized();
-  }, [markupReady, lexWasmOptimized]);
+    if (markupReady) void lexWasm();
+  }, [markupReady, lexWasm]);
 
   const markupToJsonFor = useCallback(
     async (parsers: readonly ParserType[], editedTab: ParserType, markup: string) => {
@@ -213,11 +212,13 @@ const useBitmarkConverter = (): BitmarkConverter => {
     async (editedTab: ParserType, markup: string) => {
       // Edited tab keeps the user input verbatim.
       bitmarkState.setEditedMarkup(editedTab, markup);
-      await markupToJsonFor(WASM_PARSERS, editedTab, markup);
-      lexWasmOptimized();
-      void scheduleOldParser(() => markupToJsonFor(OLD_PARSERS, editedTab, markup));
+      await runWasm(async () => {
+        await markupToJsonFor(WASM_PARSERS, editedTab, markup);
+        await lexWasm();
+      });
+      scheduleLegacy(() => markupToJsonFor(OLD_PARSERS, editedTab, markup));
     },
-    [markupToJsonFor, lexWasmOptimized],
+    [markupToJsonFor, lexWasm],
   );
 
   const jsonToMarkupFor = useCallback(
@@ -231,8 +232,8 @@ const useBitmarkConverter = (): BitmarkConverter => {
           if (parser === 'js' && r.error && r.error.message === 'Expected string') return;
           bitmarkState.setMarkup(parser, r.markup, r.error, r.durationSec);
           // Where the bits are depends on the JSON only, not on the parser that
-          // converts it, so the WASM optimized run places them for whichever
-          // tab was edited — the Original (bpg) run reports no positions.
+          // converts it, so the WASM run places them for whichever tab was
+          // edited — the legacy (bpg) run reports no positions.
           if (parser === 'wasm' && r.inputStarts) {
             bitmarkState.setEditedJsonBitStarts(editedTab, json, r.inputStarts);
           }
@@ -260,27 +261,57 @@ const useBitmarkConverter = (): BitmarkConverter => {
     async (editedTab: ParserType, json: string) => {
       // Edited tab keeps the user input verbatim.
       bitmarkState.setEditedJson(editedTab, json);
-      await jsonToMarkupFor(WASM_PARSERS, editedTab, json);
-      lexWasmOptimized();
-      void scheduleOldParser(() => jsonToMarkupFor(OLD_PARSERS, editedTab, json));
+      await runWasm(async () => {
+        await jsonToMarkupFor(WASM_PARSERS, editedTab, json);
+        await lexWasm();
+      });
+      scheduleLegacy(() => jsonToMarkupFor(OLD_PARSERS, editedTab, json));
     },
-    [jsonToMarkupFor, lexWasmOptimized],
+    [jsonToMarkupFor, lexWasm],
   );
 
   // Every WASM tab, the edited one included, from its own JSON. A tab with an
   // error keeps its text: its JSON is a last good value, or its bitmark is.
   const regenerateWasmMarkup = useCallback(async () => {
-    await Promise.allSettled(
-      WASM_PARSERS.map(async (parser) => {
-        const slice = bitmarkState[parser];
-        if (slice.jsonError || slice.markupError) return;
-        const r = await jsonToMarkupForParser(parser, slice.jsonAsString);
-        if (!r || r.error || r.markup === undefined) return;
-        bitmarkState.setMarkup(parser, r.markup, undefined, r.durationSec);
-      }),
-    );
-    lexWasmOptimized();
-  }, [jsonToMarkupForParser, lexWasmOptimized]);
+    await runWasm(async () => {
+      await Promise.allSettled(
+        WASM_PARSERS.map(async (parser) => {
+          const slice = bitmarkState[parser];
+          if (slice.jsonError || slice.markupError) return;
+          const r = await jsonToMarkupForParser(parser, slice.jsonAsString);
+          if (!r || r.error || r.markup === undefined) return;
+          bitmarkState.setMarkup(parser, r.markup, undefined, r.durationSec);
+        }),
+      );
+      await lexWasm();
+    });
+  }, [jsonToMarkupForParser, lexWasm]);
+
+  // The shown bitmark to JSON in the new mode, then the bitmark back from
+  // that JSON, so the Bitmark tab shows that mode's output (PLAN-026 D3).
+  // A bitmark with an error keeps its text.
+  const regenerateWasm = useCallback(async () => {
+    await runWasm(async () => {
+      const { markup, markupError } = bitmarkState.wasm;
+      if (markupError) return;
+      const forward = await markupToJsonForParser('wasm', markup);
+      if (!forward) return;
+      bitmarkState.setJson('wasm', forward.json, forward.error, forward.durationSec);
+      if (!forward.error) {
+        const back = await jsonToMarkupForParser('wasm', bitmarkState.wasm.jsonAsString);
+        if (back && !back.error && back.markup !== undefined) {
+          bitmarkState.setMarkup('wasm', back.markup, undefined, back.durationSec);
+        }
+      }
+      await lexWasm();
+    });
+  }, [markupToJsonForParser, jsonToMarkupForParser, lexWasm]);
+
+  // From the WASM bitmark, as if it had been edited: fills both Legacy tabs.
+  const syncLegacy = useCallback(() => {
+    const markup = bitmarkState.wasm.markup;
+    scheduleLegacy(() => markupToJsonFor(OLD_PARSERS, 'wasm', markup));
+  }, [markupToJsonFor]);
 
   return {
     jsLoadSuccess,
@@ -290,6 +321,8 @@ const useBitmarkConverter = (): BitmarkConverter => {
     markupToJson,
     jsonToMarkup,
     regenerateWasmMarkup,
+    regenerateWasm,
+    syncLegacy,
   };
 };
 
