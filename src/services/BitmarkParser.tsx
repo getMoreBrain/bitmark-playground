@@ -7,6 +7,7 @@ import {
   loadBitmarkModule,
   Monaco,
   schemaUrlFor,
+  schemaUrlForVersion,
 } from '@gmb/bitmark-editor';
 import EngineWorker from '@gmb/bitmark-editor/worker?worker';
 import * as monaco from 'monaco-editor';
@@ -41,6 +42,18 @@ export const engineUrl = (search: string, base: string, cacheBuster: number): st
   const version = params.get('v2') ?? 'latest';
   return `${BITMARK_PARSER_CDN_URL.replace('${version}', version)}?_=${cacheBuster}`;
 };
+
+/**
+ * The JSON Schema for the engine that actually loaded. A published engine's
+ * schema is pinned to the version it reports, not the `@latest` (or `?v2=`)
+ * it was asked for: an exact-version URL is immutable on the CDN, so a stale
+ * cached `@latest` schema can never outlive a release. The local engine's
+ * schema is served beside it (see `vite.config.ts`).
+ */
+export const schemaUrl = (search: string, moduleUrl: string, version: string): string =>
+  new URLSearchParams(search).get('engine') === 'local' || !version
+    ? schemaUrlFor(moduleUrl)
+    : schemaUrlForVersion(version);
 
 // Single cache-buster timestamp
 const _cacheBuster = Date.now();
@@ -121,11 +134,14 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
         const engine = await startEngine(moduleUrl);
 
         // The JSON pane validates against the schema the SAME parser
-        // version publishes (PLAN-017). Independent of the
+        // version publishes (PLAN-017), resolved from the version the engine
+        // reports. Independent of the
         // engine: a failure leaves JSON syntax checking as it was.
         // Every JSON model in the playground holds a bitmark document, so
         // the schema applies to all of them.
-        void loadBitmarkJsonSchema(schemaUrlFor(moduleUrl)).then(
+        void loadBitmarkJsonSchema(
+          schemaUrl(window.location.search, moduleUrl, engine.version),
+        ).then(
           (schema) =>
             schema !== undefined &&
             bindBitmarkJsonSchema(monaco as unknown as Monaco, schema, { fileMatch: ['*'] }),

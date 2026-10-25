@@ -4,7 +4,7 @@
 
 export const buildInfo = {
   "name": "@gmb/bitmark-playground",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "author": "Get More Brain Ltd",
   "license": "ISC",
   "description": "A web playground for parsing and generating bitmark",
