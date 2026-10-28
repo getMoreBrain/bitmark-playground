@@ -135,6 +135,14 @@ const SettingsMenu = () => {
           >
             Link scrolling
           </Option>
+          <Option
+            type="checkbox"
+            title="Show the Final Bitmark panel and the Diff tab"
+            checked={snap.showDiff}
+            onChange={(checked) => uiState.setShowDiff(checked)}
+          >
+            Diff
+          </Option>
 
           <Text
             sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mt: 2, mb: 1, display: 'block' }}

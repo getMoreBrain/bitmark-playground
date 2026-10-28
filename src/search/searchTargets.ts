@@ -3,8 +3,15 @@ import type { editor } from 'monaco-editor';
 import type { JsonTabType } from '../state/bitmarkState';
 
 /** Where a pane is on screen; also the order panes are listed in. */
-export type SearchArea = 'left' | 'right' | 'bottomLeft' | 'bottomRight';
-export const AREA_ORDER: readonly SearchArea[] = ['left', 'right', 'bottomLeft', 'bottomRight'];
+export type SearchArea = 'left' | 'middle' | 'right' | 'bottomLeft' | 'bottomRight';
+export const AREA_ORDER: readonly SearchArea[] = [
+  'left',
+  // The Final Bitmark panel (PLAN-032 D2).
+  'middle',
+  'right',
+  'bottomLeft',
+  'bottomRight',
+];
 
 /** What the search needs from a Monaco editor. */
 export type SearchEditor = Pick<

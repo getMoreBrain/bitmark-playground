@@ -13,6 +13,7 @@ import { playgroundScrollGroup } from '../scrollSync/scrollSync';
 import { SearchEditor, useSearchTarget } from '../search';
 import { BitmarkConverter, useBitmarkConverter } from '../services/BitmarkConverter';
 import { useBitmarkParser } from '../services/BitmarkParser';
+import { timeParse } from '../services/parseTime';
 import {
   bitmarkState,
   DISABLED_JSON_TABS,
@@ -51,6 +52,24 @@ const MESSAGES = {
   needsFullParser: 'Loading the full parser…',
 };
 
+/** The parser's time for each output format's latest pane conversion (PLAN-030 D8). */
+const paneParseMs = new Map<string, number>();
+
+/**
+ * The session's engine, keeping the parser's time of each pane conversion:
+ * a pane reports how long its whole run took, which in workers includes the
+ * wait behind the other conversions. Read in the pane's `onRender`, which
+ * follows its conversion in the same task.
+ */
+const timingPanes = (engine: BitmarkEngine): BitmarkEngine =>
+  Object.assign(Object.create(engine) as BitmarkEngine, {
+    convertWithBitStarts: async (...args: Parameters<BitmarkEngine['convertWithBitStarts']>) => {
+      const { value, ms } = await timeParse(() => engine.convertWithBitStarts(...args));
+      if (args[1].outputFormat) paneParseMs.set(args[1].outputFormat, ms);
+      return value;
+    },
+  });
+
 /** The playground's document: the bitmark the left editor shows. */
 const shownBitmark = (): string => bitmarkState[tabParser(bitmarkState.activeMarkupTab)].markup;
 
@@ -68,7 +87,7 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
     return { promise, resolve, reject };
   }, []);
   useEffect(() => {
-    if (engine) deferred.resolve(engine);
+    if (engine) deferred.resolve(timingPanes(engine));
     // The panes then show the load error, not an endless "loading".
     else if (loadError) deferred.reject(new Error('The bitmark parser failed to load.'));
   }, [engine, loadError, deferred]);
@@ -271,7 +290,9 @@ export const SessionPaneTab = ({
   }, [hidden]);
   const onRender = useCallback(
     ({ durationMs }: { durationMs: number }) => {
-      if (spec.timed) bitmarkState.setPaneDuration(spec.timed, durationMs / 1000);
+      if (!spec.timed) return;
+      const parseMs = paneParseMs.get(spec.mapping ?? spec.type);
+      bitmarkState.setPaneDuration(spec.timed, (parseMs ?? durationMs) / 1000);
     },
     [spec],
   );

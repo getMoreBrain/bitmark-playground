@@ -10,7 +10,7 @@ export type ParserType = 'js' | 'wasm';
 /** Tab id for the bitmark (left) tab bar. */
 export type MarkupTabType = 'bitmark' | 'legacy';
 /** Tab id for the right-hand tab bar. */
-export type JsonTabType = 'json' | 'tableHtml' | XmlVariant | 'text' | 'legacy';
+export type JsonTabType = 'json' | 'tableHtml' | XmlVariant | 'text' | 'diff' | 'legacy';
 /**
  * XML mapping variants. Each is its own JSON-side tab and its own state slice;
  * they differ only by the config mapping id passed to the parser's `convert`.
@@ -28,6 +28,7 @@ export const JSON_TAB_LABEL: Record<JsonTabType, string> = {
   xmlNiso: 'XML (niso-iec)',
   xmlNisoEs: 'XML (niso-iec-es)',
   text: 'Text',
+  diff: 'Diff',
   legacy: 'Legacy JSON',
 };
 
@@ -35,6 +36,7 @@ export const JSON_TAB_LABEL: Record<JsonTabType, string> = {
 export const DISABLED_JSON_TABS: readonly JsonTabType[] = ['xmlNisoEs'];
 
 const JSON_TABS: readonly JsonTabType[] = [
+  'diff',
   'json',
   'legacy',
   'tableHtml',
@@ -47,9 +49,17 @@ const JSON_TABS: readonly JsonTabType[] = [
 export const markupTabs = (showLegacy: boolean): MarkupTabType[] =>
   showLegacy ? ['bitmark', 'legacy'] : ['bitmark'];
 
-/** The right-hand tabs on screen, in order (PLAN-026 D4, D5). */
-export const jsonTabs = (showLegacy: boolean): JsonTabType[] =>
-  JSON_TABS.filter((tab) => !DISABLED_JSON_TABS.includes(tab) && (showLegacy || tab !== 'legacy'));
+/**
+ * The right-hand tabs on screen, in order (PLAN-026 D4, D5); the Diff tab,
+ * first, only with the Diff setting (PLAN-032 D1, D3).
+ */
+export const jsonTabs = (showLegacy: boolean, showDiff = false): JsonTabType[] =>
+  JSON_TABS.filter(
+    (tab) =>
+      !DISABLED_JSON_TABS.includes(tab) &&
+      (showLegacy || tab !== 'legacy') &&
+      (showDiff || tab !== 'diff'),
+  );
 
 /** The parser whose slice a Bitmark, JSON or Legacy tab shows (PLAN-026 D6). */
 export const tabParser = (tab: 'bitmark' | 'json' | 'legacy'): ParserType =>

@@ -18,6 +18,7 @@ function collectSettings(): PersistedSettings {
     toggleTags: uiState.toggleTags,
     fullOutput: uiState.fullOutput,
     showLegacy: uiState.showLegacy,
+    showDiff: uiState.showDiff,
   };
 }
 

@@ -13,14 +13,22 @@ export interface PersistedSettings {
   toggleTags: boolean;
   fullOutput: boolean;
   showLegacy: boolean;
+  showDiff: boolean;
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 12;
+export const CURRENT_VERSION = 13;
 
 const VALID_MARKUP_TABS: readonly string[] = ['bitmark', 'legacy'];
 // Not 'xmlNisoEs': that tab is disabled (PLAN-026 D5).
-const VALID_JSON_TABS: readonly string[] = ['json', 'tableHtml', 'xmlNiso', 'text', 'legacy'];
+const VALID_JSON_TABS: readonly string[] = [
+  'json',
+  'tableHtml',
+  'xmlNiso',
+  'text',
+  'diff',
+  'legacy',
+];
 const VALID_OUTPUT_TABS: readonly string[] = ['info', 'mappings', 'lexer'];
 
 /**
@@ -111,9 +119,16 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v11 → v12: the tab rework (PLAN-026)
   if (obj.v === 11) {
-    obj.v = CURRENT_VERSION;
+    obj.v = 12;
     migrateV11(obj);
-    // Fall through to v12 validation
+    // Fall through
+  }
+
+  // Migrate v12 → v13: 'showDiff' added, off by default (PLAN-032 D1)
+  if (obj.v === 12) {
+    obj.v = CURRENT_VERSION;
+    obj.showDiff = false;
+    // Fall through to v13 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
@@ -129,13 +144,16 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
       typeof obj.linkScroll === 'boolean' &&
       typeof obj.toggleTags === 'boolean' &&
       typeof obj.fullOutput === 'boolean' &&
-      typeof obj.showLegacy === 'boolean'
+      typeof obj.showLegacy === 'boolean' &&
+      typeof obj.showDiff === 'boolean'
     ) {
       // A Legacy tab is only shown with the legacy parser (PLAN-026 D12).
       if (!obj.showLegacy) {
         if (obj.activeMarkupTab === 'legacy') obj.activeMarkupTab = 'bitmark';
         if (obj.activeJsonTab === 'legacy') obj.activeJsonTab = 'json';
       }
+      // Nor a Diff tab without the Diff panes (PLAN-032 D1).
+      if (!obj.showDiff && obj.activeJsonTab === 'diff') obj.activeJsonTab = 'json';
       return obj as unknown as PersistedSettings;
     }
     return null;

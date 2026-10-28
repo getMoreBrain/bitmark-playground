@@ -1,6 +1,6 @@
 {
   "name": "@gmb/bitmark-playground",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "A web playground for parsing and generating bitmark",
   "author": "Get More Brain Ltd",
   "license": "ISC",
@@ -36,7 +36,7 @@
     "@eslint/js": "^9.28.0",
     "@eslint/json": "^0.14.0",
     "@eslint/markdown": "^7.5.1",
-    "@gmb/bitmark-parser": "^7.11.0",
+    "@gmb/bitmark-parser": "^7.17.0",
     "@gmb/bitmark-parser-generator": "^5.26.0",
     "@ncoderz/awa": "^1.10.3",
     "@testing-library/jest-dom": "^6.9.1",

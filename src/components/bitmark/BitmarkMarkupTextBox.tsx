@@ -16,7 +16,8 @@ import { uiState } from '../../state/uiState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
 
-const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
+/** The bitmark editors' options (the Diff panes' too, PLAN-032). */
+export const BITMARK_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   renderWhitespace: 'all',
   insertSpaces: false,
   // Bitmark is prose with markup in it: the suggestion list opens on the
@@ -140,7 +141,7 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
 
   if (loadSuccess) {
     const opts = {
-      ...DEFAULT_MONACO_OPTIONS,
+      ...BITMARK_MONACO_OPTIONS,
       ...options,
     };
 

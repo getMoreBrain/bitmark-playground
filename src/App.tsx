@@ -6,6 +6,7 @@ import { useSnapshot } from 'valtio';
 
 import { BitmarkJsonTextBox } from './components/bitmark/BitmarkJsonTextBox';
 import { BitmarkMarkupTextBox } from './components/bitmark/BitmarkMarkupTextBox';
+import { FINAL_BITMARK_LABEL, FinalBitmarkTextBox } from './components/bitmark/DiffPanes';
 import { HtmlPreview } from './components/bitmark/HtmlPreview';
 import { LexerPanel } from './components/bitmark/LexerPanel';
 import { OutputPanel } from './components/generic/ui/OutputPanel';
@@ -17,6 +18,7 @@ import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
+import { DiffSyncProvider } from './services/DiffSyncProvider';
 import { PlaygroundSession, SessionPaneTab } from './session/PlaygroundSession';
 import {
   bitmarkState,
@@ -27,6 +29,7 @@ import {
   markupTabs,
   tabParser,
 } from './state/bitmarkState';
+import { diffState } from './state/diffState';
 import { OutputTab, uiState } from './state/uiState';
 import { theme } from './theme/theme';
 import { NARROW_MEDIA, STACKED_PANEL_SX, useNarrowLayout } from './utils/narrowLayout';
@@ -49,12 +52,18 @@ const EDITOR_OPTIONS = {
 function App() {
   const snap = useSnapshot(bitmarkState);
   const uiSnap = useSnapshot(uiState);
+  const diffSnap = useSnapshot(diffState);
   const narrow = useNarrowLayout();
 
   const jsonTabDuration = (tab: JsonTabType): number | undefined =>
     tab === 'json' || tab === 'legacy'
       ? snap[tabParser(tab)].jsonDurationSec
-      : snap.paneDurations[tab];
+      : tab === 'diff'
+        ? diffSnap.diffDurationSec
+        : snap.paneDurations[tab];
+
+  // The top panels share the width equally (PLAN-032 D2).
+  const panelWidth = uiSnap.showDiff ? '33.33%' : '50%';
 
   const editorPanels = (
     <Flex
@@ -70,7 +79,7 @@ function App() {
         sx={{
           flexDirection: 'column',
           flexGrow: 1,
-          width: '50%',
+          width: panelWidth,
           minHeight: 0,
           overflow: 'hidden',
           ...STACKED_PANEL_SX,
@@ -107,11 +116,52 @@ function App() {
           />
         </Flex>
       </Flex>
+      {/* Its slot stays in the tree: showing it does not remount the right panel. */}
+      {uiSnap.showDiff ? (
+        <Flex
+          sx={{
+            flexDirection: 'column',
+            flexGrow: 1,
+            width: panelWidth,
+            minHeight: 0,
+            overflow: 'hidden',
+            ...STACKED_PANEL_SX,
+          }}
+        >
+          <Flex sx={{ alignItems: 'flex-end', flexShrink: 0 }}>
+            <TabBar
+              tabs={[
+                { id: 'final', label: FINAL_BITMARK_LABEL, duration: diffSnap.finalDurationSec },
+              ]}
+              activeTab="final"
+              onTabChange={() => {}}
+            />
+          </Flex>
+          <Flex
+            sx={{
+              resize: 'none',
+              variant: 'textarea.code',
+              flexGrow: 1,
+              minHeight: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <FinalBitmarkTextBox
+              className={'final-markup-editor'}
+              sx={{
+                border: '1px solid',
+                borderColor: 'accent',
+              }}
+              options={EDITOR_OPTIONS}
+            />
+          </Flex>
+        </Flex>
+      ) : null}
       <Flex
         sx={{
           flexDirection: 'column',
           flexGrow: 1,
-          width: '50%',
+          width: panelWidth,
           minHeight: 0,
           overflow: 'hidden',
           ...STACKED_PANEL_SX,
@@ -119,7 +169,7 @@ function App() {
       >
         <Flex sx={{ alignItems: 'flex-end', flexShrink: 0 }}>
           <TabBar
-            tabs={jsonTabs(uiSnap.showLegacy).map((tab) => ({
+            tabs={jsonTabs(uiSnap.showLegacy, uiSnap.showDiff).map((tab) => ({
               id: tab,
               label: JSON_TAB_LABEL[tab],
               duration: jsonTabDuration(tab),
@@ -184,52 +234,54 @@ function App() {
       <BitmarkParserGeneratorProvider>
         <BitmarkParserProvider>
           <PlaygroundSession>
-            <Flex
-              sx={{
-                flexDirection: 'column',
-                height: '100vh',
-                width: '100%',
-                backgroundColor: 'background',
-                // Stacked: the page scrolls between the panels (PLAN-027 D3).
-                [NARROW_MEDIA]: { height: 'auto', minHeight: '100vh' },
-              }}
-            >
-              <SearchBar />
-              {/* Always render ResizableLayout so the editor panels keep a stable
-                tree position — toggling the bottom panels must not remount the
-                editors (which would reset their content). */}
-              <ResizableLayout
-                top={editorPanels}
-                bottom={bottomPanels}
-                showBottom={uiSnap.showBottomPanels}
-                stacked={narrow}
-                bottomHeight={uiSnap.bottomPanelHeight}
-                collapsed={uiSnap.bottomPanelCollapsed}
-                onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
-                onToggleCollapse={() =>
-                  uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
-                }
-              />
+            <DiffSyncProvider>
               <Flex
                 sx={{
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  columnGap: 3,
-                  flexShrink: 0,
+                  flexDirection: 'column',
+                  height: '100vh',
+                  width: '100%',
+                  backgroundColor: 'background',
+                  // Stacked: the page scrolls between the panels (PLAN-027 D3).
+                  [NARROW_MEDIA]: { height: 'auto', minHeight: '100vh' },
                 }}
               >
-                <Version
-                  sx={{
-                    variant: 'text.copyright',
-                  }}
+                <SearchBar />
+                {/* Always render ResizableLayout so the editor panels keep a stable
+                tree position — toggling the bottom panels must not remount the
+                editors (which would reset their content). */}
+                <ResizableLayout
+                  top={editorPanels}
+                  bottom={bottomPanels}
+                  showBottom={uiSnap.showBottomPanels}
+                  stacked={narrow}
+                  bottomHeight={uiSnap.bottomPanelHeight}
+                  collapsed={uiSnap.bottomPanelCollapsed}
+                  onHeightChange={(h) => uiState.setBottomPanelHeight(h)}
+                  onToggleCollapse={() =>
+                    uiState.setBottomPanelCollapsed(!uiState.bottomPanelCollapsed)
+                  }
                 />
-                <Copyright
+                <Flex
                   sx={{
-                    variant: 'text.copyright',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    columnGap: 3,
+                    flexShrink: 0,
                   }}
-                />
+                >
+                  <Version
+                    sx={{
+                      variant: 'text.copyright',
+                    }}
+                  />
+                  <Copyright
+                    sx={{
+                      variant: 'text.copyright',
+                    }}
+                  />
+                </Flex>
               </Flex>
-            </Flex>
+            </DiffSyncProvider>
           </PlaygroundSession>
         </BitmarkParserProvider>
       </BitmarkParserGeneratorProvider>

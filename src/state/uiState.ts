@@ -25,6 +25,8 @@ export interface UiState {
   readonly fullOutput: boolean;
   /** Whether the legacy parser (bpg) and its tabs are on (PLAN-026 D1) */
   readonly showLegacy: boolean;
+  /** Whether the Final Bitmark and Diff panes are shown (PLAN-032 D1) */
+  readonly showDiff: boolean;
 
   setShowBottomPanels(value: boolean): void;
   setBottomPanelHeight(value: number): void;
@@ -35,6 +37,7 @@ export interface UiState {
   setToggleTags(value: boolean): void;
   setFullOutput(value: boolean): void;
   setShowLegacy(value: boolean): void;
+  setShowDiff(value: boolean): void;
 }
 
 const stored = loadSettings();
@@ -49,6 +52,7 @@ const uiState = proxy<UiState>({
   toggleTags: stored?.toggleTags ?? false,
   fullOutput: stored?.fullOutput ?? false,
   showLegacy: stored?.showLegacy ?? false,
+  showDiff: stored?.showDiff ?? false,
 
   setShowBottomPanels(value: boolean) {
     (uiState as Writable<UiState>).showBottomPanels = value;
@@ -88,6 +92,12 @@ const uiState = proxy<UiState>({
     // A Legacy tab that was shown goes with it (PLAN-026 D12).
     if (bitmarkState.activeMarkupTab === 'legacy') bitmarkState.setActiveMarkupTab('bitmark');
     if (bitmarkState.activeJsonTab === 'legacy') bitmarkState.setActiveJsonTab('json');
+  },
+
+  setShowDiff(value: boolean) {
+    (uiState as Writable<UiState>).showDiff = value;
+    // A Diff tab that was shown goes with it (PLAN-032 D1).
+    if (!value && bitmarkState.activeJsonTab === 'diff') bitmarkState.setActiveJsonTab('json');
   },
 });
 

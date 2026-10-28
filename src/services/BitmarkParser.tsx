@@ -9,7 +9,6 @@ import {
   schemaUrlFor,
   schemaUrlForVersion,
 } from '@gmb/bitmark-editor';
-import EngineWorker from '@gmb/bitmark-editor/worker?worker';
 import * as monaco from 'monaco-editor';
 import {
   createContext,
@@ -22,6 +21,9 @@ import {
 } from 'react';
 
 import { log } from '../logging/log';
+import { BitmarkPatcher, modulePatcher, workerPatcher } from './bitmarkPatcher';
+import EngineWorker from './engineWorker?worker';
+import { trackParseTimes } from './parseTime';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
@@ -76,6 +78,8 @@ interface IBitmarkParserContext {
   version: string;
   /** The parser, in workers off the main thread (PLAN-030 D1, D3). */
   engine: BitmarkEngine | undefined;
+  /** The parser's diff and its application, beside the engine (PLAN-032 D8). */
+  patcher: BitmarkPatcher | undefined;
 }
 
 const defaultState: IBitmarkParserContext = {
@@ -84,23 +88,33 @@ const defaultState: IBitmarkParserContext = {
   markupReady: false,
   version: '',
   engine: undefined,
+  patcher: undefined,
 };
 
 /**
  * The parser in two workers, a fast lane and a conversion lane (PLAN-030
- * D1); on the main thread if they cannot start (D2).
+ * D1), which report the parser's time for each call (D8); on the main
+ * thread if they cannot start (D2). The diff calls go to the conversion
+ * lane (PLAN-032 D8).
  */
 export const startEngine = async (
   moduleUrl: string,
-  createWorker: () => Worker = () => new EngineWorker(),
-): Promise<BitmarkEngine> => {
+  createWorker: () => Worker = () => trackParseTimes(new EngineWorker()),
+): Promise<{ engine: BitmarkEngine; patcher: BitmarkPatcher }> => {
   try {
-    return await createBitmarkWorkerEngine({
-      createPort: createWorker,
+    const workers: Worker[] = [];
+    const engine = await createBitmarkWorkerEngine({
+      // The fast lane first, then the conversion lane.
+      createPort: () => {
+        const worker = createWorker();
+        workers.push(worker);
+        return worker;
+      },
       // A worker resolves a relative URL against its own script, not the page.
       url: new URL(moduleUrl, window.location.href).href,
       feature: 'full',
     });
+    return { engine, patcher: workerPatcher(workers[workers.length - 1]) };
   } catch (e) {
     log.warn('BitmarkParserProvider: the parser workers failed; parsing on the main thread', e);
     // Stage 1 now; stage 2 (`full`) in the background (parser PLAN-203 D4).
@@ -110,7 +124,7 @@ export const startEngine = async (
       (feature) => engine.setFeature(feature),
       (err) => log.error('BitmarkParserProvider: the full engine failed to load', err),
     );
-    return engine;
+    return { engine, patcher: modulePatcher(module, stage2) };
   }
 };
 
@@ -131,7 +145,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
 
     const load = async () => {
       try {
-        const engine = await startEngine(moduleUrl);
+        const { engine, patcher } = await startEngine(moduleUrl);
 
         // The JSON pane validates against the schema the SAME parser
         // version publishes (PLAN-017), resolved from the version the engine
@@ -153,6 +167,7 @@ const BitmarkParserProvider = (props: BitmarkParserProviderProps): ReactElement 
           markupReady: engine.markupFormats,
           version: engine.version,
           engine,
+          patcher,
         });
         // Stage 2 lands in the background; a failure leaves stage 1 in place.
         engine.onFeatureChange(() =>

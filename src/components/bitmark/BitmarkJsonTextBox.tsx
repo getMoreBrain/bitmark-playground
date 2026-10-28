@@ -12,6 +12,7 @@ import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { keepsMounted, RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/PlaygroundSession';
 import { bitmarkState, JSON_TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
+import { DiffTextBox } from './DiffPanes';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   //
@@ -74,6 +75,7 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
     <>
       {sessionPanes}
       {activeTab === 'legacy' ? legacyTab() : null}
+      {activeTab === 'diff' ? <DiffTextBox {...restProps} options={options} /> : null}
     </>
   );
 

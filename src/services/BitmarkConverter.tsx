@@ -8,6 +8,7 @@ import { uiState } from '../state/uiState';
 import { StringUtils } from '../utils/StringUtils';
 import { useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
+import { timeParse } from './parseTime';
 
 const WASM_PARSERS: readonly ParserType[] = ['wasm'];
 const OLD_PARSERS: readonly ParserType[] = ['js'];
@@ -95,9 +96,9 @@ const useBitmarkConverter = (): BitmarkConverter => {
   // markup -> json for a single parser. Returns null when that parser is unavailable.
   const markupToJsonForParser = useCallback(
     async (parser: ParserType, markup: string): Promise<M2JResult | null> => {
-      const startMark = `${parser}-m2j-start-${Date.now()}`;
-      const endMark = `${parser}-m2j-end-${Date.now()}`;
-      performance.mark(startMark);
+      const started = performance.now();
+      // The WASM parser's own time, from its worker (PLAN-030 D8).
+      let parseMs: number | undefined;
 
       let json: JsonText | undefined;
       let error: Error | undefined;
@@ -111,15 +112,15 @@ const useBitmarkConverter = (): BitmarkConverter => {
         } else {
           if (!engine) return null;
           // The JSON text and its bit starts, written in the worker (PLAN-030 D4).
-          json = await engine.bitmarkToJsonText(markup, { mode: wasmMode() });
+          ({ value: json, ms: parseMs } = await timeParse(() =>
+            engine.bitmarkToJsonText(markup, { mode: wasmMode() }),
+          ));
         }
       } catch (e) {
         error = e as Error;
       }
 
-      performance.mark(endMark);
-      const durationSec =
-        performance.measure(`${parser}-markupToJson`, startMark, endMark).duration / 1000;
+      const durationSec = (parseMs ?? performance.now() - started) / 1000;
       return { json, error, durationSec };
     },
     [bitmarkParserGenerator, engine],
@@ -128,9 +129,9 @@ const useBitmarkConverter = (): BitmarkConverter => {
   // json -> markup for a single parser. Returns null when that parser is unavailable.
   const jsonToMarkupForParser = useCallback(
     async (parser: ParserType, json: string): Promise<J2MResult | null> => {
-      const startMark = `${parser}-j2m-start-${Date.now()}`;
-      const endMark = `${parser}-j2m-end-${Date.now()}`;
-      performance.mark(startMark);
+      const started = performance.now();
+      // The WASM parser's own time, from its worker (PLAN-030 D8).
+      let parseMs: number | undefined;
 
       let markup: string | undefined;
       let inputStarts: number[] | undefined;
@@ -145,20 +146,22 @@ const useBitmarkConverter = (): BitmarkConverter => {
           if (!engine) return null;
           // A parser older than 7.11 ignores `inlineStyle` (PLAN-025 D3).
           const inlineStyle = uiState.toggleTags ? 'toggle' : 'classic';
-          ({ output: markup, inputStarts } = await engine.convertWithBitStarts(json, {
-            inputFormat: 'json',
-            outputFormat: 'bitmark',
-            mode: wasmMode(),
-            inlineStyle,
-          }));
+          const { value, ms } = await timeParse(() =>
+            engine.convertWithBitStarts(json, {
+              inputFormat: 'json',
+              outputFormat: 'bitmark',
+              mode: wasmMode(),
+              inlineStyle,
+            }),
+          );
+          ({ output: markup, inputStarts } = value);
+          parseMs = ms;
         }
       } catch (e) {
         error = e as Error;
       }
 
-      performance.mark(endMark);
-      const durationSec =
-        performance.measure(`${parser}-jsonToMarkup`, startMark, endMark).duration / 1000;
+      const durationSec = (parseMs ?? performance.now() - started) / 1000;
       return { markup, inputStarts, error, durationSec };
     },
     [bitmarkParserGenerator, engine],
