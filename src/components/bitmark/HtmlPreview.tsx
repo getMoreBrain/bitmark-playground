@@ -1,13 +1,16 @@
 /** @jsxImportSource theme-ui */
-import { BitmarkEngine, createLatestRunner, SUPERSEDED } from '@gmb/bitmark-editor';
+import { BitmarkEngine, createLatestRunner, SUPERSEDED, SyncViewEditor } from '@gmb/bitmark-editor';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
+import { subscribeKey } from 'valtio/utils';
 
 import { createFrameScrollEditor, FrameScrollEditor } from '../../scrollSync/frameScrollEditor';
 import { joinScrollSync } from '../../scrollSync/scrollSync';
+import { attachPlaygroundSyncView } from '../../scrollSync/syncView';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { bitmarkState } from '../../state/bitmarkState';
+import { uiState } from '../../state/uiState';
 import PREVIEW_CSS from './htmlPreview.css?raw';
 
 const HTML_OPTIONS = { inputFormat: 'bitmark', outputFormat: 'html' } as const;
@@ -20,6 +23,9 @@ const FRAME_DOC = `<!doctype html><html><head><meta charset="utf-8"><style>${PRE
  * `allow-same-origin` lets the playground write the frame's body.
  */
 export const PREVIEW_SANDBOX = 'allow-same-origin allow-popups allow-popups-to-escape-sandbox';
+
+/** The frame's view has no text, so nothing to decorate: it marks the bit itself. */
+const NO_DECORATIONS = { set: () => [], clear: () => {} };
 
 type Content = { html: string } | { message: string; error?: boolean };
 
@@ -70,10 +76,32 @@ const HtmlPreview = ({ className }: HtmlPreviewProps) => {
     const win = frameRef.current?.contentWindow;
     if (!loaded || !win) return;
     const scroll = createFrameScrollEditor(win, 'body > bitmark-bit');
-    const member = joinScrollSync(scroll.editor, scroll.bitStarts);
+    // The guide line over the frame (PLAN-033 D4).
+    const view = attachPlaygroundSyncView(
+      {
+        getModel: () => null,
+        getLayoutInfo: () => scroll.editor.getLayoutInfo(),
+        createDecorationsCollection: () => NO_DECORATIONS,
+      } as unknown as SyncViewEditor,
+      frameRef.current!.parentElement!,
+    );
+    // The bit matching the cursor, switched by "Block highlight" (D7). The
+    // frame's offsets are bit indexes, so a match starts at its bit's.
+    let matched: number | undefined;
+    const drawMatch = () => scroll.match(uiState.syncMatch ? matched : undefined);
+    const offMatch = subscribeKey(uiState, 'syncMatch', drawMatch);
+    const member = joinScrollSync(scroll.editor, scroll.bitStarts, {
+      onSyncLine: view.onSyncLine,
+      onMatch: (range) => {
+        matched = range?.start;
+        drawMatch();
+      },
+    });
     scrollRef.current = scroll;
     return () => {
+      offMatch();
       member.dispose();
+      view.dispose();
       scroll.dispose();
       scrollRef.current = undefined;
     };

@@ -3,7 +3,6 @@ import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
-import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
@@ -15,6 +14,7 @@ import { bitmarkState, MARKUP_TAB_LABEL, MarkupTabType, tabParser } from '../../
 import { uiState } from '../../state/uiState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
+import { ParserLoadingPane } from './ParserLoadingPane';
 
 /** The bitmark editors' options (the Diff panes' too, PLAN-032). */
 export const BITMARK_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
@@ -164,15 +164,11 @@ const BitmarkMarkupTextBox = (props: BitmarkMarkupTextBoxProps) => {
       text = 'Load failed.';
     }
     return (
-      <Flex
-        sx={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-        }}
-      >
-        {text}
-      </Flex>
+      <ParserLoadingPane
+        message={text}
+        className={restProps.className}
+        options={{ ...BITMARK_MONACO_OPTIONS, ...options }}
+      />
     );
   }
 };

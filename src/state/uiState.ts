@@ -19,6 +19,10 @@ export interface UiState {
   readonly settingsOpen: boolean;
   /** Whether the top panes scroll together, by bit (PLAN-018) */
   readonly linkScroll: boolean;
+  /** Whether linked panes show a guide line where they are matched (PLAN-033 D1) */
+  readonly syncLine: boolean;
+  /** Whether the block under the cursor, and its match in the other panes, is highlighted (PLAN-033 D1) */
+  readonly syncMatch: boolean;
   /** Whether the WASM parsers write inline marks as toggle tags (PLAN-025) */
   readonly toggleTags: boolean;
   /** Whether the WASM parser runs in full mode, not optimised (PLAN-026 D2) */
@@ -34,6 +38,8 @@ export interface UiState {
   setLeftOutputTab(tab: OutputTab): void;
   setSettingsOpen(value: boolean): void;
   setLinkScroll(value: boolean): void;
+  setSyncLine(value: boolean): void;
+  setSyncMatch(value: boolean): void;
   setToggleTags(value: boolean): void;
   setFullOutput(value: boolean): void;
   setShowLegacy(value: boolean): void;
@@ -49,6 +55,8 @@ const uiState = proxy<UiState>({
   leftOutputTab: stored?.leftOutputTab ?? 'info',
   settingsOpen: false,
   linkScroll: stored?.linkScroll ?? true,
+  syncLine: stored?.syncLine ?? true,
+  syncMatch: stored?.syncMatch ?? true,
   toggleTags: stored?.toggleTags ?? false,
   fullOutput: stored?.fullOutput ?? false,
   showLegacy: stored?.showLegacy ?? false,
@@ -76,6 +84,14 @@ const uiState = proxy<UiState>({
 
   setLinkScroll(value: boolean) {
     (uiState as Writable<UiState>).linkScroll = value;
+  },
+
+  setSyncLine(value: boolean) {
+    (uiState as Writable<UiState>).syncLine = value;
+  },
+
+  setSyncMatch(value: boolean) {
+    (uiState as Writable<UiState>).syncMatch = value;
   },
 
   setToggleTags(value: boolean) {

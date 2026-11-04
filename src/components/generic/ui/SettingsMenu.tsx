@@ -42,6 +42,22 @@ const Option = ({ type, name, title, checked, onChange, children }: OptionProps)
   </Flex>
 );
 
+/** A group's heading in the menu; the first one sits closer to the title rule. */
+const Heading = ({ first = false, children }: { first?: boolean; children: ReactNode }) => (
+  <Text
+    sx={{
+      color: 'muted',
+      fontSize: 0,
+      fontWeight: 'bold',
+      mt: first ? 0 : 2,
+      mb: 1,
+      display: 'block',
+    }}
+  >
+    {children}
+  </Text>
+);
+
 const SettingsMenu = () => {
   const snap = useSnapshot(uiState);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,23 +133,13 @@ const SettingsMenu = () => {
             sx={{ border: 'none', borderTop: '1px solid', borderColor: 'accent', my: 2 }}
           />
 
-          <Text sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mb: 1, display: 'block' }}>
-            UI
-          </Text>
-
+          <Heading first>Panels</Heading>
           <Option
             type="checkbox"
             checked={snap.showBottomPanels}
             onChange={(checked) => uiState.setShowBottomPanels(checked)}
           >
-            Show bottom panels
-          </Option>
-          <Option
-            type="checkbox"
-            checked={snap.linkScroll}
-            onChange={(checked) => uiState.setLinkScroll(checked)}
-          >
-            Link scrolling
+            Bottom panels
           </Option>
           <Option
             type="checkbox"
@@ -143,13 +149,41 @@ const SettingsMenu = () => {
           >
             Diff
           </Option>
-
-          <Text
-            sx={{ color: 'muted', fontSize: 0, fontWeight: 'bold', mt: 2, mb: 1, display: 'block' }}
+          <Option
+            type="checkbox"
+            title="Show the deprecated bitmark-parser-generator's tabs"
+            checked={snap.showLegacy}
+            onChange={(checked) => uiState.setShowLegacy(checked)}
           >
-            Parser
-          </Text>
+            Legacy parser (bpg)
+          </Option>
 
+          <Heading>Editor</Heading>
+          <Option
+            type="checkbox"
+            checked={snap.linkScroll}
+            onChange={(checked) => uiState.setLinkScroll(checked)}
+          >
+            Link scrolling
+          </Option>
+          <Option
+            type="checkbox"
+            title="Show a line where the linked panes are matched"
+            checked={snap.syncLine}
+            onChange={(checked) => uiState.setSyncLine(checked)}
+          >
+            Guide line
+          </Option>
+          <Option
+            type="checkbox"
+            title="Highlight the block under the cursor, and the matching block in the other panes"
+            checked={snap.syncMatch}
+            onChange={(checked) => uiState.setSyncMatch(checked)}
+          >
+            Block highlight
+          </Option>
+
+          <Heading>Output</Heading>
           <Flex sx={{ gap: 3 }}>
             <Option
               type="radio"
@@ -177,14 +211,6 @@ const SettingsMenu = () => {
             onChange={(checked) => uiState.setToggleTags(checked)}
           >
             Toggle tags
-          </Option>
-          <Option
-            type="checkbox"
-            title="Show the deprecated bitmark-parser-generator's tabs"
-            checked={snap.showLegacy}
-            onChange={(checked) => uiState.setShowLegacy(checked)}
-          >
-            Legacy parser (bpg)
           </Option>
         </Box>
       )}

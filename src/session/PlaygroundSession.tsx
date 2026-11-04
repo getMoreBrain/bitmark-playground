@@ -92,6 +92,8 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
     else if (loadError) deferred.reject(new Error('The bitmark parser failed to load.'));
   }, [engine, loadError, deferred]);
   const [initial] = useState(shownBitmark);
+  // The guide line and the block highlight follow Settings (PLAN-033 D2).
+  const { syncLine, syncMatch } = useSnapshot(uiState);
 
   return (
     <BitmarkSession
@@ -101,7 +103,12 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
       // The playground binds the schema itself, for all its JSON editors.
       schema={false}
       theme="dark"
+      // Monaco's theme is global: set it now, so the panes are dark while
+      // the parser loads (before any playground editor sets it).
+      applyMonacoTheme
       scrollGroup={playgroundScrollGroup()}
+      syncLine={syncLine}
+      syncMatch={syncMatch}
       messages={MESSAGES}
     >
       <SessionSync />

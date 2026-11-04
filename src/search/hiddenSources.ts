@@ -1,13 +1,22 @@
-import { bitmarkState, jsonTabs, JsonTabType, markupTabs, tabParser } from '../state/bitmarkState';
+import {
+  bitmarkState,
+  jsonTabs,
+  JsonTabType,
+  markupTabs,
+  MarkupTabType,
+  tabParser,
+} from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
 import { bitmarkLabel, jsonTabLabel } from './labels';
-import type { SearchTargets } from './searchTargets';
+import type { SearchArea, SearchTargets } from './searchTargets';
 
 /** A top-pane tab that is not shown, searched as text (PLAN-024 D10). */
 export interface HiddenSource {
   readonly id: string;
   readonly label: string;
   readonly area: 'left' | 'right';
+  /** Its place in its panel's tab bar (`tabOrder`). */
+  readonly order: number;
   getText(): string;
   /** Show the tab. */
   activate(): void;
@@ -42,6 +51,23 @@ const jsonTabText = (
   }
 };
 
+/**
+ * A tab's place in its panel's tab bar, whichever tabs are on screen
+ * (PLAN-034 D8): the order every tab bar keeps.
+ */
+export const tabOrder = (area: 'left' | 'right', tab: string): number =>
+  area === 'left'
+    ? markupTabs(true).indexOf(tab as MarkupTabType)
+    : jsonTabs(true, true).indexOf(tab as JsonTabType);
+
+/** Where the tab shown in a panel is in its tab bar; 0 for a panel without tabs to step. */
+export const shownTabOrder = (area: SearchArea, state: State = bitmarkState): number =>
+  area === 'left'
+    ? tabOrder('left', state.activeMarkupTab)
+    : area === 'right'
+      ? tabOrder('right', state.activeJsonTab)
+      : 0;
+
 /** The top panes' tabs that are not shown, in tab order; only tabs in a tab bar. */
 export const hiddenSources = (
   targets: SearchTargets,
@@ -56,6 +82,7 @@ export const hiddenSources = (
         id: `hidden:left:${tab}`,
         label: bitmarkLabel(tab),
         area: 'left',
+        order: tabOrder('left', tab),
         getText: () => slice.markupErrorAsString ?? slice.markup,
         activate: () => state.setActiveMarkupTab(tab),
       };
@@ -70,6 +97,7 @@ export const hiddenSources = (
           id: `hidden:right:${tab}`,
           label: jsonTabLabel(tab),
           area: 'right',
+          order: tabOrder('right', tab),
           getText,
           activate: () => state.setActiveJsonTab(tab),
         },

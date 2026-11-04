@@ -26,6 +26,9 @@ export type SearchEditor = Pick<
   | 'revealRangeInCenter'
   | 'hasTextFocus'
   | 'focus'
+  | 'getRawOptions'
+  | 'executeEdits'
+  | 'pushUndoStop'
 >;
 
 export interface SearchTarget {

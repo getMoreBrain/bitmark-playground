@@ -10,6 +10,8 @@ export interface PersistedSettings {
   showBottomPanels: boolean;
   leftOutputTab: OutputTab;
   linkScroll: boolean;
+  syncLine: boolean;
+  syncMatch: boolean;
   toggleTags: boolean;
   fullOutput: boolean;
   showLegacy: boolean;
@@ -17,7 +19,7 @@ export interface PersistedSettings {
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 13;
+export const CURRENT_VERSION = 14;
 
 const VALID_MARKUP_TABS: readonly string[] = ['bitmark', 'legacy'];
 // Not 'xmlNisoEs': that tab is disabled (PLAN-026 D5).
@@ -126,9 +128,17 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v12 → v13: 'showDiff' added, off by default (PLAN-032 D1)
   if (obj.v === 12) {
-    obj.v = CURRENT_VERSION;
+    obj.v = 13;
     obj.showDiff = false;
-    // Fall through to v13 validation
+    // Fall through
+  }
+
+  // Migrate v13 → v14: 'syncLine' and 'syncMatch' added, on by default (PLAN-033 D1)
+  if (obj.v === 13) {
+    obj.v = CURRENT_VERSION;
+    obj.syncLine = true;
+    obj.syncMatch = true;
+    // Fall through to v14 validation
   }
 
   if (obj.v === CURRENT_VERSION) {
@@ -142,6 +152,8 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
       typeof obj.leftOutputTab === 'string' &&
       VALID_OUTPUT_TABS.includes(obj.leftOutputTab) &&
       typeof obj.linkScroll === 'boolean' &&
+      typeof obj.syncLine === 'boolean' &&
+      typeof obj.syncMatch === 'boolean' &&
       typeof obj.toggleTags === 'boolean' &&
       typeof obj.fullOutput === 'boolean' &&
       typeof obj.showLegacy === 'boolean' &&

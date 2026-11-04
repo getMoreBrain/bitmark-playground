@@ -24,9 +24,8 @@ import 'monaco-editor/esm/vs/basic-languages/xml/xml.contribution';
 // editor services need, and nothing more.
 import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController';
 import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution';
-// Each pane's own find/replace widget (Ctrl+H, F3): without it the browser's
-// find sees only the lines Monaco has rendered (PLAN-024 D8).
-import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController';
+// No find contribution: Monaco's own find/replace widget is left out, so
+// only the playground search answers Ctrl+F / Ctrl+H (PLAN-034 D6).
 // Import codicon font (needed for Monaco's UI icons: folding arrows, suggestions, etc.)
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codiconStyles';
 

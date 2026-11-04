@@ -47,3 +47,6 @@ junit.xml
 
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+
+# Claude Code worktrees
+.claude/worktrees/

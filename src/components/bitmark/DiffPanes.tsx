@@ -1,7 +1,6 @@
 import { BITMARK_LANGUAGE_ID, MONACO_THEME } from '@gmb/bitmark-editor';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
-import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { SearchArea, SearchEditor, useSearchTarget } from '../../search';
@@ -13,6 +12,7 @@ import { diffState } from '../../state/diffState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { useBitmarkEditorServices } from '../monaco/useBitmarkEditorServices';
 import { BITMARK_MONACO_OPTIONS } from './BitmarkMarkupTextBox';
+import { ParserLoadingPane } from './ParserLoadingPane';
 
 export const FINAL_BITMARK_LABEL = 'Final Bitmark';
 
@@ -58,9 +58,11 @@ const BitmarkEditor = (props: BitmarkEditorProps) => {
 
   if (!loadSuccess) {
     return (
-      <Flex sx={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-        {loadError ? 'Load failed.' : 'Loading...'}
-      </Flex>
+      <ParserLoadingPane
+        message={loadError ? 'Load failed.' : 'Loading...'}
+        className={restProps.className}
+        options={{ ...BITMARK_MONACO_OPTIONS, ...options }}
+      />
     );
   }
   return (

@@ -1,5 +1,6 @@
 import {
   createScrollSyncGroup,
+  JoinOptions,
   ScrollSyncEditor,
   ScrollSyncGroup,
   ScrollSyncMember,
@@ -15,11 +16,15 @@ import { uiState } from '../state/uiState';
  */
 let group: ScrollSyncGroup = createScrollSyncGroup();
 
-/** Add a pane to the playground's group, linked as the toggle says. */
+/**
+ * Add a pane to the playground's group, linked as the toggle says, with its
+ * anchors and its guide line and highlight callbacks (PLAN-033).
+ */
 export const joinScrollSync = (
   editor: ScrollSyncEditor,
   bitStarts: () => readonly number[],
-): ScrollSyncMember => group.join(editor, bitStarts, { linked: uiState.linkScroll });
+  options: Omit<JoinOptions, 'linked'> = {},
+): ScrollSyncMember => group.join(editor, bitStarts, { ...options, linked: uiState.linkScroll });
 
 subscribeKey(uiState, 'linkScroll', (on) => {
   for (const member of group.members()) member.setLinked(on);

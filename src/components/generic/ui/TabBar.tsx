@@ -1,5 +1,5 @@
 /** @jsxImportSource theme-ui */
-import { useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { Flex, Text } from 'theme-ui';
 
 export interface Tab<T extends string> {
@@ -7,6 +7,8 @@ export interface Tab<T extends string> {
   label: string;
   /** The tab's last conversion time, in seconds, shown after the label. */
   duration?: number;
+  /** Shown after the label and duration, e.g. the tab's search count (PLAN-034 D7). */
+  badge?: ReactNode;
 }
 
 export interface TabBarProps<T extends string> {
@@ -107,6 +109,7 @@ const TabBar = <T extends string>({ tabs, activeTab, onTabChange }: TabBarProps<
         >
           {tab.label}
           {formatDuration(tab.duration)}
+          {tab.badge}
         </Text>
       ))}
     </Flex>

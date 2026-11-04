@@ -2,7 +2,6 @@ import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
-import { Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
@@ -13,6 +12,7 @@ import { keepsMounted, RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/
 import { bitmarkState, JSON_TAB_LABEL } from '../../state/bitmarkState';
 import { MonacoTextArea, MonacoTextAreaUncontrolledProps } from '../monaco/MonacoTextArea';
 import { DiffTextBox } from './DiffPanes';
+import { ParserLoadingPane } from './ParserLoadingPane';
 
 const DEFAULT_MONACO_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   //
@@ -104,15 +104,11 @@ const BitmarkJsonTextBox = (props: BitmarkJsonTextBoxProps) => {
       );
     }
     return (
-      <Flex
-        sx={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-        }}
-      >
-        {jsLoadError ? 'Load failed.' : 'Loading legacy parser...'}
-      </Flex>
+      <ParserLoadingPane
+        message={jsLoadError ? 'Load failed.' : 'Loading legacy parser...'}
+        className={restProps.className}
+        options={{ ...DEFAULT_MONACO_OPTIONS, ...options }}
+      />
     );
   }
 };

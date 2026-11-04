@@ -5,7 +5,8 @@ import { subscribeKey } from 'valtio/utils';
 
 import { findAll, regexError, SearchModel } from './findAll';
 import type { HiddenSource } from './hiddenSources';
-import type { PaneResult, SearchState } from './searchState';
+import { replacements } from './replace';
+import type { PaneResult, SearchField, SearchState } from './searchState';
 import { AREA_ORDER, SearchArea, SearchTarget, SearchTargets } from './searchTargets';
 
 /** How long the search waits for typing (in the query or a pane) to pause. */
@@ -49,17 +50,32 @@ export interface SearchControllerDeps {
   hiddenSources: () => readonly HiddenSource[];
   /** Calls back when hidden tabs' text may have changed; returns the unsubscribe. */
   subscribeHidden: (listener: () => void) => () => void;
+  /** Where the tab shown in a panel is in its tab bar (PLAN-034 D8); 0 by default. */
+  shownTabOrder?: (area: SearchArea) => number;
   debounceMs?: number;
   now?: () => number;
 }
 
 export interface SearchController {
-  /** Open the bar (and focus it); `query` replaces the current one when given. */
-  open(query?: string): void;
-  /** Close the bar and clear every highlight; focus goes back to the active pane. */
+  /**
+   * Start searching and focus `field` (the search input by default; the
+   * replace input shows the replace row); `query` replaces the current one.
+   */
+  open(query?: string, field?: SearchField): void;
+  /** Stop searching and clear every highlight; focus goes back to the active pane. */
   close(): void;
-  /** Step to the next (1) or previous (-1) match in the active pane. */
+  /**
+   * Step to the next (1) or previous (-1) match in the active pane; past its
+   * end, on to the next pane with matches in tab order (PLAN-034 D8).
+   */
   step(direction: 1 | -1): void;
+  /**
+   * Replace the active pane's current match and step to the next; with no
+   * current match, only step to one (as Monaco's Replace, PLAN-034 D4).
+   */
+  replace(): void;
+  /** Replace every match in the active pane, as one undo step (PLAN-034 D4). */
+  replaceAll(): void;
   /** Make a listed pane the active one (a hidden tab is shown first). */
   select(id: string): void;
   /** The focused (else active) pane's selection, when it is on one line. */
@@ -81,6 +97,8 @@ interface Attached {
 const before = (a: IRange, line: number, column: number) =>
   a.startLineNumber < line || (a.startLineNumber === line && a.startColumn < column);
 
+const readOnly = (target: SearchTarget) => !!target.editor.getRawOptions().readOnly;
+
 /**
  * The playground search (PLAN-024): finds the query in every pane on screen,
  * highlights the matches, steps through the active pane's, and (D10) counts
@@ -92,7 +110,7 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
   const hiddenWatchers = new Map<SearchTarget, IDisposable>();
   let hidden = new Map<string, HiddenSource>();
   /** A hidden tab just shown: reveal its first match once its pane has one. */
-  let pending: { area: SearchArea; until: number; armed: boolean } | undefined;
+  let pending: { area: SearchArea; until: number; armed: boolean; last?: boolean } | undefined;
 
   const refresh = () => {
     sync();
@@ -137,6 +155,7 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
           capped: result.ok && result.capped,
           current: -1,
           hidden: true,
+          readOnly: true,
         });
       }
     }
@@ -225,6 +244,7 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
         capped: a.capped,
         current: a.current,
         hidden: false,
+        readOnly: readOnly(a.target),
       }),
     );
     state.setResults([...live, ...hiddenResults]);
@@ -235,7 +255,7 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
     return (
       all.find((a) => a.target.area === state.activeId) ??
       all.find((a) => a.target.area === 'left') ??
-      all[0]
+      ordered()[0]
     );
   };
 
@@ -257,31 +277,166 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
     if (!pending.armed) return;
     const a = [...attached.values()].find((x) => x.target.area === pending?.area);
     if (!a || a.ranges.length === 0) return;
+    const last = pending.last;
     pending = undefined;
     state.setActiveId(a.target.area);
-    goTo(a, 0);
+    goTo(a, last ? a.ranges.length - 1 : 0);
   };
 
-  const step = (direction: 1 | -1) => {
-    refresh();
-    const a = active();
-    if (!a || a.ranges.length === 0) return;
+  /** Show a hidden tab, then reveal its first (or last) match once its pane has one. */
+  const showHidden = (source: HiddenSource, last = false) => {
+    pending = { area: source.area, until: now() + ACTIVATION_TIMEOUT_MS, armed: false, last };
+    source.activate();
+    schedule();
+  };
+
+  /**
+   * The next match in `a` from its current match, or from the cursor on the
+   * first step (as Monaco's find); undefined past the pane's end.
+   */
+  const nextIndex = (a: Attached, direction: 1 | -1): number | undefined => {
     const n = a.ranges.length;
+    if (n === 0) return undefined;
     if (a.current !== -1) {
-      goTo(a, (a.current + direction + n) % n);
-      return;
+      const i = a.current + direction;
+      return i >= 0 && i < n ? i : undefined;
     }
-    // The first step goes from the cursor, as Monaco's find does.
     const sel = a.target.editor.getSelection();
     const line = direction > 0 ? (sel?.endLineNumber ?? 1) : (sel?.startLineNumber ?? 1);
     const column = direction > 0 ? (sel?.endColumn ?? 1) : (sel?.startColumn ?? 1);
-    if (direction > 0) {
-      const next = a.ranges.findIndex((r) => !before(r, line, column));
-      goTo(a, next === -1 ? 0 : next);
-    } else {
-      const prev = a.ranges.findLastIndex((r) => before(r, line, column));
-      goTo(a, prev === -1 ? n - 1 : prev);
+    const i =
+      direction > 0
+        ? a.ranges.findIndex((r) => !before(r, line, column))
+        : a.ranges.findLastIndex((r) => before(r, line, column));
+    return i === -1 ? undefined : i;
+  };
+
+  /** The first match in `direction`: the pane's first, or its last going back. */
+  const edge = (a: Attached, direction: 1 | -1) => (direction > 0 ? 0 : a.ranges.length - 1);
+
+  /** Step within one pane, wrapping at its ends. */
+  const stepWithin = (a: Attached, direction: 1 | -1) => {
+    if (a.ranges.length === 0) return;
+    goTo(a, nextIndex(a, direction) ?? edge(a, direction));
+  };
+
+  type Stop = { live: Attached } | { hidden: HiddenSource };
+
+  /**
+   * The panes with matches, and the active one, in tab order (PLAN-034 D8):
+   * the panels in screen order, then each panel's tabs; hidden tabs only
+   * while they are counted.
+   */
+  const stops = (current: Attached): Stop[] => {
+    const shownOrder = deps.shownTabOrder ?? (() => 0);
+    const keyed: { stop: Stop; key: [number, number] }[] = [];
+    for (const a of attached.values()) {
+      if (a !== current && a.ranges.length === 0) continue;
+      const area = a.target.area;
+      keyed.push({ stop: { live: a }, key: [AREA_ORDER.indexOf(area), shownOrder(area)] });
     }
+    for (const r of state.results) {
+      const source = r.hidden && r.count > 0 ? hidden.get(r.id) : undefined;
+      if (!source) continue;
+      keyed.push({
+        stop: { hidden: source },
+        key: [AREA_ORDER.indexOf(source.area), source.order],
+      });
+    }
+    keyed.sort((x, y) => x.key[0] - y.key[0] || x.key[1] - y.key[1]);
+    return keyed.map((k) => k.stop);
+  };
+
+  /** Past a pane's end, on to the next pane with matches in tab order, round to the first. */
+  const step = (direction: 1 | -1) => {
+    refresh();
+    const a = active();
+    if (!a) return;
+    const i = nextIndex(a, direction);
+    if (i !== undefined) {
+      goTo(a, i);
+      return;
+    }
+    const list = stops(a);
+    const at = list.findIndex((x) => 'live' in x && x.live === a);
+    const next = list[(at + direction + list.length) % list.length];
+    if (!next || ('live' in next && next.live === a)) {
+      stepWithin(a, direction);
+      return;
+    }
+    // Leaving the pane: its current match is no longer the current one.
+    a.current = -1;
+    paint(a);
+    if ('live' in next) {
+      state.setActiveId(next.live.target.area);
+      next.live.current = -1;
+      goTo(next.live, edge(next.live, direction));
+    } else {
+      publish(state.results.filter((r) => r.hidden));
+      showHidden(next.hidden, direction < 0);
+    }
+  };
+
+  /** Apply `edits` to the active pane as one undo step, and search it again. */
+  const edit = (a: Attached, edits: ReturnType<typeof replacements>) => {
+    const ed = a.target.editor;
+    ed.pushUndoStop();
+    ed.executeEdits(
+      'search',
+      edits.map((r) => ({ range: r.range, text: r.text, forceMoveMarkers: true })),
+    );
+    ed.pushUndoStop();
+    refresh();
+  };
+
+  /** The active pane, when it can be replaced in. */
+  const editable = (): Attached | undefined => {
+    refresh();
+    const a = active();
+    return a && !readOnly(a.target) && a.ranges.length > 0 ? a : undefined;
+  };
+
+  const replace = () => {
+    const a = editable();
+    if (!a) return;
+    const range = a.ranges[a.current];
+    const sel = a.target.editor.getSelection();
+    const model = a.target.editor.getModel();
+    // Replace stays in its pane (PLAN-034 D4): the panes regenerate one another.
+    if (!range || !sel || !model || !sameRanges([range], [sel])) {
+      stepWithin(a, 1);
+      return;
+    }
+    const { query, options } = state;
+    const match = replacements(model, query, options, state.replace).find((r) =>
+      sameRanges([r.range], [range]),
+    );
+    if (!match) {
+      stepWithin(a, 1);
+      return;
+    }
+    edit(a, [match]);
+    // On to the next match after the replacement (wrapping), as `step` from the cursor.
+    const lines = match.text.split('\n');
+    const line = range.startLineNumber + lines.length - 1;
+    const column = (lines.length === 1 ? range.startColumn : 1) + lines[lines.length - 1].length;
+    a.current = -1;
+    a.target.editor.setSelection({
+      startLineNumber: line,
+      startColumn: column,
+      endLineNumber: line,
+      endColumn: column,
+    });
+    refresh();
+    stepWithin(a, 1);
+  };
+
+  const replaceAll = () => {
+    const a = editable();
+    const model = a?.target.editor.getModel();
+    if (!a || !model) return;
+    const edits = replacements(model, state.query, state.options, state.replace);
+    if (edits.length > 0) edit(a, edits);
   };
 
   const unsubscribers = [
@@ -296,10 +451,11 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
   ];
 
   return {
-    open(query) {
+    open(query, field = 'search') {
       if (query !== undefined) state.setQuery(query);
+      if (field === 'replace') state.setShowReplace(true);
       state.setOpen(true);
-      state.requestFocus();
+      state.requestFocus(field);
       schedule();
     },
     close() {
@@ -309,17 +465,17 @@ export const createSearchController = (deps: SearchControllerDeps): SearchContro
       active()?.target.editor.focus();
     },
     step,
+    replace,
+    replaceAll,
     select(id) {
       const source = hidden.get(id);
       if (source) {
-        pending = { area: source.area, until: now() + ACTIVATION_TIMEOUT_MS, armed: false };
-        source.activate();
-        schedule();
+        showHidden(source);
         return;
       }
       state.setActiveId(id as SearchArea);
       const a = active();
-      if (a && a.current === -1) step(1);
+      if (a && a.current === -1) stepWithin(a, 1);
     },
     selectionText() {
       const live = targets.live();

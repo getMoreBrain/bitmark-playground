@@ -14,8 +14,10 @@ import { ResizableLayout } from './components/generic/ui/ResizableLayout';
 import { SettingsMenu } from './components/generic/ui/SettingsMenu';
 import { TabBar } from './components/generic/ui/TabBar';
 import { SearchBar } from './components/search/SearchBar';
+import { SearchCount } from './components/search/SearchCount';
 import { Copyright } from './components/version/Copyright';
 import { Version } from './components/version/Version';
+import { searchState } from './search';
 import { BitmarkParserProvider } from './services/BitmarkParser';
 import { BitmarkParserGeneratorProvider } from './services/BitmarkParserGenerator';
 import { DiffSyncProvider } from './services/DiffSyncProvider';
@@ -91,9 +93,13 @@ function App() {
               id: tab,
               label: MARKUP_TAB_LABEL[tab],
               duration: snap[tabParser(tab)].markupDurationSec,
+              badge: <SearchCount area="left" tab={tab} shown={tab === snap.activeMarkupTab} />,
             }))}
             activeTab={snap.activeMarkupTab}
-            onTabChange={(tab) => bitmarkState.setActiveMarkupTab(tab)}
+            onTabChange={(tab) => {
+              bitmarkState.setActiveMarkupTab(tab);
+              searchState.setActiveId('left');
+            }}
           />
         </Flex>
         <Flex
@@ -131,10 +137,15 @@ function App() {
           <Flex sx={{ alignItems: 'flex-end', flexShrink: 0 }}>
             <TabBar
               tabs={[
-                { id: 'final', label: FINAL_BITMARK_LABEL, duration: diffSnap.finalDurationSec },
+                {
+                  id: 'final',
+                  label: FINAL_BITMARK_LABEL,
+                  duration: diffSnap.finalDurationSec,
+                  badge: <SearchCount area="middle" tab="final" shown />,
+                },
               ]}
               activeTab="final"
-              onTabChange={() => {}}
+              onTabChange={() => searchState.setActiveId('middle')}
             />
           </Flex>
           <Flex
@@ -173,9 +184,13 @@ function App() {
               id: tab,
               label: JSON_TAB_LABEL[tab],
               duration: jsonTabDuration(tab),
+              badge: <SearchCount area="right" tab={tab} shown={tab === snap.activeJsonTab} />,
             }))}
             activeTab={snap.activeJsonTab}
-            onTabChange={(tab) => bitmarkState.setActiveJsonTab(tab)}
+            onTabChange={(tab) => {
+              bitmarkState.setActiveJsonTab(tab);
+              searchState.setActiveId('right');
+            }}
           />
           <Flex sx={{ flexGrow: 1 }} />
           {/* Pinned: the tabs scroll, the cog does not (PLAN-027 D6). */}
@@ -215,9 +230,15 @@ function App() {
       }}
     >
       <OutputPanel
-        tabs={LEFT_OUTPUT_TABS}
+        tabs={LEFT_OUTPUT_TABS.map((t) => ({
+          ...t,
+          badge: <SearchCount area="bottomLeft" tab={t.id} shown={t.id === uiSnap.leftOutputTab} />,
+        }))}
         activeTab={uiSnap.leftOutputTab}
-        onTabChange={(tab) => uiState.setLeftOutputTab(tab)}
+        onTabChange={(tab) => {
+          uiState.setLeftOutputTab(tab);
+          searchState.setActiveId('bottomLeft');
+        }}
       >
         {uiSnap.leftOutputTab === 'info' ? <SessionPaneTab tab="info" /> : null}
         {uiSnap.leftOutputTab === 'mappings' ? <SessionPaneTab tab="mappings" /> : null}

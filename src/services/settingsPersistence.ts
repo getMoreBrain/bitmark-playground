@@ -15,6 +15,8 @@ function collectSettings(): PersistedSettings {
     showBottomPanels: uiState.showBottomPanels,
     leftOutputTab: uiState.leftOutputTab,
     linkScroll: uiState.linkScroll,
+    syncLine: uiState.syncLine,
+    syncMatch: uiState.syncMatch,
     toggleTags: uiState.toggleTags,
     fullOutput: uiState.fullOutput,
     showLegacy: uiState.showLegacy,

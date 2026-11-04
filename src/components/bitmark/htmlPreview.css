@@ -385,3 +385,12 @@ bitmark-bit[data-type='chapter'] > :not(bitmark-tag) {
 bitmark-bit[data-type='chapter'] a {
   color: #c4b5fd;
 }
+
+/* The bit matching the editor's cursor (PLAN-033 D7): the editors' amber.
+ * Last, so it outranks the bit types' own shadows (a chapter has none). */
+bitmark-bit.preview-match {
+  box-shadow:
+    0 0 0 4px rgb(255 196 0 / 0.6),
+    0 4px 12px rgb(0 0 0 / 0.04);
+  transition: box-shadow 120ms ease-out;
+}

@@ -6,6 +6,9 @@ export type FrameWindow = Pick<
   'scrollY' | 'scrollTo' | 'innerHeight' | 'addEventListener' | 'removeEventListener'
 > & { readonly document: Document };
 
+/** The class of the bit matching the cursor (the preview's stylesheet draws it). */
+export const MATCH_CLASS = 'preview-match';
+
 /** A frame's own scrolls arrive asynchronously; this long after setting one, they are echoes. */
 export const ECHO_MS = 150;
 
@@ -18,6 +21,11 @@ export interface FrameScrollEditor {
   bitStarts(): readonly number[];
   /** The frame's content was replaced (the bits moved). */
   contentChanged(): void;
+  /**
+   * Mark bit `index` as the one matching the cursor (PLAN-033 D7), with the
+   * class {@link MATCH_CLASS}; `undefined` clears it. Kept across content changes.
+   */
+  match(index: number | undefined): void;
   dispose(): void;
 }
 
@@ -51,6 +59,13 @@ export const createFrameScrollEditor = (
     return { dispose: () => set.delete(l) };
   };
   const emit = (set: Set<Listener>) => set.forEach((l) => l());
+  let matched: number | undefined;
+  let marked: Element | undefined;
+  const drawMatch = () => {
+    marked?.classList.remove(MATCH_CLASS);
+    marked = matched === undefined ? undefined : bits()[matched];
+    marked?.classList.add(MATCH_CLASS);
+  };
 
   const onScroll = () => {
     if (now() < echoUntil) return;
@@ -92,6 +107,9 @@ export const createFrameScrollEditor = (
     getLayoutInfo: () => ({ height: win.innerHeight }),
     // Never the leader on a content change: the editors are typed into.
     hasTextFocus: () => false,
+    // No cursor: it never leads by one, nor shows a matching block.
+    getPosition: () => null,
+    onDidChangeCursorPosition: subscribe(new Set<Listener>()),
     onDidScrollChange: subscribe(scrollListeners),
     onDidChangeModelContent: subscribe(contentListeners),
     onDidContentSizeChange: subscribe(contentListeners),
@@ -104,7 +122,12 @@ export const createFrameScrollEditor = (
     contentChanged: () => {
       bitsCache = undefined;
       lastHeight = doc.documentElement.scrollHeight;
+      drawMatch();
       emit(contentListeners);
+    },
+    match: (index) => {
+      matched = index;
+      drawMatch();
     },
     dispose: () => {
       win.removeEventListener('scroll', onScroll);
