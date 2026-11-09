@@ -8,6 +8,7 @@ import { uiState } from '../state/uiState';
 import { StringUtils } from '../utils/StringUtils';
 import { useBitmarkParser } from './BitmarkParser';
 import { useBitmarkParserGenerator } from './BitmarkParserGenerator';
+import { inlineStyleOption, inlineStyleOptions } from './inlineStyle';
 import { timeParse } from './parseTime';
 
 const WASM_PARSERS: readonly ParserType[] = ['wasm'];
@@ -88,6 +89,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
   } = useBitmarkParserGenerator();
   const {
     engine,
+    version,
     markupReady,
     loadSuccess: wasmLoadSuccess,
     loadError: wasmLoadError,
@@ -144,14 +146,14 @@ const useBitmarkConverter = (): BitmarkConverter => {
           markup = out as string;
         } else {
           if (!engine) return null;
-          // A parser older than 7.11 ignores `inlineStyle` (PLAN-025 D3).
-          const inlineStyle = uiState.toggleTags ? 'toggle' : 'classic';
+          // Toggle tags or classic marks, as this parser version needs (PLAN-035 D2).
+          const style = inlineStyleOption(version, uiState.toggleTags);
           const { value, ms } = await timeParse(() =>
             engine.convertWithBitStarts(json, {
               inputFormat: 'json',
               outputFormat: 'bitmark',
               mode: wasmMode(),
-              inlineStyle,
+              ...inlineStyleOptions(style),
             }),
           );
           ({ output: markup, inputStarts } = value);
@@ -164,7 +166,7 @@ const useBitmarkConverter = (): BitmarkConverter => {
       const durationSec = (parseMs ?? performance.now() - started) / 1000;
       return { markup, inputStarts, error, durationSec };
     },
-    [bitmarkParserGenerator, engine],
+    [bitmarkParserGenerator, engine, version],
   );
 
   // Lex the Bitmark tab's markup into the token JSON (PLAN-026 D8).

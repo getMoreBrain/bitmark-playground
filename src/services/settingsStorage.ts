@@ -19,7 +19,7 @@ export interface PersistedSettings {
 }
 
 export const STORAGE_KEY = 'bitmark-playground-settings';
-export const CURRENT_VERSION = 14;
+export const CURRENT_VERSION = 15;
 
 const VALID_MARKUP_TABS: readonly string[] = ['bitmark', 'legacy'];
 // Not 'xmlNisoEs': that tab is disabled (PLAN-026 D5).
@@ -135,10 +135,18 @@ function migrateSettings(raw: unknown): PersistedSettings | null {
 
   // Migrate v13 → v14: 'syncLine' and 'syncMatch' added, on by default (PLAN-033 D1)
   if (obj.v === 13) {
-    obj.v = CURRENT_VERSION;
+    obj.v = 14;
     obj.syncLine = true;
     obj.syncMatch = true;
-    // Fall through to v14 validation
+    // Fall through
+  }
+
+  // Migrate v14 → v15: toggle tags on, classic marks deprecated (PLAN-035 D1).
+  // The old default was off, so a stored `false` is almost never a choice.
+  if (obj.v === 14) {
+    obj.v = CURRENT_VERSION;
+    obj.toggleTags = true;
+    // Fall through to v15 validation
   }
 
   if (obj.v === CURRENT_VERSION) {

@@ -23,7 +23,7 @@ export interface UiState {
   readonly syncLine: boolean;
   /** Whether the block under the cursor, and its match in the other panes, is highlighted (PLAN-033 D1) */
   readonly syncMatch: boolean;
-  /** Whether the WASM parsers write inline marks as toggle tags (PLAN-025) */
+  /** Whether the WASM parsers write inline marks as toggle tags, else classic (PLAN-025, PLAN-035) */
   readonly toggleTags: boolean;
   /** Whether the WASM parser runs in full mode, not optimised (PLAN-026 D2) */
   readonly fullOutput: boolean;
@@ -57,7 +57,8 @@ const uiState = proxy<UiState>({
   linkScroll: stored?.linkScroll ?? true,
   syncLine: stored?.syncLine ?? true,
   syncMatch: stored?.syncMatch ?? true,
-  toggleTags: stored?.toggleTags ?? false,
+  // On by default: classic marks are deprecated (PLAN-035 D1).
+  toggleTags: stored?.toggleTags ?? true,
   fullOutput: stored?.fullOutput ?? false,
   showLegacy: stored?.showLegacy ?? false,
   showDiff: stored?.showDiff ?? false,

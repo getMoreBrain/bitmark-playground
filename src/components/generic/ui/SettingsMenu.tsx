@@ -206,7 +206,7 @@ const SettingsMenu = () => {
           </Flex>
           <Option
             type="checkbox"
-            title="WASM parser: write inline marks as toggle tags, e.g. (+bold)x(-bold)"
+            title="WASM parser: write inline marks as toggle tags, e.g. (+bold)x(-bold). Off: the classic marks, which are deprecated"
             checked={snap.toggleTags}
             onChange={(checked) => uiState.setToggleTags(checked)}
           >

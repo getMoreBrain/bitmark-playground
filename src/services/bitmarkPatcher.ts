@@ -2,16 +2,18 @@ import type { EnginePort, RawParserModule } from '@gmb/bitmark-editor';
 import { loadBitmarkModule } from '@gmb/bitmark-editor';
 import type * as Parser from '@gmb/bitmark-parser';
 
+import { InlineStyleOption, inlineStyleOptions } from './inlineStyle';
+
 /**
  * The parser's diff and its application (PLAN-032): not methods of the
  * package's engine, so the playground's engine worker answers them itself
  * (D8), as `patch` messages beside the package's own.
  */
 export interface BitmarkPatcher {
-  /** The diff that turns `a` into `b`. */
-  diff(a: string, b: string): Promise<Timed>;
-  /** `a` with `diff` applied, as bitmark. */
-  apply(a: string, diff: string): Promise<Timed>;
+  /** The diff that turns `a` into `b`, its marks as `inlineStyle` says (PLAN-035 D3; parser 8+). */
+  diff(a: string, b: string, inlineStyle?: InlineStyleOption): Promise<Timed>;
+  /** `a` with `diff` applied, as bitmark, its marks as `inlineStyle` says (PLAN-035 D3). */
+  apply(a: string, diff: string, inlineStyle?: InlineStyleOption): Promise<Timed>;
 }
 
 /** A result, and the parser's time for it (as PLAN-030 D8). */
@@ -32,7 +34,7 @@ interface PatchRequest {
   type: 'patch';
   id: number;
   method: PatchMethod;
-  args: [string, string];
+  args: [string, string, InlineStyleOption?];
 }
 
 interface PatchResult {
@@ -68,15 +70,23 @@ export const modulePatcher = (
   const { diff, transform } = module as PatchModule;
   const loaded = ready.catch(() => undefined);
   return {
-    diff: async (a, b) => {
+    diff: async (a, b, inlineStyle) => {
       await loaded;
       if (!diff) throw new Error('this parser has no diff()');
-      return timed(() => diff(a, b, DIFF_OPTIONS));
+      // Parser 7's diff has no `inlineStyle`, and ignores it.
+      return timed(() => diff(a, b, { ...DIFF_OPTIONS, ...inlineStyleOptions(inlineStyle) }));
     },
-    apply: async (a, patch) => {
+    apply: async (a, patch, inlineStyle) => {
       await loaded;
       if (!transform) throw new Error('this parser has no transform()');
-      return timed(() => transform(a, { inputFormat: 'bitmark', outputFormat: 'bitmark', patch }));
+      return timed(() =>
+        transform(a, {
+          inputFormat: 'bitmark',
+          outputFormat: 'bitmark',
+          patch,
+          ...inlineStyleOptions(inlineStyle),
+        }),
+      );
     },
   };
 };
@@ -101,7 +111,8 @@ export const servePatches = (
   const answer = async ({ id, method, args }: PatchRequest) => {
     try {
       if (!patcher) throw new Error('the parser is not loaded');
-      const value = await (await patcher)[method](...args);
+      const p = await patcher;
+      const value = await p[method](...args);
       port.postMessage({ type: 'patchResult', id, ok: true, value } satisfies PatchResult);
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
@@ -148,14 +159,14 @@ export const workerPatcher = (port: EnginePort): BitmarkPatcher => {
     if (m.ok) p.resolve(m.value ?? { value: '', ms: 0 });
     else p.reject(new Error(m.error ?? 'the patch call failed'));
   });
-  const call = (method: PatchMethod, args: [string, string]) =>
+  const call = (method: PatchMethod, args: PatchRequest['args']) =>
     new Promise<Timed>((resolve, reject) => {
       const id = nextId++;
       pending.set(id, { resolve, reject });
       port.postMessage({ type: 'patch', id, method, args } satisfies PatchRequest);
     });
   return {
-    diff: (a, b) => call('diff', [a, b]),
-    apply: (a, diff) => call('apply', [a, diff]),
+    diff: (a, b, inlineStyle) => call('diff', [a, b, inlineStyle]),
+    apply: (a, diff, inlineStyle) => call('apply', [a, diff, inlineStyle]),
   };
 };

@@ -10,14 +10,18 @@ export interface DiffState {
   readonly diff: string;
   /** The last diff's error, shown instead of the diff (which keeps its last value). */
   readonly diffErrorAsString: string | undefined;
+  /** Why the edited Diff does not apply (shown over the Diff; Final Bitmark keeps its last value). */
+  readonly applyErrorAsString: string | undefined;
   /** The parser's time for the last applied Diff, in seconds (the tab shows it). */
   readonly finalDurationSec: number | undefined;
   /** The parser's time for the last diff, in seconds (the tab shows it). */
   readonly diffDurationSec: number | undefined;
   /** Final Bitmark: an edit, or an applied Diff with its time. */
   setFinalMarkup(markup: string, durationSec?: number): void;
-  /** A computed diff and its time, or its error. */
+  /** A computed diff and its time, or its error. Either clears the apply error. */
   setDiff(diff: string | undefined, error?: unknown, durationSec?: number): void;
+  /** The edited Diff's apply error, or `undefined` once one applies. */
+  setApplyError(error: unknown): void;
   /** Set the diff verbatim (raw user input; clears the error). */
   setEditedDiff(diff: string): void;
 }
@@ -26,6 +30,7 @@ const diffState = proxy<DiffState>({
   finalMarkup: '',
   diff: '',
   diffErrorAsString: undefined,
+  applyErrorAsString: undefined,
   finalDurationSec: undefined,
   diffDurationSec: undefined,
 
@@ -38,12 +43,20 @@ const diffState = proxy<DiffState>({
   setDiff: (diff: string | undefined, error?: unknown, durationSec?: number) => {
     const state = diffState as Writable<DiffState>;
     if (durationSec !== undefined) state.diffDurationSec = durationSec;
+    // The Diff is the computed one again, not the edit that did not apply.
+    state.applyErrorAsString = undefined;
     if (error !== undefined) {
       state.diffErrorAsString = error instanceof Error ? error.message : String(error);
       return;
     }
     state.diff = diff ?? '';
     state.diffErrorAsString = undefined;
+  },
+
+  setApplyError: (error: unknown) => {
+    const state = diffState as Writable<DiffState>;
+    state.applyErrorAsString =
+      error === undefined ? undefined : error instanceof Error ? error.message : String(error);
   },
 
   setEditedDiff: (diff: string) => {

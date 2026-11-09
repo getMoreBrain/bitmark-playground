@@ -13,6 +13,7 @@ import { playgroundScrollGroup } from '../scrollSync/scrollSync';
 import { SearchEditor, useSearchTarget } from '../search';
 import { BitmarkConverter, useBitmarkConverter } from '../services/BitmarkConverter';
 import { useBitmarkParser } from '../services/BitmarkParser';
+import { inlineStyleOption, inlineStyleOptions } from '../services/inlineStyle';
 import { timeParse } from '../services/parseTime';
 import {
   bitmarkState,
@@ -59,13 +60,25 @@ const paneParseMs = new Map<string, number>();
  * The session's engine, keeping the parser's time of each pane conversion:
  * a pane reports how long its whole run took, which in workers includes the
  * wait behind the other conversions. Read in the pane's `onRender`, which
- * follows its conversion in the same task.
+ * follows its conversion in the same task. A pane's text converted to
+ * bitmark (an HTML or XML edit) gets toggle tags or classic marks as
+ * Settings says (PLAN-035 D3): the package passes no `inlineStyle`.
  */
-const timingPanes = (engine: BitmarkEngine): BitmarkEngine =>
+export const sessionEngine = (engine: BitmarkEngine): BitmarkEngine =>
   Object.assign(Object.create(engine) as BitmarkEngine, {
-    convertWithBitStarts: async (...args: Parameters<BitmarkEngine['convertWithBitStarts']>) => {
-      const { value, ms } = await timeParse(() => engine.convertWithBitStarts(...args));
-      if (args[1].outputFormat) paneParseMs.set(args[1].outputFormat, ms);
+    convertWithBitStarts: async (
+      input: string,
+      options: Parameters<BitmarkEngine['convertWithBitStarts']>[1],
+    ) => {
+      const opts =
+        options.outputFormat === 'bitmark' && options.inlineStyle === undefined
+          ? {
+              ...options,
+              ...inlineStyleOptions(inlineStyleOption(engine.version, uiState.toggleTags)),
+            }
+          : options;
+      const { value, ms } = await timeParse(() => engine.convertWithBitStarts(input, opts));
+      if (opts.outputFormat) paneParseMs.set(opts.outputFormat, ms);
       return value;
     },
   });
@@ -87,7 +100,7 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
     return { promise, resolve, reject };
   }, []);
   useEffect(() => {
-    if (engine) deferred.resolve(timingPanes(engine));
+    if (engine) deferred.resolve(sessionEngine(engine));
     // The panes then show the load error, not an endless "loading".
     else if (loadError) deferred.reject(new Error('The bitmark parser failed to load.'));
   }, [engine, loadError, deferred]);
