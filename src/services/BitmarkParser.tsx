@@ -23,15 +23,14 @@ import {
 import { log } from '../logging/log';
 import { BitmarkPatcher, modulePatcher, workerPatcher } from './bitmarkPatcher';
 import EngineWorker from './engineWorker?worker';
-import { trackParseTimes } from './parseTime';
 
 const BITMARK_PARSER_CDN_URL =
   'https://cdn.jsdelivr.net/npm/@gmb/bitmark-parser@${version}/dist/browser/bitmark-parser.min.js';
 
 /**
- * Where the dev server serves this checkout's own parser build from — the
- * sibling `packages/bitmark-parser/dist/browser` of the repo this playground
- * is a submodule of (see `vite.config.ts`). Selected with `?engine=local`,
+ * Where the dev server serves a local parser build from — the
+ * `packages/bitmark-parser/dist/browser` of a bitmark-parser checkout
+ * (`BITMARK_PARSER_DIR`, see `vite.config.ts`). Selected with `?engine=local`,
  * so an UNRELEASED parser can be driven from the playground before it ships;
  * `main` always loads the published one.
  */
@@ -93,13 +92,13 @@ const defaultState: IBitmarkParserContext = {
 
 /**
  * The parser in two workers, a fast lane and a conversion lane (PLAN-030
- * D1), which report the parser's time for each call (D8); on the main
- * thread if they cannot start (D2). The diff calls go to the conversion
+ * D1), whose engine reports the parser's time with each answer (D8); on the
+ * main thread if they cannot start (D2). The diff calls go to the conversion
  * lane (PLAN-032 D8).
  */
 export const startEngine = async (
   moduleUrl: string,
-  createWorker: () => Worker = () => trackParseTimes(new EngineWorker()),
+  createWorker: () => Worker = () => new EngineWorker(),
 ): Promise<{ engine: BitmarkEngine; patcher: BitmarkPatcher }> => {
   try {
     const workers: Worker[] = [];

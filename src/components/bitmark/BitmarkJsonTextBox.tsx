@@ -1,11 +1,11 @@
-import { MONACO_THEME } from '@gmb/bitmark-editor';
+import { MONACO_THEME, type SearchEditor } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { useSnapshot } from 'valtio';
 
 import { usePinnedScrollSync } from '../../scrollSync/useScrollSync';
-import { SearchEditor, useSearchTarget } from '../../search';
+import { useSearchTarget } from '../../search';
 import { jsonTabLabel } from '../../search/labels';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { keepsMounted, RIGHT_SESSION_TABS, SessionPaneTab } from '../../session/PlaygroundSession';

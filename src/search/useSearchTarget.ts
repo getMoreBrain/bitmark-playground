@@ -1,7 +1,8 @@
+import type { SearchEditor } from '@gmb/bitmark-editor';
 import { useEffect } from 'react';
 
 import type { JsonTabType } from '../state/bitmarkState';
-import { SearchArea, SearchEditor, searchTargets } from './searchTargets';
+import { SearchArea, searchTargets } from './searchTargets';
 
 /**
  * Make an editor searchable while it is mounted (PLAN-024). `hiddenTab`

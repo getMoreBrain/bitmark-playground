@@ -1,10 +1,10 @@
-import { BITMARK_LANGUAGE_ID, MONACO_THEME } from '@gmb/bitmark-editor';
+import { BITMARK_LANGUAGE_ID, MONACO_THEME, type SearchEditor } from '@gmb/bitmark-editor';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { Box, Flex } from 'theme-ui';
 import { useSnapshot } from 'valtio';
 
-import { SearchArea, SearchEditor, useSearchTarget } from '../../search';
+import { SearchArea, useSearchTarget } from '../../search';
 import { useBitmarkParser } from '../../services/BitmarkParser';
 import { useDiffSync } from '../../services/DiffSyncProvider';
 import { createInputScheduler } from '../../services/inputScheduler';

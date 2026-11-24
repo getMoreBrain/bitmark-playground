@@ -1,10 +1,6 @@
-import { log } from '../logging/log';
-import type { SearchOptions } from './findAll';
+import type { SearchSettings } from '@gmb/bitmark-editor';
 
-/** The search options that persist (PLAN-024 D11); never the term. */
-export interface SearchSettings extends SearchOptions {
-  readonly includeHidden: boolean;
-}
+import { log } from '../logging/log';
 
 export const SEARCH_STORAGE_KEY = 'bitmark-playground-search';
 

@@ -1,4 +1,4 @@
-import { BITMARK_LANGUAGE_ID } from '@gmb/bitmark-editor';
+import { BITMARK_LANGUAGE_ID, type SearchEditor } from '@gmb/bitmark-editor';
 import { MONACO_THEME } from '@gmb/bitmark-editor';
 import { editor } from 'monaco-editor';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -6,7 +6,7 @@ import { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor';
 import { useSnapshot } from 'valtio';
 
 import { useSplitScrollSync } from '../../scrollSync/useScrollSync';
-import { SearchEditor, useSearchTarget } from '../../search';
+import { useSearchTarget } from '../../search';
 import { bitmarkLabel } from '../../search/labels';
 import { useBitmarkConverter } from '../../services/BitmarkConverter';
 import { createInputScheduler } from '../../services/inputScheduler';

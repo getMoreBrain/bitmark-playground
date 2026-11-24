@@ -27,7 +27,7 @@ A web playground for parsing and generating [bitmark](https://docs.bitmark.cloud
 - **Works on narrow screens:** below 900px wide the panels stack vertically and the page scrolls;
   tab bars scroll sideways.
 - **Search everything** from the search bar above the panels, or with Ctrl+F (Cmd+F on macOS):
-  every pane on screen, with a match count on each tab (click it to go there). Enter / Shift+Enter step through the matches, tab by tab in order,
+  every pane on screen, with a match count on each tab (click it to go there). Enter / Shift+Enter in the search input, or F3 / Shift+F3 (Cmd+G / Cmd+Shift+G on macOS) from anywhere, step through the matches, tab by tab in order,
   and the linked panes follow to the same bit.
 - **Replace** with Ctrl+H (Cmd+Alt+F on macOS), or the ▸ beside the search input: Replace (Enter)
   and Replace all (Ctrl+Alt+Enter) work in the active pane, with `$1`-style groups for a regex

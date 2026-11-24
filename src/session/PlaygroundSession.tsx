@@ -2,6 +2,7 @@ import type {
   BitmarkEngine,
   BitmarkPane as Pane,
   Monaco,
+  SearchEditor,
   SessionChange,
 } from '@gmb/bitmark-editor';
 import { BitmarkPane, BitmarkSession, useBitmarkSession } from '@gmb/bitmark-editor/react';
@@ -10,11 +11,10 @@ import { ReactElement, ReactNode, useCallback, useEffect, useMemo, useRef, useSt
 import { subscribe, useSnapshot } from 'valtio';
 
 import { playgroundScrollGroup } from '../scrollSync/scrollSync';
-import { SearchEditor, useSearchTarget } from '../search';
+import { useSearchTarget } from '../search';
 import { BitmarkConverter, useBitmarkConverter } from '../services/BitmarkConverter';
 import { useBitmarkParser } from '../services/BitmarkParser';
 import { inlineStyleOption, inlineStyleOptions } from '../services/inlineStyle';
-import { timeParse } from '../services/parseTime';
 import {
   bitmarkState,
   DISABLED_JSON_TABS,
@@ -38,11 +38,13 @@ import { uiState } from '../state/uiState';
  */
 
 /**
- * How an edit in a session pane goes back into the playground's pipeline.
- * `text` is the pane text the session converted (not the pane's current
- * text, which may be newer).
+ * How an edit in a session pane goes back into the playground's pipeline:
+ * by the bitmark the session made of it. Never by the pane's text: the
+ * session reads that from the pane when asked, by when it may be a later
+ * text than the one it converted, and reading it copies the whole pane for
+ * each key (PLAN-036).
  */
-type PaneRoute = (text: string, change: SessionChange, converter: BitmarkConverter) => void;
+type PaneRoute = (change: SessionChange, converter: BitmarkConverter) => void;
 const routes = new WeakMap<Pane, PaneRoute>();
 
 /** At its top or bottom, a pane lets the page scroll (PLAN-027 D7). */
@@ -53,42 +55,12 @@ const MESSAGES = {
   needsFullParser: 'Loading the full parser…',
 };
 
-/** The parser's time for each output format's latest pane conversion (PLAN-030 D8). */
-const paneParseMs = new Map<string, number>();
-
-/**
- * The session's engine, keeping the parser's time of each pane conversion:
- * a pane reports how long its whole run took, which in workers includes the
- * wait behind the other conversions. Read in the pane's `onRender`, which
- * follows its conversion in the same task. A pane's text converted to
- * bitmark (an HTML or XML edit) gets toggle tags or classic marks as
- * Settings says (PLAN-035 D3): the package passes no `inlineStyle`.
- */
-export const sessionEngine = (engine: BitmarkEngine): BitmarkEngine =>
-  Object.assign(Object.create(engine) as BitmarkEngine, {
-    convertWithBitStarts: async (
-      input: string,
-      options: Parameters<BitmarkEngine['convertWithBitStarts']>[1],
-    ) => {
-      const opts =
-        options.outputFormat === 'bitmark' && options.inlineStyle === undefined
-          ? {
-              ...options,
-              ...inlineStyleOptions(inlineStyleOption(engine.version, uiState.toggleTags)),
-            }
-          : options;
-      const { value, ms } = await timeParse(() => engine.convertWithBitStarts(input, opts));
-      if (opts.outputFormat) paneParseMs.set(opts.outputFormat, ms);
-      return value;
-    },
-  });
-
 /** The playground's document: the bitmark the left editor shows. */
 const shownBitmark = (): string => bitmarkState[tabParser(bitmarkState.activeMarkupTab)].markup;
 
 /** The session for the whole playground. Mount once, inside `BitmarkParserProvider`. */
 export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactElement => {
-  const { engine, loadError } = useBitmarkParser();
+  const { engine, loadError, version } = useBitmarkParser();
   // Created once; the engine arrives after the first load stage.
   const deferred = useMemo(() => {
     let resolve!: (e: BitmarkEngine) => void;
@@ -100,13 +72,19 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
     return { promise, resolve, reject };
   }, []);
   useEffect(() => {
-    if (engine) deferred.resolve(sessionEngine(engine));
+    if (engine) deferred.resolve(engine);
     // The panes then show the load error, not an endless "loading".
     else if (loadError) deferred.reject(new Error('The bitmark parser failed to load.'));
   }, [engine, loadError, deferred]);
   const [initial] = useState(shownBitmark);
   // The guide line and the block highlight follow Settings (PLAN-033 D2).
-  const { syncLine, syncMatch } = useSnapshot(uiState);
+  const { syncLine, syncMatch, toggleTags } = useSnapshot(uiState);
+  // A pane's text converted to bitmark (a JSON, HTML or XML edit) gets toggle
+  // tags or classic marks as Settings says (PLAN-035 D3, PLAN-036 D5).
+  const bitmarkOptions = useMemo(
+    () => inlineStyleOptions(inlineStyleOption(version, toggleTags)),
+    [version, toggleTags],
+  );
 
   return (
     <BitmarkSession
@@ -122,6 +100,7 @@ export const PlaygroundSession = ({ children }: { children: ReactNode }): ReactE
       scrollGroup={playgroundScrollGroup()}
       syncLine={syncLine}
       syncMatch={syncMatch}
+      bitmarkOptions={bitmarkOptions}
       messages={MESSAGES}
     >
       <SessionSync />
@@ -142,7 +121,7 @@ const SessionSync = (): null => {
     // Session → playground: a pane edit runs the playground's own pipeline.
     const off = session.on('change', (e) => {
       const route = e.source && routes.get(e.source);
-      if (route) route(session.lastEdit?.content ?? '', e, latest.current);
+      if (route) route(e, latest.current);
     });
 
     // Playground → session.
@@ -212,17 +191,15 @@ interface TabSpec {
   scroll?: boolean;
 }
 
-/** A JSON edit goes through the playground's JSON pipeline. */
-const jsonRoute: PaneRoute = (json, _change, converter) => {
-  bitmarkState.setLastEdit('json', json, JSON_TAB_LABEL.json, 'session');
-  void converter.jsonToMarkup('wasm', json);
-};
-
-/** A markup-format edit (HTML, XML): its bitmark goes in as an edit of the left tab. */
-const markupRoute =
+/**
+ * An edit of a pane in another format (JSON, HTML, XML): its bitmark goes in
+ * as an edit of the left tab. The edit's own text stays the session's: the
+ * playground's record of the last edit is read only for its own editors'.
+ */
+const paneRoute =
   (inputFormat: string, label: string): PaneRoute =>
-  (text, change, converter) => {
-    bitmarkState.setLastEdit(inputFormat, text, label, 'session');
+  (change, converter) => {
+    bitmarkState.setLastEdit(inputFormat, '', label, 'session');
     void converter.markupToJson(tabParser(bitmarkState.activeMarkupTab), change.bitmark);
   };
 
@@ -236,11 +213,11 @@ const XML_LABEL: Record<XmlVariant, string> = {
 };
 
 const TABS: Record<SessionTab, TabSpec> = {
-  json: { type: 'json', label: JSON_TAB_LABEL.json, route: jsonRoute },
+  json: { type: 'json', label: JSON_TAB_LABEL.json, route: paneRoute('json', JSON_TAB_LABEL.json) },
   tableHtml: {
     type: 'html',
     label: JSON_TAB_LABEL.tableHtml,
-    route: markupRoute('html', 'HTML'),
+    route: paneRoute('html', 'HTML'),
     timed: 'tableHtml',
   },
   text: { type: 'text', label: JSON_TAB_LABEL.text, timed: 'text' },
@@ -248,14 +225,14 @@ const TABS: Record<SessionTab, TabSpec> = {
     type: 'xml',
     mapping: XML_MAPPING.xmlNiso,
     label: XML_LABEL.xmlNiso,
-    route: markupRoute(XML_MAPPING.xmlNiso, XML_LABEL.xmlNiso),
+    route: paneRoute(XML_MAPPING.xmlNiso, XML_LABEL.xmlNiso),
     timed: 'xmlNiso',
   },
   xmlNisoEs: {
     type: 'xml',
     mapping: XML_MAPPING.xmlNisoEs,
     label: XML_LABEL.xmlNisoEs,
-    route: markupRoute(XML_MAPPING.xmlNisoEs, XML_LABEL.xmlNisoEs),
+    route: paneRoute(XML_MAPPING.xmlNisoEs, XML_LABEL.xmlNisoEs),
     timed: 'xmlNisoEs',
   },
   info: { type: 'info', label: 'Info', scroll: false },
@@ -308,11 +285,10 @@ export const SessionPaneTab = ({
     const frame = requestAnimationFrame(() => setLaidOut(true));
     return () => cancelAnimationFrame(frame);
   }, [hidden]);
+  // The parser's own time, as the pane reports it (PLAN-036 D4).
   const onRender = useCallback(
-    ({ durationMs }: { durationMs: number }) => {
-      if (!spec.timed) return;
-      const parseMs = paneParseMs.get(spec.mapping ?? spec.type);
-      bitmarkState.setPaneDuration(spec.timed, (parseMs ?? durationMs) / 1000);
+    ({ parseMs }: { parseMs: number }) => {
+      if (spec.timed) bitmarkState.setPaneDuration(spec.timed, parseMs / 1000);
     },
     [spec],
   );

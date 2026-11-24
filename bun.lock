@@ -6,7 +6,7 @@
       "name": "@gmb/bitmark-playground",
       "dependencies": {
         "@emotion/react": "^11.11.1",
-        "@gmb/bitmark-editor": "^0.4.2",
+        "@gmb/bitmark-editor": "^0.5.0",
         "@types/lodash": "^4.17.16",
         "@types/node": "^20.8.7",
         "@types/react": "^18.2.31",
@@ -25,7 +25,7 @@
         "@eslint/js": "^9.28.0",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@gmb/bitmark-parser": "^7.20.0",
+        "@gmb/bitmark-parser": "^8",
         "@gmb/bitmark-parser-generator": "^5.26.0",
         "@ncoderz/awa": "^1.10.3",
         "@testing-library/jest-dom": "^6.9.1",
@@ -219,21 +219,21 @@
 
     "@exodus/bytes": ["@exodus/bytes@1.14.1", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ=="],
 
-    "@gmb/bitmark-editor": ["@gmb/bitmark-editor@0.4.2", "", { "peerDependencies": { "@gmb/bitmark-parser": ">=7.7.0 <8", "monaco-editor": ">=0.46.0 <1", "react": ">=18" }, "optionalPeers": ["@gmb/bitmark-parser", "monaco-editor", "react"] }, "sha512-SyOUYnILij8I2vZgjpDUEdCLO3C86mtGlvu2migUnjT6oR3VwP9g0xbQvEVkNeBUpb1l6xXGrzM9F/yjtv/GSA=="],
+    "@gmb/bitmark-editor": ["@gmb/bitmark-editor@0.5.0", "", { "peerDependencies": { "@gmb/bitmark-parser": ">=7.7.0 <9", "monaco-editor": ">=0.46.0 <1", "react": ">=18" }, "optionalPeers": ["@gmb/bitmark-parser", "monaco-editor", "react"] }, "sha512-C0DHOhnIix6ABbR6cB31x3aMKjG4aI+3jGpI/fxJtuWJs2O65Pf9XLWnH134jAjubeaN3TwzF2oMVHgRBZotkg=="],
 
-    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@7.20.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "7.20.0", "@gmb/bitmark-parser-darwin-x64": "7.20.0", "@gmb/bitmark-parser-linux-arm64": "7.20.0", "@gmb/bitmark-parser-linux-x64": "7.20.0", "@gmb/bitmark-parser-win32-x64": "7.20.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-LbGC25eZLlp4ACj14f9043Qt8PSPpcQNEpky9GL2WoYWVWBYXaanUrSQLjbHRSm+taCY0r4cgpmMSWEDYJLB2A=="],
+    "@gmb/bitmark-parser": ["@gmb/bitmark-parser@8.1.0", "", { "optionalDependencies": { "@gmb/bitmark-parser-darwin-arm64": "8.1.0", "@gmb/bitmark-parser-darwin-x64": "8.1.0", "@gmb/bitmark-parser-linux-arm64": "8.1.0", "@gmb/bitmark-parser-linux-x64": "8.1.0", "@gmb/bitmark-parser-win32-x64": "8.1.0" }, "bin": { "bitmark": "bin/bitmark" } }, "sha512-f/oEChngGMKNszjinhkPYGeeihKBfRtEjwxXeE8b81QMUpcYzKJMvnb27WGIzm0j5zh1zHi2PYSFPY2BWLB01g=="],
 
-    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@7.20.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-HArh2GoyuJ3MhYPvxf09w7kM4m/QTOU3YOmhZfwd+HjR/VANiXQMzspqkGBlYxDyJXXUcV5edEZJwxLxWMLUGA=="],
+    "@gmb/bitmark-parser-darwin-arm64": ["@gmb/bitmark-parser-darwin-arm64@8.1.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-VVWqWoRR35q0edLr3i+9QdbJaYC3zmDwbxjCoVpxD9OpL7N12OLiDCCeWioOjyjE6F8VZaWl5eEoP9KQE8zz3Q=="],
 
-    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@7.20.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-3qbLumXVa9hi+fB1YpXOQbIEVG5dHgQEddz1HVDzdx+cG7+sDbKpPnKIqIW48a+7KGTazATc6z0L3rZbblRg0Q=="],
+    "@gmb/bitmark-parser-darwin-x64": ["@gmb/bitmark-parser-darwin-x64@8.1.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-DG0cHEL/4QZ4yktSOceA8Yc7gdfX6iQMQ58BXRANapIFdIruGMz+6vfswWE+9brvQ8gj2NBd6JbJlHJNpeQOoQ=="],
 
     "@gmb/bitmark-parser-generator": ["@gmb/bitmark-parser-generator@5.26.0", "", { "dependencies": { "@ncoderz/superenum": "^1.0.0", "@types/fs-extra": "^11.0.4", "commander": "^14.0.3", "fs-extra": "^11.3.4" }, "bin": { "bitmark-parser": "bin/run" } }, "sha512-i1Mii1Di56LzK9R3T3qbljZU6iAt/etXdZtuaqcd2pAvAd+yCPrA7DF28OWlsg8O95espUQyVOox1g7Gs6t4ng=="],
 
-    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@7.20.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-KRuhjNRwDPKrRDMWHPBUMLjhjlHg8xqwtUhOuGhnPQvnk0TEX6mMJ2l0gjAb0uWoJ4kLyX0ua9INbseDU01PrA=="],
+    "@gmb/bitmark-parser-linux-arm64": ["@gmb/bitmark-parser-linux-arm64@8.1.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-z4v12JFVWabzZ9X4Czyaht9aHlm4sQ6QLPQXgKT+L5HmXFipCE4y9Qj+eIVcJKjHCJgEMLwfOm26r1ZD/knoBw=="],
 
-    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@7.20.0", "", { "os": "linux", "cpu": "x64" }, "sha512-EXazznWr4OqKiHLX+t0TJCIrwfiyDnxeZNWW7pE8WL9JGruRXD+Wy/ZTAFKHkm6T38YZAWTfy0KRAFhcZqjmfQ=="],
+    "@gmb/bitmark-parser-linux-x64": ["@gmb/bitmark-parser-linux-x64@8.1.0", "", { "os": "linux", "cpu": "x64" }, "sha512-XdYII29RM5jGv8fd6hlaSJfHFPj1/F0PcHcF8h/CdIWXLwmrtIjYc03MPaszEduQ8zdAbBzA3g/r9iwSdW8g6Q=="],
 
-    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@7.20.0", "", { "os": "win32", "cpu": "x64" }, "sha512-HwcFQzC12rsQBhGXzpWnyUhOBSob17DzIFenfO5bL6xHF2Q77z2Q4te5BAxanQzKepLMEVXCN9aiDz27UukGhQ=="],
+    "@gmb/bitmark-parser-win32-x64": ["@gmb/bitmark-parser-win32-x64@8.1.0", "", { "os": "win32", "cpu": "x64" }, "sha512-Ei6CbrYwI1m/Ar1J0A74TUS/e7gRqd4wtiLmcIpKkGInFDgRXBLRj57eo+O+LH7ubKpL8MPY/JFckQ//4dhdlA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

@@ -6,16 +6,20 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, Plugin } from 'vite';
 
 /**
- * Serve the parser build of the repository this playground is a submodule of
+ * Serve the parser build of a local bitmark-parser checkout
  * (`packages/bitmark-parser/dist/browser`) at `/local-engine`, so
  * `?engine=local` drives an UNRELEASED parser — the engine bundle, the wasm
  * binaries it fetches beside itself, and the published JSON Schema.
+ *
+ * The checkout is `BITMARK_PARSER_DIR`, or `../bitmark-parser` beside this
+ * repo when that is not set.
  *
  * Dev only. `main` always loads the published engine from the CDN; this is
  * how a parser change is tried out before it ships.
  */
 const localEngine = (): Plugin => {
-  const pkg = path.resolve(__dirname, '../../../packages/bitmark-parser');
+  const repo = process.env.BITMARK_PARSER_DIR ?? path.resolve(__dirname, '../bitmark-parser');
+  const pkg = path.resolve(repo, 'packages/bitmark-parser');
   const dist = path.join(pkg, 'dist/browser');
   const types: Record<string, string> = {
     '.js': 'text/javascript',

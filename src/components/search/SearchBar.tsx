@@ -1,24 +1,26 @@
 /** @jsxImportSource theme-ui */
+import {
+  activePaneId,
+  type PaneResult,
+  type SearchController,
+  type SearchOptions,
+  searchOptionShortcut,
+} from '@gmb/bitmark-editor';
 import { KeyboardEvent, useEffect, useRef } from 'react';
 import { Flex, Text } from 'theme-ui';
-import { useSnapshot } from 'valtio';
 
-import { getSearchController, searchState, useSearchShortcut } from '../../search';
-import { SearchOptions } from '../../search/findAll';
-import type { SearchController } from '../../search/searchController';
-import { activePaneId, PaneResult } from '../../search/searchState';
+import {
+  getSearchController,
+  searchState,
+  useSearchShortcut,
+  useSearchSnapshot,
+} from '../../search';
 
 const OPTION_BUTTONS: readonly { option: keyof SearchOptions; text: string; title: string }[] = [
   { option: 'matchCase', text: 'Aa', title: 'Match case (Alt+C)' },
   { option: 'wholeWord', text: 'ab', title: 'Match whole word (Alt+W)' },
   { option: 'regex', text: '.*', title: 'Use regular expression (Alt+R)' },
 ];
-
-const OPTION_KEYS: Record<string, keyof SearchOptions> = {
-  c: 'matchCase',
-  w: 'wholeWord',
-  r: 'regex',
-};
 
 const buttonSx = (on = false) =>
   ({
@@ -77,7 +79,7 @@ const isMac = () => typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(n
  */
 const SearchBar = (props: SearchBarProps) => {
   const controller = props.controller ?? getSearchController();
-  const snap = useSnapshot(searchState);
+  const snap = useSearchSnapshot();
   const input = useRef<HTMLInputElement>(null);
   const replaceInput = useRef<HTMLInputElement>(null);
   useSearchShortcut(controller, input);
@@ -104,10 +106,12 @@ const SearchBar = (props: SearchBarProps) => {
     controller.close();
   };
 
+  // Alt+C, Alt+W, Alt+R; on macOS Cmd+Option with the same keys (the package's).
   const toggleOption = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!e.altKey || !OPTION_KEYS[e.key.toLowerCase()]) return false;
+    const option = searchOptionShortcut(e.nativeEvent);
+    if (!option) return false;
     e.preventDefault();
-    searchState.toggleOption(OPTION_KEYS[e.key.toLowerCase()]);
+    searchState.toggleOption(option);
     return true;
   };
 
@@ -201,7 +205,7 @@ const SearchBar = (props: SearchBarProps) => {
         ))}
         <button
           type="button"
-          title="Previous match (Shift+Enter)"
+          title="Previous match (Shift+Enter, Shift+F3)"
           aria-label="Previous match"
           onClick={() => controller.step(-1)}
           sx={buttonSx()}
@@ -210,7 +214,7 @@ const SearchBar = (props: SearchBarProps) => {
         </button>
         <button
           type="button"
-          title="Next match (Enter)"
+          title="Next match (Enter, F3)"
           aria-label="Next match"
           onClick={() => controller.step(1)}
           sx={buttonSx()}

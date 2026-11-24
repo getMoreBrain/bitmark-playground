@@ -30,11 +30,7 @@ export const inlineStyleOption = (
   return toggleTags ? 'toggle' : undefined;
 };
 
-/**
- * `{ inlineStyle }` to spread into the parser's options, or nothing. The
- * dev dependency (parser 7) does not type `'legacy'` (parser 8).
- */
+/** `{ inlineStyle }` to spread into the parser's options, or nothing. */
 export const inlineStyleOptions = (
   style: InlineStyleOption | undefined,
-): Pick<ConvertOptions, 'inlineStyle'> =>
-  style === undefined ? {} : { inlineStyle: style as ConvertOptions['inlineStyle'] };
+): Pick<ConvertOptions, 'inlineStyle'> => (style === undefined ? {} : { inlineStyle: style });

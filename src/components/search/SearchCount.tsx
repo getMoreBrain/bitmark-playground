@@ -1,11 +1,11 @@
 /** @jsxImportSource theme-ui */
+import { activePaneId, countText, type SearchController, tabResultId } from '@gmb/bitmark-editor';
 import { MouseEvent } from 'react';
-import { useSnapshot } from 'valtio';
 
-import { getSearchController, searchState } from '../../search';
-import type { SearchController } from '../../search/searchController';
-import { activePaneId, countText, tabResultId } from '../../search/searchState';
-import type { SearchArea } from '../../search/searchTargets';
+import { getSearchController, SearchArea, useSearchFields } from '../../search';
+
+/** What a count reads of the search. */
+const COUNT_FIELDS = ['open', 'query', 'error', 'results', 'activeId'] as const;
 
 export interface SearchCountProps {
   /** The panel the tab is in. */
@@ -23,7 +23,7 @@ export interface SearchCountProps {
  * (a hidden tab is shown first) and goes to a match.
  */
 const SearchCount = ({ area, tab, shown, controller }: SearchCountProps) => {
-  const snap = useSnapshot(searchState);
+  const snap = useSearchFields(COUNT_FIELDS);
   if (!snap.open || !snap.query || snap.error) return null;
   const id = tabResultId(area, tab, shown);
   const result = snap.results.find((r) => r.id === id);

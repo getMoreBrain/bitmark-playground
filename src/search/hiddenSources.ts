@@ -1,3 +1,5 @@
+import type { HiddenSource, SearchTargets } from '@gmb/bitmark-editor';
+
 import {
   bitmarkState,
   jsonTabs,
@@ -8,19 +10,7 @@ import {
 } from '../state/bitmarkState';
 import { uiState } from '../state/uiState';
 import { bitmarkLabel, jsonTabLabel } from './labels';
-import type { SearchArea, SearchTargets } from './searchTargets';
-
-/** A top-pane tab that is not shown, searched as text (PLAN-024 D10). */
-export interface HiddenSource {
-  readonly id: string;
-  readonly label: string;
-  readonly area: 'left' | 'right';
-  /** Its place in its panel's tab bar (`tabOrder`). */
-  readonly order: number;
-  getText(): string;
-  /** Show the tab. */
-  activate(): void;
-}
+import type { SearchArea } from './searchTargets';
 
 type State = Pick<
   typeof bitmarkState,
